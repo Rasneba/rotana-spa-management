@@ -367,7 +367,7 @@ AND NOT EXISTS (SELECT 1 FROM company_modules cm WHERE cm.company_id = c.id AND 
 
 -- 19. Seed default admin user (password: admin123)
 INSERT INTO users (name, email, password, role, role_id, is_active, company_id)
-SELECT 'Admin', 'admin@rotanaspa.com', '$2b$10$8K1p/a0dL1LXMIgoEDFrwOfMQkfAjkMBcGmC1yGX0hJqYIwJkqK6e',
+SELECT 'Admin', 'admin@rotanaspa.com',   '$2b$10$nHqeLRVpq05EdFIK8wEj/O4QnnJ5yUKnLWXZRxyiEEikyOwOJvshe',
   'admin', r.id, true, c.id
 FROM companies c, roles r
 WHERE c.tin = 'TIN-ROTANA-001' AND r.name = 'admin'

@@ -27,16 +27,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Company account is not active" }, { status: 403 });
     }
 
-    // Verify license is active
-    const licenseRes = await pool.query(
-      "SELECT id, status, expiry_date FROM demo_licenses WHERE company_id = $1 AND status = 'active' AND expiry_date >= CURRENT_DATE ORDER BY expiry_date DESC LIMIT 1",
-      [company.id]
-    );
-
-    const hasActiveLicense = licenseRes.rows.length > 0;
-    // For enterprise/internal companies, bypass license check
-    if (!hasActiveLicense && company.tin !== 'TIN-000001') {
-      return NextResponse.json({ error: "No active license for this company" }, { status: 403 });
+    // Verify license is active (bypass for internal/enterprise companies)
+    if (!['TIN-000001', 'TIN-ROTANA-001'].includes(company.tin)) {
+      const licenseRes = await pool.query(
+        "SELECT id, status, expiry_date FROM demo_licenses WHERE company_id = $1 AND status = 'active' AND expiry_date >= CURRENT_DATE ORDER BY expiry_date DESC LIMIT 1",
+        [company.id]
+      );
+      if (licenseRes.rows.length === 0) {
+        return NextResponse.json({ error: "No active license for this company" }, { status: 403 });
+      }
     }
 
     // Look up user by email AND company_id
@@ -87,7 +86,7 @@ export async function POST(req: Request) {
         role: roleName,
         role_id: user.role_id,
         role_name: role?.name || null,
-        branch_id: user.branch_id,
+        branch_id: user.branch_id || null,
         company_id: company.id,
         company_name: company.name,
         company_tin: company.tin,
