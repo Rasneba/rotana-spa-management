@@ -3,18 +3,13 @@
 import { useEffect, useState } from "react";
 
 const ENTITY_TYPES = [
-  "customer", "member", "employee", "voucher",
-  "parking_session", "qr_ticket",
-  "invoice", "sales_order", "quotation",
-  "purchase_order", "purchase_return",
-  "stock_item", "product", "branch"
+  "customer", "member",
 ];
 
 const RESET_TYPES = ["never", "yearly", "monthly", "daily"];
 
 export default function IdDefinitionsPage() {
   const [defs, setDefs] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -37,14 +32,9 @@ export default function IdDefinitionsPage() {
     if (!token) return;
     setLoading(true);
     try {
-      const [defRes, branchRes] = await Promise.all([
-        fetch("/api/settings/id-definitions", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/branches", { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
+      const defRes = await fetch("/api/settings/id-definitions", { headers: { Authorization: `Bearer ${token}` } });
       const defData = await defRes.json();
-      const branchData = await branchRes.json();
       if (Array.isArray(defData)) setDefs(defData);
-      if (Array.isArray(branchData)) setBranches(branchData);
     } catch {}
     setLoading(false);
   };
@@ -176,13 +166,6 @@ export default function IdDefinitionsPage() {
                   </select>
                 </div>
                 <div className="col-md-4">
-                  <label className="form-label small fw-semibold">Branch (optional)</label>
-                  <select className="form-select" value={form.branch_id} onChange={e => setForm({...form, branch_id: e.target.value})}>
-                    <option value="">-- Company-wide --</option>
-                    {branches.map(b => <option key={b.id} value={b.id}>{b.name} ({b.code})</option>)}
-                  </select>
-                </div>
-                <div className="col-md-4">
                   <label className="form-label small fw-semibold">Pattern</label>
                   <input type="text" className="form-control" value={form.pattern} onChange={e => setForm({...form, pattern: e.target.value})} />
                   <small className="text-muted">
@@ -222,7 +205,6 @@ export default function IdDefinitionsPage() {
                     <th>Pad</th>
                     <th>Start</th>
                     <th>Reset</th>
-                    <th>Branch</th>
                     <th>Status</th>
                     <th className="text-end">Actions</th>
                   </tr>
@@ -236,7 +218,6 @@ export default function IdDefinitionsPage() {
                       <td>{d.pad_length}</td>
                       <td>{d.start_from}</td>
                       <td><span className="badge bg-info">{d.reset_type}</span></td>
-                      <td className="small">{d.branch_name ? `${d.branch_name} (${d.branch_code})` : <span className="text-muted">All</span>}</td>
                       <td>
                         <span className={`badge ${d.is_active ? "bg-success" : "bg-secondary"}`}>
                           {d.is_active ? "Active" : "Inactive"}

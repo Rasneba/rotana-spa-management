@@ -5,23 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const modules = [
-  { name: "Sales", moduleCode: "sales", icon: "bi-cart3", href: "/dashboard/sales", color: "#3b82f6", desc: "Orders, invoices, customers, quotations" },
-  { name: "Stock", moduleCode: "stock", icon: "bi-box-seam", href: "/dashboard/stock", color: "#10b981", desc: "Inventory, warehouses, stock movements" },
-  { name: "Finance", moduleCode: "finance", icon: "bi-cash-stack", href: "/dashboard/finance", color: "#f59e0b", desc: "Ledgers, payments, accounts, budget" },
-  { name: "Production", moduleCode: "production", icon: "bi-gear", href: "/dashboard/production", color: "#8b5cf6", desc: "Manufacturing, BOM, work orders" },
-  { name: "HRMS", moduleCode: "hrms", icon: "bi-people", href: "/dashboard/employees", color: "#ef4444", desc: "Employees, payroll, attendance, leave" },
-  { name: "Procurement", moduleCode: "procurement", icon: "bi-truck", href: "/dashboard/procurement", color: "#06b6d4", desc: "Purchase orders, suppliers, RFQ" },
-  { name: "E-Commerce", moduleCode: "ecommerce", icon: "bi-shop", href: "/dashboard/ecommerce", color: "#ec4899", desc: "Online store, products, orders" },
   { name: "Membership", moduleCode: "membership", icon: "bi-person-badge", href: "/dashboard/membership", color: "#6366f1", desc: "Plans, members, renewals, payments" },
   { name: "Audit", icon: "bi-journal-text", href: "/dashboard/audit-logs", color: "#14b8a6", desc: "Audit trails, activity logs" },
-  { name: "Reports", icon: "bi-bar-chart", href: "/dashboard/reports", color: "#f97316", desc: "Analytics, charts, exports" },
 ];
 
 const quickActions = [
-  { label: "New Employee", icon: "bi-person-plus", href: "/dashboard/employees/add", color: "primary" },
-  { label: "New Sale", icon: "bi-cart-plus", href: "/dashboard/sales/new", color: "success" },
-  { label: "New Purchase", icon: "bi-truck-flatbed", href: "/dashboard/procurement/new", color: "info" },
-  { label: "New Voucher", icon: "bi-file-earmark-plus", href: "/dashboard/vouchers/add", color: "warning" },
+  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/membership/members", color: "primary" },
+  { label: "New Plan", icon: "bi-layers", href: "/dashboard/membership/plans", color: "success" },
+  { label: "Record Payment", icon: "bi-credit-card", href: "/dashboard/membership/payments", color: "info" },
+  { label: "Check In", icon: "bi-box-arrow-in-right", href: "/dashboard/membership/attendance", color: "warning" },
 ];
 
 export default function Dashboard() {
@@ -83,31 +75,28 @@ export default function Dashboard() {
   const hasLicense = (code: string) => isSuper || licensedModules.includes(code);
 
   const visibleModules = modules.filter(m => {
-    if (!m.moduleCode) return hasLicense("reports") || hasLicense("audit");
+    if (!m.moduleCode) return hasLicense("audit");
     return hasLicense(m.moduleCode);
   });
 
   const visibleQuickActions = quickActions.filter(a => {
-    if (a.href.includes("/employees")) return hasLicense("hrms");
-    if (a.href.includes("/sales")) return hasLicense("sales");
-    if (a.href.includes("/procurement")) return hasLicense("procurement");
-    if (a.href.includes("/vouchers")) return hasLicense("finance");
+    if (a.href.includes("/membership")) return hasLicense("membership");
     return false;
   });
 
-  const hrCards = hasLicense("hrms") ? [
-    { title: "Employees", value: stats.totalEmployees, color: "text-primary", icon: "bi-people", href: "/dashboard/employees" },
-    { title: "Present Today", value: stats.presentToday, color: "text-success", icon: "bi-calendar-check", href: "/dashboard/attendance" },
-    { title: "Pending Leave", value: stats.pendingLeave, color: "text-warning", icon: "bi-calendar-event", href: "/dashboard/leave" },
-    { title: "Payroll", value: `${currency} ${stats.totalPayroll?.toLocaleString()}`, color: "text-info", icon: "bi-wallet2", href: "/dashboard/payroll" },
-  ] : [];
+  const spaCards = [
+    { title: "Total Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/membership/members" },
+    { title: "Active Members", value: stats.activeMembers || stats.activeCustomers, color: "text-success", icon: "bi-person-check", href: "/dashboard/membership/members" },
+    { title: "Today Check-ins", value: stats.todayCheckIns || 0, color: "text-warning", icon: "bi-box-arrow-in-right", href: "/dashboard/membership/attendance" },
+    { title: "Revenue", value: `${currency} ${(stats.totalRevenue || 0)?.toLocaleString()}`, color: "text-info", icon: "bi-cash-stack", href: "/dashboard/membership/payments" },
+  ];
 
   return (
     <div className="page-enter">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h3 className="fw-bold mb-1">{greeting}</h3>
-          <p className="text-muted mb-0 small">Welcome to {companyName || "Genius ERP"}</p>
+          <p className="text-muted mb-0 small">Welcome to {companyName || "Rotana Spa"}</p>
         </div>
         <div className="d-flex gap-2">
           {visibleQuickActions.map((a) => (
@@ -120,7 +109,7 @@ export default function Dashboard() {
 
       {visibleModules.length > 0 && (
         <>
-          <h5 className="fw-semibold mb-3"><i className="bi bi-grid me-2"></i>ERP Modules</h5>
+          <h5 className="fw-semibold mb-3"><i className="bi bi-grid me-2"></i>Modules</h5>
           <div className="row g-3 mb-4">
             {visibleModules.map((mod) => (
               <div className="col-md-4 col-lg-3" key={mod.name}>
@@ -146,34 +135,32 @@ export default function Dashboard() {
         </>
       )}
 
-      {hrCards.length > 0 && (
-        <>
-          <h5 className="fw-semibold mb-3"><i className="bi bi-speedometer2 me-2"></i>HR Quick Stats</h5>
-          <div className="row g-3 mb-4">
-            {hrCards.map((item) => (
-              <div className="col-md-3" key={item.title}>
-                <Link href={item.href} className="text-decoration-none">
-                  <div className="card interactive-card border-0 shadow-sm p-3 rounded-3 h-100">
-                    <div className="d-flex align-items-center gap-3">
-                      <i className={`bi ${item.icon} fs-2 ${item.color}`}></i>
-                      <div>
-                        <div className="text-muted small text-uppercase fw-bold">{item.title}</div>
-                        <div className={`fs-4 fw-bold counter-value ${item.color}`}>{item.value}</div>
-                      </div>
+      <>
+        <h5 className="fw-semibold mb-3"><i className="bi bi-speedometer2 me-2"></i>Spa Quick Stats</h5>
+        <div className="row g-3 mb-4">
+          {spaCards.map((item) => (
+            <div className="col-md-3" key={item.title}>
+              <Link href={item.href} className="text-decoration-none">
+                <div className="card interactive-card border-0 shadow-sm p-3 rounded-3 h-100">
+                  <div className="d-flex align-items-center gap-3">
+                    <i className={`bi ${item.icon} fs-2 ${item.color}`}></i>
+                    <div>
+                      <div className="text-muted small text-uppercase fw-bold">{item.title}</div>
+                      <div className={`fs-4 fw-bold counter-value ${item.color}`}>{item.value}</div>
                     </div>
                   </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </>
 
-      {hasLicense("hrms") && (
+      {stats.recentMembers?.length > 0 && (
         <div className="card border-0 shadow-sm">
           <div className="card-header fw-semibold d-flex justify-content-between align-items-center" style={{ backgroundColor: "var(--card-bg)", borderBottom: "1px solid var(--card-border)" }}>
-            <span>Recent Employees</span>
-            <Link href="/dashboard/employees" className="btn btn-sm btn-outline-primary">View All</Link>
+            <span>Recent Members</span>
+            <Link href="/dashboard/membership/members" className="btn btn-sm btn-outline-primary">View All</Link>
           </div>
           <div className="card-body p-0">
             <table className="table table-hover mb-0">
@@ -181,31 +168,27 @@ export default function Dashboard() {
                 <tr>
                   <th>Code</th>
                   <th>Name</th>
-                  <th>Department</th>
+                  <th>Plan</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {stats.recentEmployees?.length > 0 ? (
-                  stats.recentEmployees.map((emp: any) => (
-                    <tr key={emp.id}>
-                      <td>{emp.code}</td>
-                      <td>{emp.first_name} {emp.last_name}</td>
-                      <td>{emp.department_name || "-"}</td>
-                      <td>
-                        {emp.is_active ? (
-                          <span className="badge bg-success">Active</span>
-                        ) : (
-                          <span className="badge bg-danger">Inactive</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="text-center text-muted py-3">No employees yet</td>
+                {stats.recentMembers.map((m: any) => (
+                  <tr key={m.id}>
+                    <td>{m.code}</td>
+                    <td>{m.first_name} {m.last_name}</td>
+                    <td>{m.plan_name || "-"}</td>
+                    <td>
+                      {m.status === "active" ? (
+                        <span className="badge bg-success">Active</span>
+                      ) : m.status === "expired" ? (
+                        <span className="badge bg-danger">Expired</span>
+                      ) : (
+                        <span className="badge bg-secondary">{m.status}</span>
+                      )}
+                    </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
           </div>
@@ -213,8 +196,8 @@ export default function Dashboard() {
       )}
 
       <div className="text-center text-muted small mt-4">
-        <i className="bi bi-building me-1"></i>{companyName || "Genius ERP"} &middot;
-        <i className="bi bi-laptop ms-2 me-1"></i>Genius ERP ICT Solutions PLC
+        <i className="bi bi-building me-1"></i>{companyName || "Rotana Spa"} &middot;
+        <i className="bi bi-laptop ms-2 me-1"></i>Rotana Spa Management System
       </div>
     </div>
   );

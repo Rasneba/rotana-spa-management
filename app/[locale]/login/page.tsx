@@ -28,7 +28,7 @@ export default function LoginPortal() {
           <div className="bg-primary text-white d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style={{ width: "60px", height: "60px" }}>
             <i className="bi bi-grid-fill fs-3"></i>
           </div>
-          <h3 className="fw-bold">Genius ERP ICT Solutions PLC</h3>
+          <h3 className="fw-bold">Rotana Spa</h3>
           <p className="text-muted small">Select your login type</p>
         </div>
 
@@ -78,7 +78,7 @@ export default function LoginPortal() {
 
         <div className="text-center mt-4">
           <small className="text-muted">
-            Demo super admin: admin@genius.com / 123456<br />
+            Demo super admin: admin@rotana.com / 123456<br />
             Demo company admin: TIN-000001 / admin@gmail.com / 123456
           </small>
         </div>

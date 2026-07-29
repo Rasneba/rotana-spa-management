@@ -14,13 +14,12 @@ const typeIcon = (t: string) => {
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("");
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const [form, setForm] = useState({ employee_id: "", title: "", message: "", type: "info" });
+  const [form, setForm] = useState({ title: "", message: "", type: "info" });
 
   const loadData = async () => {
     const tok = localStorage.getItem("token");
@@ -28,14 +27,9 @@ export default function NotificationsPage() {
     setLoading(true);
     try {
       const url = filter ? `/api/notifications?is_read=${filter}` : "/api/notifications";
-      const [nRes, eRes] = await Promise.all([
-        fetch(url, { headers: { Authorization: `Bearer ${tok}` } }),
-        fetch("/api/employees", { headers: { Authorization: `Bearer ${tok}` } }),
-      ]);
+      const nRes = await fetch(url, { headers: { Authorization: `Bearer ${tok}` } });
       const nData = await nRes.json();
-      const eData = await eRes.json();
       if (Array.isArray(nData)) setNotifications(nData);
-      if (Array.isArray(eData)) setEmployees(eData);
     } catch (err) { console.error(err); }
     setLoading(false);
   };
@@ -60,7 +54,6 @@ export default function NotificationsPage() {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        employee_id: parseInt(form.employee_id) || null,
         title: form.title,
         message: form.message,
         type: form.type,
@@ -68,7 +61,7 @@ export default function NotificationsPage() {
     });
     if (res.ok) {
       setShowForm(false);
-      setForm({ employee_id: "", title: "", message: "", type: "info" });
+      setForm({ title: "", message: "", type: "info" });
       loadData();
     } else {
       const data = await res.json();
@@ -99,15 +92,6 @@ export default function NotificationsPage() {
           <div className="card-body">
             <form onSubmit={submit}>
               <div className="row g-3">
-                <div className="col-md-4">
-                  <label className="form-label small fw-semibold">Employee</label>
-                  <select name="employee_id" className="form-control" value={form.employee_id} onChange={handleChange}>
-                    <option value="">All Employees</option>
-                    {employees.map((e: any) => (
-                      <option key={e.id} value={e.id}>{e.first_name} {e.last_name} ({e.code})</option>
-                    ))}
-                  </select>
-                </div>
                 <div className="col-md-4">
                   <label className="form-label small fw-semibold">Type *</label>
                   <select name="type" className="form-control" value={form.type} onChange={handleChange} required>

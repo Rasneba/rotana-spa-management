@@ -1,5 +1,5 @@
 {
-    "name": "genius-hrms",
+    "name": "rotana-spa-management",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -8,7 +8,6 @@
         "start": "next start",
         "lint": "eslint",
         "relay": "node scripts/local-relay.mjs",
-        "start:all": "start cmd /c \"npm run dev\" & powershell -Command \"Start-Sleep 5; node scripts/local-relay.mjs\"",
         "clean": "rmdir /s /q .next 2>nul & echo Cache cleared. Restart with: npm run dev",
         "clean:full": "rmdir /s /q .next 2>nul & rmdir /s /q node_modules 2>nul & npm install"
     },

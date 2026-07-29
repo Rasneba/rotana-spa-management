@@ -11,16 +11,11 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const is_read = url.searchParams.get("is_read");
     try {
-      let query = `
-        SELECT n.*, e.first_name || ' ' || e.last_name as employee_name
-        FROM notifications n
-        LEFT JOIN employees e ON n.employee_id = e.id
-        WHERE 1=1
-      `;
+      let query = `SELECT n.* FROM notifications n WHERE 1=1`;
       const params: any[] = [];
       let idx = 1;
       if (!isAdmin) {
-        query += ` AND e.company_id = $${idx}`;
+        query += ` AND n.company_id = $${idx}`;
         params.push(user.company_id);
         idx++;
       }

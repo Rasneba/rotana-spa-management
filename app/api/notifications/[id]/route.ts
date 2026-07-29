@@ -10,10 +10,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     try {
       const result = await pool.query(
-        `SELECT n.*, e.first_name || ' ' || e.last_name as employee_name
-         FROM notifications n
-         LEFT JOIN employees e ON n.employee_id = e.id
-         WHERE n.id = $1`,
+        `SELECT n.* FROM notifications n WHERE n.id = $1`,
         [id]
       );
       if (result.rows.length === 0) return notFound("Notification not found");

@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 
 const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "genius-hrms-secret-key-2026"
+  process.env.JWT_SECRET || "rotana-spa-secret-key-2026"
 );
 
 export async function createToken(payload: { id: number; email: string; role: string; company_id?: number; company_name?: string; company_tin?: string }) {

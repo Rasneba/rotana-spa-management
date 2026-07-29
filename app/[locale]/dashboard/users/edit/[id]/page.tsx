@@ -7,7 +7,6 @@ export default function EditUserPage() {
   const { id } = useParams();
   const router = useRouter();
   const [roles, setRoles] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSuper, setIsSuper] = useState(false);
@@ -23,20 +22,17 @@ export default function EditUserPage() {
       const u = stored ? JSON.parse(stored) : null;
       setIsSuper(u?.role === "super_admin");
       try {
-        const [userRes, rolesRes, branchesRes, companiesRes] = await Promise.all([
+        const [userRes, rolesRes, companiesRes] = await Promise.all([
           fetch(`/api/users/${id}`, { headers: { Authorization: `Bearer ${tok}` } }),
           fetch("/api/roles", { headers: { Authorization: `Bearer ${tok}` } }),
-          fetch("/api/branches", { headers: { Authorization: `Bearer ${tok}` } }),
           fetch("/api/companies", { headers: { Authorization: `Bearer ${tok}` } }),
         ]);
-        const u = await userRes.json();
-        const r = await rolesRes.json();
-        const b = await branchesRes.json();
-        const c = await companiesRes.json();
-        if (u && !u.error) setForm({ ...u, password: "", confirm_password: "" });
-        if (Array.isArray(r)) setRoles(r);
-        if (Array.isArray(b)) setBranches(b);
-        if (Array.isArray(c)) setCompanies(c);
+        const uData = await userRes.json();
+        const rData = await rolesRes.json();
+        const cData = await companiesRes.json();
+        if (uData && !uData.error) setForm({ ...uData, password: "", confirm_password: "" });
+        if (Array.isArray(rData)) setRoles(rData);
+        if (Array.isArray(cData)) setCompanies(cData);
       } catch (err) { console.error(err); }
       setLoading(false);
     };
@@ -58,7 +54,6 @@ export default function EditUserPage() {
       const body: any = { ...form };
       if (!body.password) { delete body.password; delete body.confirm_password; }
       body.role_id = body.role_id ? parseInt(body.role_id) : null;
-      body.branch_id = body.branch_id ? parseInt(body.branch_id) : null;
       body.company_id = body.company_id ? parseInt(body.company_id) : null;
       const res = await fetch(`/api/users/${id}`, {
         method: "PUT",
@@ -125,13 +120,6 @@ export default function EditUserPage() {
                 <input name="phone" className="form-control" value={form.phone || ""} onChange={handleChange} />
               </div>
               <div className="col-md-4">
-                <label className="form-label small fw-semibold">Branch</label>
-                <select name="branch_id" className="form-control" value={form.branch_id || ""} onChange={handleChange}>
-                  <option value="">Select Branch</option>
-                  {branches.map((b: any) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
               </div>
               <div className="col-md-4">
                 <div className="form-check form-switch mt-4">

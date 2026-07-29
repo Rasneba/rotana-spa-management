@@ -11,20 +11,20 @@ export default function MembershipDashboard() {
   const load = async () => {
     if (!token) return;
     try {
-      const [plansRes, customersRes, paymentsRes] = await Promise.all([
+      const [plansRes, membersRes, paymentsRes] = await Promise.all([
         fetch("/api/membership/plans", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/membership/parking/customers", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/membership/members", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/membership/payments", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const plans = await plansRes.json();
-      const customers = await customersRes.json();
+      const members = await membersRes.json();
       const payments = await paymentsRes.json();
-      const active = Array.isArray(customers) ? customers.filter((c: any) => c.status === "active") : [];
+      const activeMembers = Array.isArray(members) ? members.filter((m: any) => m.status === "active") : [];
       const totalRevenue = Array.isArray(payments) ? payments.reduce((s: number, p: any) => s + Number(p.amount), 0) : 0;
       setStats({
         totalPlans: Array.isArray(plans) ? plans.length : 0,
-        totalCustomers: Array.isArray(customers) ? customers.length : 0,
-        activeCustomers: active.length,
+        totalMembers: Array.isArray(members) ? members.length : 0,
+        activeMembers: activeMembers.length,
         totalRevenue,
         recentPayments: Array.isArray(payments) ? payments.slice(0, 5) : [],
       });
@@ -37,7 +37,7 @@ export default function MembershipDashboard() {
     <GemPage>
       <GemHeader
         title="Membership Dashboard"
-        subtitle="Manage gym, parking, club memberships"
+        subtitle="Manage spa, gym & cafe memberships"
         actions={
           <>
             <Link href="/dashboard/membership/attendance" className="text-inherit"><GemBtnOutline><Building size={16} />Attendance</GemBtnOutline></Link>
@@ -54,8 +54,8 @@ export default function MembershipDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
               { label: "Total Plans", value: stats.totalPlans, icon: <Layers size={22} />, color: "bg-black", href: "/dashboard/membership/plans" },
-              { label: "Total Customers", value: stats.totalCustomers, icon: <Users size={22} />, color: "bg-emerald-600", href: "/dashboard/membership/parking/customers" },
-              { label: "Active Customers", value: stats.activeCustomers, icon: <CheckCircle size={22} />, color: "bg-blue-500", href: "/dashboard/membership/parking/customers" },
+              { label: "Total Members", value: stats.totalMembers, icon: <Users size={22} />, color: "bg-emerald-600", href: "/dashboard/membership/members" },
+              { label: "Active Members", value: stats.activeMembers, icon: <CheckCircle size={22} />, color: "bg-blue-500", href: "/dashboard/membership/members" },
               { label: "Revenue", value: `ETB ${stats.totalRevenue.toLocaleString()}`, icon: <DollarSign size={22} />, color: "bg-amber-500", href: "/dashboard/membership/payments" },
             ].map(card => (
               <Link key={card.label} href={card.href} className="text-inherit">

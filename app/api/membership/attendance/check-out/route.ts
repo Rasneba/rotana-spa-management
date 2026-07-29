@@ -1,25 +1,14 @@
 import pool from "@/lib/db";
 import { withAuth, ok, err, badRequest } from "@/lib/api-utils";
-import { lookupCard } from "@/lib/rfid";
 
 export async function POST(req: Request) {
   return withAuth(req, async (user) => {
     try {
       const body = await req.json();
-      const { card_uid, member_id, checkin_id } = body;
+      const { member_id, checkin_id } = body;
 
-      let targetMemberId = member_id;
-
-      if (card_uid) {
-        const result = await lookupCard(card_uid, user);
-        if (!result.found || !result.member) {
-          return ok({ checked_out: false, reason: "Card not found or not assigned" });
-        }
-        targetMemberId = result.member.id;
-      }
-
-      if (!targetMemberId && !checkin_id) {
-        return badRequest("Provide member_id, card_uid, or checkin_id");
+      if (!member_id && !checkin_id) {
+        return badRequest("Provide member_id or checkin_id");
       }
 
       let whereClause = "";
@@ -29,7 +18,7 @@ export async function POST(req: Request) {
         params = [checkin_id, user.company_id];
       } else {
         whereClause = "member_id = $1 AND status = 'checked_in' AND company_id = $2";
-        params = [targetMemberId, user.company_id];
+        params = [member_id, user.company_id];
       }
 
       const result = await pool.query(

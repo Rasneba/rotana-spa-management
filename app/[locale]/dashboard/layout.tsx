@@ -12,110 +12,7 @@ const sidebarGroups: any[] = [
     icon: "bi-speedometer2",
     adminOnly: false,
     links: [
-      { name: "Dashboard", href: "/dashboard", icon: "bi-speedometer2", adminOnly: false, resource: "employees" },
-    ]
-  },
-  {
-    name: "Sales",
-    moduleCode: "sales",
-    icon: "bi-cart3",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/sales", icon: "bi-cart3", adminOnly: false, resource: "sales_orders" },
-      { name: "Customers", href: "/dashboard/sales/customers", icon: "bi-people", adminOnly: false, resource: "sales_customers" },
-      { name: "Quotations", href: "/dashboard/sales/quotations", icon: "bi-file-text", adminOnly: false, resource: "sales_quotations" },
-      { name: "Sales Orders", href: "/dashboard/sales/orders", icon: "bi-receipt", adminOnly: false, resource: "sales_orders" },
-      { name: "Invoices", href: "/dashboard/sales/invoices", icon: "bi-file-earmark-text", adminOnly: false, resource: "sales_invoices" },
-      { name: "POS", href: "/dashboard/sales/pos", icon: "bi-display", adminOnly: false, resource: "sales_pos" },
-    ]
-  },
-  {
-    name: "Stock",
-    moduleCode: "stock",
-    icon: "bi-box-seam",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/stock", icon: "bi-box-seam", adminOnly: false, resource: "items" },
-      { name: "Inventory", href: "/dashboard/stock/inventory", icon: "bi-archive", adminOnly: false, resource: "items" },
-      { name: "Warehouses", href: "/dashboard/stock/warehouses", icon: "bi-building", adminOnly: false, resource: "warehouses" },
-      { name: "Stock Movements", href: "/dashboard/stock/movements", icon: "bi-arrow-left-right", adminOnly: false, resource: "stock_movements" },
-      { name: "Adjustments", href: "/dashboard/stock/adjustments", icon: "bi-sliders", adminOnly: false, resource: "stock_adjustments" },
-      { name: "Transfers", href: "/dashboard/stock/transfers", icon: "bi-truck", adminOnly: false, resource: "stock_transfers" },
-    ]
-  },
-  {
-    name: "Finance",
-    moduleCode: "finance",
-    icon: "bi-cash-stack",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/finance", icon: "bi-cash-stack", adminOnly: false, resource: "finance_accounts" },
-      { name: "Chart of Accounts", href: "/dashboard/finance/accounts", icon: "bi-book", adminOnly: false, resource: "finance_accounts" },
-      { name: "Journal Entries", href: "/dashboard/finance/journal", icon: "bi-journal-text", adminOnly: false, resource: "finance_journal" },
-      { name: "Ledger", href: "/dashboard/finance/ledger", icon: "bi-table", adminOnly: false, resource: "finance_ledger" },
-      { name: "Payments", href: "/dashboard/finance/payments", icon: "bi-credit-card", adminOnly: false, resource: "finance_payments" },
-      { name: "Budget", href: "/dashboard/finance/budget", icon: "bi-pie-chart", adminOnly: false, resource: "finance_budget" },
-      { name: "Vouchers", href: "/dashboard/vouchers", icon: "bi-file-earmark-text", adminOnly: false, resource: "vouchers" },
-    ]
-  },
-  {
-    name: "Production",
-    moduleCode: "production",
-    icon: "bi-gear",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/production", icon: "bi-gear", adminOnly: false, resource: "work_orders" },
-      { name: "Bill of Materials", href: "/dashboard/production/bom", icon: "bi-list-ul", adminOnly: false, resource: "bom" },
-      { name: "Work Orders", href: "/dashboard/production/work-orders", icon: "bi-clipboard-check", adminOnly: false, resource: "work_orders" },
-      { name: "Routings", href: "/dashboard/production/routings", icon: "bi-diagram-2", adminOnly: false, resource: "routings" },
-    ]
-  },
-  {
-    name: "HRMS",
-    moduleCode: "hrms",
-    icon: "bi-people",
-    adminOnly: false,
-    links: [
-      { name: "Employees", href: "/dashboard/employees", icon: "bi-people", adminOnly: false, resource: "employees" },
-      { name: "Departments", href: "/dashboard/departments", icon: "bi-building", adminOnly: false, resource: "departments" },
-      { name: "Positions", href: "/dashboard/positions", icon: "bi-briefcase", adminOnly: false, resource: "positions" },
-      { name: "Branches", href: "/dashboard/branches", icon: "bi-diagram-3", adminOnly: false, resource: "branches" },
-      { name: "Placements", href: "/dashboard/placements", icon: "bi-box-seam", adminOnly: false, resource: "placements" },
-      { name: "Attendance", href: "/dashboard/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "attendance" },
-      { name: "Shifts", href: "/dashboard/shifts", icon: "bi-clock", adminOnly: false, resource: "shifts" },
-      { name: "Overtime", href: "/dashboard/overtime", icon: "bi-clock-history", adminOnly: false, resource: "overtime" },
-      { name: "Leave", href: "/dashboard/leave", icon: "bi-calendar-event", adminOnly: false, resource: "leave" },
-      { name: "Termination", href: "/dashboard/termination", icon: "bi-person-x", adminOnly: false, resource: "termination" },
-      { name: "Clearance", href: "/dashboard/clearance", icon: "bi-door-open", adminOnly: false, resource: "clearance" },
-      { name: "Performance", href: "/dashboard/performance", icon: "bi-star", adminOnly: false, resource: "performance" },
-      { name: "Payroll", href: "/dashboard/payroll", icon: "bi-wallet2", adminOnly: false, resource: "payroll" },
-      { name: "Reports", href: "/dashboard/reports", icon: "bi-bar-chart", adminOnly: false, resource: "reports" },
-      { name: "Documents", href: "/dashboard/documents", icon: "bi-file-text", adminOnly: false, resource: "documents" },
-    ]
-  },
-  {
-    name: "Procurement",
-    moduleCode: "procurement",
-    icon: "bi-truck",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/procurement", icon: "bi-truck", adminOnly: false, resource: "purchase_orders" },
-      { name: "Suppliers", href: "/dashboard/procurement/suppliers", icon: "bi-building", adminOnly: false, resource: "suppliers" },
-      { name: "Purchase Orders", href: "/dashboard/procurement/purchase-orders", icon: "bi-file-earmark-text", adminOnly: false, resource: "purchase_orders" },
-      { name: "RFQ", href: "/dashboard/procurement/rfq", icon: "bi-envelope-open", adminOnly: false, resource: "rfq" },
-      { name: "Purchase Returns", href: "/dashboard/procurement/returns", icon: "bi-arrow-return-left", adminOnly: false, resource: "purchase_orders" },
-    ]
-  },
-  {
-    name: "E-Commerce",
-    moduleCode: "ecommerce",
-    icon: "bi-shop",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/ecommerce", icon: "bi-shop", adminOnly: false, resource: "sales_orders" },
-      { name: "Products", href: "/dashboard/ecommerce/products", icon: "bi-box", adminOnly: false, resource: "items" },
-      { name: "Online Orders", href: "/dashboard/ecommerce/orders", icon: "bi-receipt", adminOnly: false, resource: "sales_orders" },
-      { name: "Customers", href: "/dashboard/ecommerce/customers", icon: "bi-people", adminOnly: false, resource: "sales_customers" },
+      { name: "Dashboard", href: "/dashboard", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
     ]
   },
   {
@@ -127,24 +24,7 @@ const sidebarGroups: any[] = [
       { name: "Dashboard", href: "/dashboard/membership", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
       { name: "Plans", href: "/dashboard/membership/plans", icon: "bi-layers", adminOnly: false, resource: "membership_plans" },
       { name: "Payments", href: "/dashboard/membership/payments", icon: "bi-credit-card", adminOnly: false, resource: "membership_payments" },
-      { separator: true, label: "Parking" },
-      { name: "Parking Dashboard", href: "/dashboard/membership/parking", icon: "bi-car-front", adminOnly: false, resource: "parking_zones" },
-      { name: "Zones & Lots", href: "/dashboard/membership/parking/zones", icon: "bi-map", adminOnly: false, resource: "parking_zones" },
-      { name: "Slots", href: "/dashboard/membership/parking/slots", icon: "bi-grid-3x3-gap", adminOnly: false, resource: "parking_slots" },
-      { name: "Gates", href: "/dashboard/membership/parking/gates", icon: "bi-door-open", adminOnly: false, resource: "parking_gates" },
-      { name: "Cameras", href: "/dashboard/membership/parking/cameras", icon: "bi-camera-video", adminOnly: false, resource: "parking_cameras" },
-      { name: "Customers", href: "/dashboard/membership/parking/customers", icon: "bi-person-badge", adminOnly: false, resource: "parking_customers" },
-      { name: "Vehicles", href: "/dashboard/membership/parking/vehicles", icon: "bi-truck", adminOnly: false, resource: "parking_vehicles" },
-      { name: "RFID Cards", href: "/dashboard/membership/parking/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "parking_rfid_cards" },
-      { name: "Access Control", href: "/dashboard/membership/parking/access", icon: "bi-shield-check", adminOnly: false, resource: "parking_gates" },
-      { name: "QR Access", href: "/dashboard/membership/parking/qr-access", icon: "bi-qr-code-scan", adminOnly: false, resource: "parking_gates" },
-      { name: "Subscriptions", href: "/dashboard/membership/parking/subscriptions", icon: "bi-calendar-check", adminOnly: false, resource: "parking_subscriptions" },
-      { name: "Sessions", href: "/dashboard/membership/parking/sessions", icon: "bi-clock-history", adminOnly: false, resource: "parking_sessions" },
-      { name: "Rates", href: "/dashboard/membership/parking/rates", icon: "bi-cash-coin", adminOnly: false, resource: "parking_rates" },
-      { name: "QR Tickets", href: "/dashboard/membership/parking/qr-tickets", icon: "bi-qr-code", adminOnly: false, resource: "parking_qr_tickets" },
-      { name: "Kiosk", href: "/dashboard/membership/parking/kiosk", icon: "bi-pc-display", adminOnly: false, resource: "parking_sessions" },
-      { name: "POS", href: "/dashboard/membership/parking/pos", icon: "bi-display", adminOnly: false, resource: "parking_payments" },
-      { name: "Reports", href: "/dashboard/membership/parking/reports", icon: "bi-bar-chart", adminOnly: false, resource: "parking_reports" },
+      { name: "Attendance", href: "/dashboard/membership/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "membership_attendance" },
     ]
   },
   {
@@ -393,7 +273,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <i className="bi bi-grid-fill text-white" style={{ fontSize: "16px" }}></i>
           </div>
-          <span className="fw-bold gradient-text" style={{ fontSize: "1rem" }}>Genius ERP ICT Solutions PLC</span>
+          <span className="fw-bold gradient-text" style={{ fontSize: "1rem" }}>Rotana Spa</span>
         </div>
 
         {/* Company Info */}
@@ -533,7 +413,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <input
                     type="text"
                     className="form-control border-start-0"
-                    placeholder="Search employees, vouchers..."
+                    placeholder="Search members..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => { if (searchResults.length > 0) setShowSearch(true); }}

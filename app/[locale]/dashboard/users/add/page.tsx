@@ -6,14 +6,13 @@ import { useRouter } from "next/navigation";
 export default function AddUserPage() {
   const router = useRouter();
   const [roles, setRoles] = useState<any[]>([]);
-  const [branches, setBranches] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
   const [isSuper, setIsSuper] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const [form, setForm] = useState({
     name: "", email: "", password: "", confirm_password: "",
-    role_id: "", phone: "", branch_id: "", company_id: "", is_active: true,
+    role_id: "", phone: "", company_id: "", is_active: true,
   });
 
   useEffect(() => {
@@ -25,14 +24,11 @@ export default function AddUserPage() {
 
     Promise.all([
       fetch("/api/roles", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.json()),
-      fetch("/api/branches", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.json()),
       fetch("/api/companies", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.json()),
-    ]).then(([r, b, c]) => {
+    ]).then(([r, c]) => {
       if (Array.isArray(r)) setRoles(r);
-      if (Array.isArray(b)) setBranches(b);
       if (Array.isArray(c)) {
         setCompanies(c);
-        // Auto-select company for non-super admins
         if (!u || u.role !== "super_admin") {
           const userCompany = c.find((comp: any) => comp.id === u?.company_id);
           if (userCompany) {
@@ -61,7 +57,6 @@ export default function AddUserPage() {
         body: JSON.stringify({
           ...form,
           role_id: form.role_id ? parseInt(form.role_id) : null,
-          branch_id: form.branch_id ? parseInt(form.branch_id) : null,
           company_id: form.company_id ? parseInt(form.company_id) : null,
         }),
       });
@@ -127,13 +122,6 @@ export default function AddUserPage() {
                 <input name="phone" className="form-control" value={form.phone} onChange={handleChange} />
               </div>
               <div className="col-md-4">
-                <label className="form-label small fw-semibold">Branch</label>
-                <select name="branch_id" className="form-control" value={form.branch_id} onChange={handleChange}>
-                  <option value="">Select Branch</option>
-                  {branches.map((b: any) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
               </div>
               <div className="col-md-4">
                 <div className="form-check form-switch mt-4">

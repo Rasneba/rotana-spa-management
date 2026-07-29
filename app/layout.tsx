@@ -4,7 +4,7 @@ import "./globals.css";
 import BootstrapClient from "@/components/BootstrapClient";
 
 export const metadata = {
-  title: "Genius HRMS",
+  title: "Rotana Spa",
 };
 
 export default function RootLayout({

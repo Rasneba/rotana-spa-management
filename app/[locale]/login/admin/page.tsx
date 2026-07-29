@@ -8,7 +8,7 @@ import { useTheme } from "@/components/ThemeProvider";
 export default function SuperAdminLogin() {
   const router = useRouter();
   const { theme, toggle } = useTheme();
-  const [email, setEmail] = useState("admin@genius.com");
+  const [email, setEmail] = useState("admin@rotana.com");
   const [password, setPassword] = useState("123456");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
