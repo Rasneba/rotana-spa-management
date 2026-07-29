@@ -63,6 +63,11 @@ export default function Dashboard() {
     }).catch(console.error);
   }, [router]);
 
+  if (userRole === "super_admin") {
+    router.replace("/dashboard/admin");
+    return null;
+  }
+
   if (!stats) {
     return (
       <div className="d-flex justify-content-center py-5">
@@ -70,8 +75,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const isSuper = userRole === "super_admin";
   const hasLicense = (code: string) => isSuper || licensedModules.includes(code);
 
   const visibleModules = modules.filter(m => {

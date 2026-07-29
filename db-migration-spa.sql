@@ -335,7 +335,26 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- 16. Updated-at trigger function
+-- 16. Demo Licenses (for issuing to companies)
+CREATE TABLE IF NOT EXISTS demo_licenses (
+  id SERIAL PRIMARY KEY,
+  license_key VARCHAR(100) UNIQUE NOT NULL,
+  company_id INTEGER REFERENCES companies(id) ON DELETE SET NULL,
+  company_name VARCHAR(200) NOT NULL,
+  contact_name VARCHAR(100),
+  contact_email VARCHAR(100),
+  contact_phone VARCHAR(30),
+  issued_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  expiry_date DATE NOT NULL,
+  duration_days INTEGER DEFAULT 15,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active','expired','revoked','suspended')),
+  notes TEXT,
+  issued_by INTEGER REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 17. Updated-at trigger function
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -353,8 +372,9 @@ CREATE TRIGGER trg_membership_members_updated_at BEFORE UPDATE ON membership_mem
 CREATE TRIGGER trg_gym_checkins_updated_at BEFORE UPDATE ON gym_checkins FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_id_definitions_updated_at BEFORE UPDATE ON id_definitions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER trg_id_sequences_updated_at BEFORE UPDATE ON id_sequences FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE TRIGGER trg_demo_licenses_updated_at BEFORE UPDATE ON demo_licenses FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- 17. Seed default company
+-- 18. Seed default company
 INSERT INTO companies (name, code, tin, contact_email, license_type, status)
 SELECT 'Rotana Wellness PLC', 'CMP-ROTANA', 'TIN-ROTANA-001', 'admin@rotanaspa.com', 'enterprise', 'active'
 WHERE NOT EXISTS (SELECT 1 FROM companies WHERE tin = 'TIN-ROTANA-001');
@@ -367,11 +387,19 @@ AND NOT EXISTS (SELECT 1 FROM company_modules cm WHERE cm.company_id = c.id AND 
 
 -- 19. Seed default admin user (password: admin123)
 INSERT INTO users (name, email, password, role, role_id, is_active, company_id)
-SELECT 'Admin', 'admin@rotanaspa.com',   '$2b$10$nHqeLRVpq05EdFIK8wEj/O4QnnJ5yUKnLWXZRxyiEEikyOwOJvshe',
+SELECT 'Admin', 'admin@rotanaspa.com',   '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
   'admin', r.id, true, c.id
 FROM companies c, roles r
 WHERE c.tin = 'TIN-ROTANA-001' AND r.name = 'admin'
 AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@rotanaspa.com');
+
+-- Seed super admin user (password: admin123)
+INSERT INTO users (name, email, password, role, role_id, is_active)
+SELECT 'Super Admin', 'super@rotanaspa.com', '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
+  'super_admin', r.id, true
+FROM roles r
+WHERE r.name = 'super_admin'
+AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'super@rotanaspa.com');
 
 -- 20. Seed ID definitions for default company
 SELECT seed_id_definitions(c.id) FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
