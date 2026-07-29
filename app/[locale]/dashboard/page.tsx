@@ -75,7 +75,7 @@ export default function Dashboard() {
       </div>
     );
   }
-  const hasLicense = (code: string) => isSuper || licensedModules.includes(code);
+  const hasLicense = (code: string) => licensedModules.includes(code);
 
   const visibleModules = modules.filter(m => {
     if (!m.moduleCode) return hasLicense("audit");
