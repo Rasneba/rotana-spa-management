@@ -45,16 +45,11 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   },
   "Membership": {
     label: "Membership",
-    resources: ["membership_plans", "membership_members", "membership_payments", "membership_attendance"],
-  },
-  "Parking": {
-    label: "Parking",
     resources: [
-      "parking_zones", "parking_slots", "parking_gates", "parking_cameras",
-      "parking_vehicles", "parking_sessions", "parking_rates",
-      "parking_qr_tickets", "parking_payments", "parking_subscriptions",
-      "parking_customers", "parking_reports",
-      "parking_rfid_cards",
+      "membership_plans", "membership_members", "membership_payments", "membership_attendance",
+      "membership_subscriptions", "membership_rate_cards", "membership_facilities",
+      "membership_gates", "membership_rfid_cards", "membership_qr_passes",
+      "membership_sessions", "membership_access_logs", "membership_day_tickets",
     ],
   },
   "System": {

@@ -8,9 +8,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   try {
     const result = await pool.query(
-      `SELECT d.*, b.name as branch_name, b.code as branch_code
+      `SELECT d.*
        FROM id_definitions d
-       LEFT JOIN branches b ON d.branch_id = b.id
        WHERE d.id = $1`, [id]
     );
     if (result.rows.length === 0) return NextResponse.json({ error: "Definition not found" }, { status: 404 });
@@ -26,7 +25,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   try {
     const body = await req.json();
-    const allowed = ["branch_id","entity_type","prefix","suffix","separator","pad_length","start_from","reset_type","pattern","is_active","description"];
+    const allowed = ["entity_type","prefix","suffix","separator","pad_length","start_from","reset_type","pattern","is_active","description"];
     const sets: string[] = [];
     const vals: any[] = [];
     let idx = 1;

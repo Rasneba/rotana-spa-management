@@ -10,11 +10,10 @@ export async function GET(req: Request) {
     const admin = user.role === "super_admin";
     try {
       const result = await pool.query(
-        `SELECT d.*, b.name as branch_name, b.code as branch_code
+        `SELECT d.*
          FROM id_definitions d
-         LEFT JOIN branches b ON d.branch_id = b.id
          WHERE $1 = true OR d.company_id = $2
-         ORDER BY d.entity_type, d.branch_id NULLS FIRST`,
+         ORDER BY d.entity_type`,
         [admin, user.company_id]
       );
       return ok(result.rows);
@@ -29,13 +28,13 @@ export async function POST(req: Request) {
     const admin = user.role === "super_admin";
     try {
       const body = await req.json();
-      const { branch_id, entity_type, prefix, suffix, separator, pad_length, start_from, reset_type, pattern, description } = body;
+      const { entity_type, prefix, suffix, separator, pad_length, start_from, reset_type, pattern, description } = body;
       if (!entity_type || !prefix) return badRequest("Entity type and prefix are required");
       const company_id = admin && body.company_id ? Number(body.company_id) : user.company_id;
       const result = await pool.query(
-        `INSERT INTO id_definitions (company_id, branch_id, entity_type, prefix, suffix, separator, pad_length, start_from, reset_type, pattern, description)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-        [company_id, branch_id || null, entity_type, prefix, suffix || '', separator || '-', pad_length || 5, start_from || 1, reset_type || 'never', pattern || '{PREFIX}{SEP}{SEQ}', description || null]
+        `INSERT INTO id_definitions (company_id, entity_type, prefix, suffix, separator, pad_length, start_from, reset_type, pattern, description)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+        [company_id, entity_type, prefix, suffix || '', separator || '-', pad_length || 5, start_from || 1, reset_type || 'never', pattern || '{PREFIX}{SEP}{SEQ}', description || null]
       );
       return created(result.rows[0]);
     } catch (e: any) { return err(e.message); }

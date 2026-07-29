@@ -96,6 +96,9 @@ DECLARE
   resources TEXT[] := ARRAY[
     'dashboard', 'membership_plans', 'membership_members', 'membership_payments',
     'membership_attendance', 'gym_checkins',
+    'membership_subscriptions', 'membership_rate_cards', 'membership_facilities',
+    'membership_gates', 'membership_rfid_cards', 'membership_qr_passes',
+    'membership_sessions', 'membership_access_logs', 'membership_day_tickets',
     'users', 'roles', 'settings', 'id_definitions', 'notifications',
     'audit_logs', 'companies', 'modules', 'reports'
   ];

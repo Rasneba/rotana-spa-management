@@ -6,7 +6,12 @@ export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve"
 export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[] }> = {
   "Membership": {
     label: "Membership",
-    resources: ["membership_plans", "membership_members", "membership_payments", "membership_attendance"],
+    resources: [
+      "membership_plans", "membership_members", "membership_payments", "membership_attendance",
+      "membership_subscriptions", "membership_rate_cards", "membership_facilities",
+      "membership_gates", "membership_rfid_cards", "membership_qr_passes",
+      "membership_sessions", "membership_access_logs", "membership_day_tickets",
+    ],
   },
 
   "System": {

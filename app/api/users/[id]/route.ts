@@ -13,7 +13,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const isSuper = user.role === "super_admin";
     let query = `
       SELECT u.id, u.name, u.email, u.role_id, u.company_id, c.name as company_name, r.name as role_name,
-        u.phone, u.branch_id, u.is_active, u.created_at
+        u.phone, u.is_active, u.created_at
       FROM users u
       LEFT JOIN roles r ON u.role_id = r.id
       LEFT JOIN companies c ON u.company_id = c.id
@@ -57,7 +57,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const values: any[] = [];
   let idx = 1;
 
-  const allowedFields = ["name", "email", "role_id", "phone", "branch_id", "company_id", "is_active"];
+  const allowedFields = ["name", "email", "role_id", "phone", "company_id", "is_active"];
 
   for (const field of allowedFields) {
     if (body[field] !== undefined) {
@@ -84,7 +84,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const result = await pool.query(
       `UPDATE users SET ${fields.join(", ")} WHERE id = $${idx}
-       RETURNING id, name, email, role_id, phone, branch_id, is_active, created_at`,
+       RETURNING id, name, email, role_id, phone, is_active, created_at`,
       values
     );
 

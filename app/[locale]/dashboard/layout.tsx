@@ -22,7 +22,17 @@ const sidebarGroups: any[] = [
     adminOnly: false,
     links: [
       { name: "Dashboard", href: "/dashboard/membership", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
+      { name: "Members", href: "/dashboard/membership/members", icon: "bi-people", adminOnly: false, resource: "membership_members" },
       { name: "Plans", href: "/dashboard/membership/plans", icon: "bi-layers", adminOnly: false, resource: "membership_plans" },
+      { name: "Subscriptions", href: "/dashboard/membership/subscriptions", icon: "bi-arrow-repeat", adminOnly: false, resource: "membership_subscriptions" },
+      { name: "Rate Cards", href: "/dashboard/membership/rate-cards", icon: "bi-currency-dollar", adminOnly: false, resource: "membership_rate_cards" },
+      { name: "Facilities", href: "/dashboard/membership/facilities", icon: "bi-building", adminOnly: false, resource: "membership_facilities" },
+      { name: "Entry Gates", href: "/dashboard/membership/gates", icon: "bi-door-open", adminOnly: false, resource: "membership_gates" },
+      { name: "RFID Cards", href: "/dashboard/membership/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "membership_rfid_cards" },
+      { name: "QR Passes", href: "/dashboard/membership/qr-passes", icon: "bi-qr-code", adminOnly: false, resource: "membership_qr_passes" },
+      { name: "Visit Sessions", href: "/dashboard/membership/sessions", icon: "bi-clock-history", adminOnly: false, resource: "membership_sessions" },
+      { name: "Access Logs", href: "/dashboard/membership/access-logs", icon: "bi-shield-check", adminOnly: false, resource: "membership_access_logs" },
+      { name: "Day Tickets", href: "/dashboard/membership/day-tickets", icon: "bi-ticket-perforated", adminOnly: false, resource: "membership_day_tickets" },
       { name: "Payments", href: "/dashboard/membership/payments", icon: "bi-credit-card", adminOnly: false, resource: "membership_payments" },
       { name: "Attendance", href: "/dashboard/membership/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "membership_attendance" },
     ]
