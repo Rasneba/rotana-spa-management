@@ -119,54 +119,59 @@ export default function SpaVisitsWorkspace() {
   }), [visits]);
 
   return (
-    <div className="spa-workspace-page">
-      <header className="spa-workspace-header">
-        <div className="spa-workspace-heading">
-          <span className="spa-workspace-icon"><i className="bi bi-person-walking" /></span>
-          <div><p>Reception &amp; Treatment</p><h1>Visits</h1><span>Check in customers, assign therapists and follow each treatment through service-order handoff.</span></div>
-        </div>
-        {capabilities.create && <button type="button" className="spa-primary-button" onClick={() => setShowForm(true)}><i className="bi bi-plus-lg" /> Create Visit</button>}
+    <div className="spa-workspace-page visit-board-page">
+      <header className="visit-board-header">
+        <div><p>Reception &amp; Treatment</p><h1>Visits</h1><span>Touch a visit card to open the service-order workspace.</span></div>
+        {capabilities.create && <button type="button" onClick={() => setShowForm(true)}><i className="bi bi-plus-lg" /> New Visit</button>}
       </header>
 
       {error && <div className="spa-workspace-alert danger" role="alert"><i className="bi bi-exclamation-circle" />{error}</div>}
 
-      <section className="spa-workspace-summary spa-visit-summary" aria-label="Visit summary">
-        <article><span>Visits</span><strong>{summary.total}</strong><i className="bi bi-people" /></article>
-        <article><span>Waiting / Assigned</span><strong>{summary.waiting}</strong><i className="bi bi-hourglass-split" /></article>
-        <article><span>In Treatment</span><strong>{summary.inTreatment}</strong><i className="bi bi-flower1" /></article>
-        <article><span>Finished</span><strong>{summary.finished}</strong><i className="bi bi-check2-circle" /></article>
+      <section className="visit-board-summary" aria-label="Visit summary">
+        <article><span>Visits</span><strong>{summary.total}</strong></article>
+        <article><span>Waiting</span><strong>{summary.waiting}</strong></article>
+        <article className="active"><span>In Treatment</span><strong>{summary.inTreatment}</strong></article>
+        <article><span>Finished</span><strong>{summary.finished}</strong></article>
       </section>
 
-      <section className="spa-workspace-card">
-        <div className="spa-workspace-toolbar spa-visit-toolbar">
-          <label className="spa-workspace-search"><i className="bi bi-search" /><span className="visually-hidden">Search visits</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Visit number, customer or therapist…" /></label>
-          <label className="spa-workspace-filter"><span className="visually-hidden">Visit status</span><select value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All statuses</option><option value="checked_in">Checked In</option><option value="assigned">Assigned</option><option value="in_treatment">In Treatment</option><option value="finished">Finished</option><option value="order_printed">Order Printed</option><option value="handed_to_cashier">At Cashier</option><option value="cancelled">Cancelled</option></select></label>
-          <label className="spa-visit-date"><span className="visually-hidden">Visit date</span><input type="date" value={date} onChange={(event) => setDate(event.target.value)} /></label>
-          <button type="button" className="spa-secondary-button" onClick={() => setDate("")}>All dates</button>
-        </div>
-        <div className="spa-workspace-table-wrap">
-          {loading ? (
-            <div className="spa-workspace-state"><span className="spinner-border spinner-border-sm" /><p>Loading visits…</p></div>
-          ) : visits.length === 0 ? (
-            <div className="spa-workspace-state"><i className="bi bi-person-walking" /><h2>No visits found</h2><p>Create a visit when reception checks in a customer.</p></div>
-          ) : (
-            <table className="spa-workspace-table">
-              <thead><tr><th>Visit No</th><th>Customer</th><th>Therapist</th><th>Check-in</th><th>Services</th><th>Status</th><th /></tr></thead>
-              <tbody>{visits.map((visit) => (
-                <tr key={visit.id}>
-                  <td><span className="spa-record-code">{visit.visit_no}</span></td>
-                  <td><strong>{visit.customer_name}</strong>{visit.customer_phone && <small className="spa-cell-subtitle">{visit.customer_phone}</small>}</td>
-                  <td>{visit.therapist_name || <span className="text-muted">Unassigned</span>}</td>
-                  <td>{new Date(visit.checked_in_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
-                  <td>{Number(visit.total_items || 0)} item{Number(visit.total_items || 0) === 1 ? "" : "s"}</td>
-                  <td><span className={`spa-status-pill ${statusTone(visit.status)}`}>{humanizeStatus(visit.status)}</span></td>
-                  <td><Link href={`/dashboard/spa/operations/visits/${visit.id}`} className="spa-open-workspace">Open <i className="bi bi-arrow-right" /></Link></td>
-                </tr>
-              ))}</tbody>
-            </table>
-          )}
-        </div>
+      <section className="visit-board-controls">
+        <label className="visit-board-search"><i className="bi bi-search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search visit, customer or therapist…" /></label>
+        <label className="visit-board-date"><i className="bi bi-calendar3" /><input type="date" value={date} onChange={(event) => setDate(event.target.value)} /></label>
+        <button type="button" onClick={() => setDate("")}>All Dates</button>
       </section>
+
+      <nav className="visit-status-tabs" aria-label="Filter visits by status">
+        {[
+          ["", "All"],
+          ["checked_in", "Checked In"],
+          ["assigned", "Assigned"],
+          ["in_treatment", "In Treatment"],
+          ["finished", "Finished"],
+          ["order_printed", "Printed"],
+          ["handed_to_cashier", "At Cashier"],
+        ].map(([value, label]) => <button key={value || "all"} type="button" className={status === value ? "active" : ""} onClick={() => setStatus(value)}>{label}</button>)}
+      </nav>
+
+      {loading ? (
+        <div className="spa-workspace-state visit-board-loading"><span className="spinner-border" /><p>Loading visits…</p></div>
+      ) : visits.length === 0 ? (
+        <div className="spa-workspace-state visit-board-empty"><i className="bi bi-person-walking" /><h2>No visits found</h2><p>Create a visit when reception checks in a customer.</p>{capabilities.create && <button type="button" onClick={() => setShowForm(true)}>Create Visit</button>}</div>
+      ) : (
+        <section className="visit-card-grid">
+          {visits.map((visit) => (
+            <Link key={visit.id} href={`/dashboard/spa/operations/visits/${visit.id}`} className={`visit-touch-card ${visit.status}`}>
+              <div className="visit-card-top"><code>{visit.visit_no}</code><span className={`spa-status-pill ${statusTone(visit.status)}`}>{humanizeStatus(visit.status)}</span></div>
+              <div className="visit-card-customer"><span>{visit.customer_name.charAt(0).toUpperCase()}</span><div><h2>{visit.customer_name}</h2><p>{visit.customer_phone || "No phone"}</p></div></div>
+              <dl>
+                <div><dt>Therapist</dt><dd>{visit.therapist_name || "Unassigned"}</dd></div>
+                <div><dt>Check-In</dt><dd>{new Date(visit.checked_in_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</dd></div>
+                <div><dt>Items</dt><dd>{Number(visit.total_items || 0)}</dd></div>
+              </dl>
+              <footer><span>{visit.status === "in_treatment" ? "Continue Order" : visit.status === "checked_in" ? "Assign Therapist" : "Open Visit"}</span><i className="bi bi-chevron-right" /></footer>
+            </Link>
+          ))}
+        </section>
+      )}
 
       {showForm && (
         <div className="spa-form-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) setShowForm(false); }}>
@@ -174,7 +179,7 @@ export default function SpaVisitsWorkspace() {
             <header><div><p>Reception check-in</p><h2 id="create-visit-title">Create Visit</h2></div><button type="button" onClick={() => setShowForm(false)} aria-label="Close"><i className="bi bi-x-lg" /></button></header>
             <form onSubmit={submit}>
               <div className="spa-record-form-grid">
-                <label className="span-two"><span>Existing Member</span><select value={form.member_id} onChange={(event) => setForm((current) => ({ ...current, member_id: event.target.value }))}><option value="">Walk-in customer</option>{members.map((member) => <option key={member.id} value={member.id}>{member.customer_id ? `${member.customer_id} · ` : ""}{member.full_name}</option>)}</select></label>
+                <label className="span-two"><span>Existing Customer</span><select value={form.member_id} onChange={(event) => setForm((current) => ({ ...current, member_id: event.target.value }))}><option value="">Walk-in customer</option>{members.map((member) => <option key={member.id} value={member.id}>{member.customer_id ? `${member.customer_id} · ` : ""}{member.full_name}</option>)}</select></label>
                 {!form.member_id && <><label><span>Customer Name *</span><input required value={form.customer_name} onChange={(event) => setForm((current) => ({ ...current, customer_name: event.target.value }))} /></label><label><span>Phone</span><input type="tel" value={form.customer_phone} onChange={(event) => setForm((current) => ({ ...current, customer_phone: event.target.value }))} /></label></>}
                 <label className="span-two"><span>Reception Notes</span><textarea rows={3} value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} placeholder="Optional visit notes or customer requests" /></label>
               </div>

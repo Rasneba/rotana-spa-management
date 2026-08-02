@@ -29,6 +29,8 @@ psql "$DATABASE_URL" -f db-migration-v36.sql
 
 Migration v34 adds the visit and draft service-order workflow. Migration v35 adds focused access control, enhanced gates, operational cameras, the controller queue and kiosk QR passes. Migration v36 consolidates customers/members into one classified customer master and plans/services/packages into one classified Offering Master.
 
+The visit treatment screen is optimized for tablets and touch devices: classified offering tiles work like a restaurant order menu, while a live cart provides large quantity and removal controls before the draft Service Order is finished.
+
 ### In-app user guide
 
 The searchable, printable single-page system guide is available at `/dashboard/guide` under **Settings** and through the header help icon.
