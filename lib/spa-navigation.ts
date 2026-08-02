@@ -28,6 +28,14 @@ export const sidebarGroups: SidebarGroup[] = [
     ],
   },
   {
+    name: "User Guide",
+    icon: "bi-journal-bookmark",
+    direct: true,
+    links: [
+      { name: "User Guide", href: "/dashboard/guide", icon: "bi-journal-bookmark", resource: "dashboard" },
+    ],
+  },
+  {
     name: "Customers",
     icon: "bi-people",
     moduleCode: "membership",

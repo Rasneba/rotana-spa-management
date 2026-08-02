@@ -501,11 +501,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"} fs-5`}></i>
               </button>
 
-              {/* Notifications */}
-              <div className="d-none d-md-flex">
-                <button className="theme-toggle" title="Notifications">
+              {/* Help & notifications */}
+              <div className="d-none d-md-flex gap-1">
+                <Link href="/dashboard/guide" className="theme-toggle" title="User Guide" aria-label="Open user guide">
+                  <i className="bi bi-question-circle fs-5"></i>
+                </Link>
+                <Link href="/dashboard/notifications" className="theme-toggle" title="Notifications" aria-label="Open notifications">
                   <i className="bi bi-bell fs-5"></i>
-                </button>
+                </Link>
               </div>
 
               {/* User info */}

@@ -62,7 +62,8 @@
       "facilities": "Facilities",
       "reports": "Reports",
       "settings": "Settings",
-      "platform": "Platform Administration"
+      "platform": "Platform Administration",
+      "user_guide": "User Guide"
     },
     "section": {
       "daily_operations": "Daily Operations",
@@ -172,6 +173,9 @@
       "demo_licenses": "Demo Licenses",
       "audit_logs": "Audit Logs",
       "manuals": "Manuals"
+    },
+    "user_guide": {
+      "user_guide": "User Guide"
     }
   },
   "common": {

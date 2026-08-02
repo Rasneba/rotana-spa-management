@@ -27,6 +27,10 @@ psql "$DATABASE_URL" -f db-migration-v34.sql
 
 Migration v34 adds the reception visit, therapist treatment, service-line, and draft service-order workflow.
 
+### In-app user guide
+
+The searchable, printable single-page system guide is available at `/dashboard/guide`. It is linked directly in the sidebar and through the header help icon.
+
 ### Sales/POS boundary
 
 The Spa application does **not** connect to the Sales/POS database and does not calculate prices, discounts, tax, payments, invoices, or official receipts. Finishing a treatment produces an 80 mm **Service Order (Draft)** containing visit, customer, therapist, and service quantities only. The customer takes that draft to the cashier, who completes the financial transaction in the separate POS application.

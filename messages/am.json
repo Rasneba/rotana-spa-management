@@ -69,7 +69,8 @@
       "facilities": "ተቋማት",
       "reports": "ሪፖርቶች",
       "settings": "ቅንብሮች",
-      "platform": "የመድረክ አስተዳደር"
+      "platform": "የመድረክ አስተዳደር",
+      "user_guide": "የተጠቃሚ መመሪያ"
     },
     "section": {
       "daily_operations": "የዕለት ተዕለት ሥራዎች",
@@ -243,6 +244,9 @@
       "demo_licenses": "የማሳያ ፈቃዶች",
       "audit_logs": "የኦዲት መዝገቦች",
       "manuals": "መመሪያዎች"
+    },
+    "user_guide": {
+      "user_guide": "የተጠቃሚ መመሪያ"
     }
   },
   "common": {
