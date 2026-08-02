@@ -4,12 +4,12 @@ import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemBtn, GemBtnOutline, GemTable, GemBadge, GemInput, GemSelect } from "@/lib/gem-ui";
 import { Repeat, Plus, Save } from "lucide-react";
 
-export default function SubscriptionsPage() {
+export function SubscriptionsWorkspace({ initialCreate = false }: { initialCreate?: boolean }) {
   const [items, setItems] = useState<any[]>([]);
   const [members, setMembers] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(initialCreate);
   const [form, setForm] = useState<any>({ member_id: "", plan_id: "", end_date: "", billing_cycle: "monthly", amount: "", auto_renew: false });
   const [saving, setSaving] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -123,7 +123,7 @@ export default function SubscriptionsPage() {
             <GemTable
               headers={["Member", "Plan", "Cycle", "Amount", "Start", "End", "Status", ""]}
               rows={items.map(s => [
-                <Link href={`/dashboard/membership/members/${s.member_id}`} className="font-semibold hover:text-blue-600">{s.member_name}</Link>,
+                <Link href={`/dashboard/spa/customers/profiles/${s.member_id}`} className="font-semibold hover:text-blue-600">{s.member_name}</Link>,
                 s.plan_name || "-",
                 s.billing_cycle,
                 `ETB ${Number(s.amount).toLocaleString()}`,
@@ -138,4 +138,8 @@ export default function SubscriptionsPage() {
       </GemCardBare>
     </GemPage>
   );
+}
+
+export default function SubscriptionsPage() {
+  return <SubscriptionsWorkspace />;
 }

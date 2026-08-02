@@ -16,6 +16,16 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Spa management database
+
+The expanded Customers, Gym, Spa, Inventory, Charges, Staff, Facilities, and Reports workspaces require migration v33 after the existing spa migrations:
+
+```bash
+psql "$DATABASE_URL" -f db-migration-v33.sql
+```
+
+The migration adds tenant-scoped operational records, reporting indexes, audit metadata, and the new role permissions. Existing membership, scheduling, access, and payment data remains in its current tables.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

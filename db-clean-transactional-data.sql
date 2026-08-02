@@ -4,6 +4,7 @@
 
 -- Replace :company_id with the actual company ID to clean, or run as-is to clear everything
 
+DELETE FROM spa_management_records;
 DELETE FROM gym_checkins;
 DELETE FROM rfid_access_logs;
 DELETE FROM parking_sessions;

@@ -10,10 +10,10 @@ const modules = [
 ];
 
 const quickActions = [
-  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/membership/schedule", color: "primary" },
-  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/membership/members", color: "success" },
-  { label: "Gym Floor", icon: "bi-activity", href: "/dashboard/membership/gym", color: "info" },
-  { label: "Check In", icon: "bi-box-arrow-in-right", href: "/dashboard/membership/attendance", color: "warning" },
+  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/operations/appointments", color: "primary" },
+  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/spa/customers/profiles", color: "success" },
+  { label: "Gym Floor", icon: "bi-activity", href: "/dashboard/spa/gym/attendance", color: "info" },
+  { label: "Check In", icon: "bi-box-arrow-in-right", href: "/dashboard/spa/operations/check-in", color: "warning" },
 ];
 
 export default function Dashboard() {
@@ -88,10 +88,10 @@ export default function Dashboard() {
   });
 
   const spaCards = [
-    { title: "Total Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/membership/members" },
-    { title: "Active Members", value: stats.activeMembers || stats.activeCustomers, color: "text-success", icon: "bi-person-check", href: "/dashboard/membership/members" },
-    { title: "Today Check-ins", value: stats.todayCheckIns || 0, color: "text-warning", icon: "bi-box-arrow-in-right", href: "/dashboard/membership/attendance" },
-    { title: "Revenue", value: `${currency} ${(stats.totalRevenue || 0)?.toLocaleString()}`, color: "text-info", icon: "bi-cash-stack", href: "/dashboard/membership/payments" },
+    { title: "Total Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/spa/customers/profiles" },
+    { title: "Active Members", value: stats.activeMembers || stats.activeCustomers, color: "text-success", icon: "bi-person-check", href: "/dashboard/spa/customers/profiles" },
+    { title: "Today Check-ins", value: stats.todayCheckIns || 0, color: "text-warning", icon: "bi-box-arrow-in-right", href: "/dashboard/spa/operations/check-in" },
+    { title: "Revenue", value: `${currency} ${(stats.totalRevenue || 0)?.toLocaleString()}`, color: "text-info", icon: "bi-cash-stack", href: "/dashboard/spa/charges/payment-history" },
   ];
 
   return (
@@ -163,7 +163,7 @@ export default function Dashboard() {
         <div className="card border-0 shadow-sm">
           <div className="card-header fw-semibold d-flex justify-content-between align-items-center" style={{ backgroundColor: "var(--card-bg)", borderBottom: "1px solid var(--card-border)" }}>
             <span>Recent Members</span>
-            <Link href="/dashboard/membership/members" className="btn btn-sm btn-outline-primary">View All</Link>
+            <Link href="/dashboard/spa/customers/profiles" className="btn btn-sm btn-outline-primary">View All</Link>
           </div>
           <div className="card-body p-0">
             <table className="table table-hover mb-0">

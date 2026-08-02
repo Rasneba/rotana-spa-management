@@ -54,7 +54,7 @@ export default function MemberDetailPage() {
     <GemPage>
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/membership/members" className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"><ArrowLeft size={16} /></Link>
+          <Link href="/dashboard/spa/customers/profiles" className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"><ArrowLeft size={16} /></Link>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{member.full_name}</h1>
             <div className="flex items-center gap-2">

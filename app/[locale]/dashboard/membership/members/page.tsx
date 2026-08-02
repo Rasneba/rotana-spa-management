@@ -4,12 +4,12 @@ import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemBtn, GemBtnOutline, GemTable, GemBadge, GemInput, GemSelect } from "@/lib/gem-ui";
 import { Users, Plus, ArrowLeft, Eye } from "lucide-react";
 
-export default function MembersPage() {
+export function MembersWorkspace({ initialCreate = false }: { initialCreate?: boolean }) {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(initialCreate);
   const [form, setForm] = useState<any>({ full_name: "", phone: "", email: "", plan_id: "" });
   const [plans, setPlans] = useState<any[]>([]);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -121,13 +121,13 @@ export default function MembersPage() {
                 const daysLeft = m.end_date ? Math.max(0, Math.ceil((new Date(m.end_date).getTime() - Date.now()) / 86400000)) : null;
                 return [
                   <span className="font-mono text-xs text-gray-400">{m.customer_id}</span>,
-                  <Link href={`/dashboard/membership/members/${m.id}`} className="font-semibold hover:text-blue-600 transition-colors">{m.full_name}</Link>,
+                  <Link href={`/dashboard/spa/customers/profiles/${m.id}`} className="font-semibold hover:text-blue-600 transition-colors">{m.full_name}</Link>,
                   <span className="text-sm">{m.phone || "-"}</span>,
                   <GemBadge variant="info">{m.plan_name || "N/A"}</GemBadge>,
                   <span className="text-sm">{m.start_date ? new Date(m.start_date).toLocaleDateString() : "-"}</span>,
                   <span className="text-sm">{m.end_date ? new Date(m.end_date).toLocaleDateString() : "-"}</span>,
                   isActive ? <GemBadge variant="success">{daysLeft !== null ? `${daysLeft}d left` : "Active"}</GemBadge> : <GemBadge variant="danger">Expired</GemBadge>,
-                  <Link href={`/dashboard/membership/members/${m.id}`} className="text-blue-500 hover:text-blue-700 transition-colors"><Eye size={16} /></Link>,
+                  <Link href={`/dashboard/spa/customers/profiles/${m.id}`} className="text-blue-500 hover:text-blue-700 transition-colors"><Eye size={16} /></Link>,
                 ];
               })}
             />
@@ -136,4 +136,8 @@ export default function MembersPage() {
       </GemCardBare>
     </GemPage>
   );
+}
+
+export default function MembersPage() {
+  return <MembersWorkspace />;
 }

@@ -26,9 +26,21 @@
     "self_service": "Self Service",
     "users": "Users",
     "roles": "Roles & Permissions",
-    "reports": "Reports",
+    "reports": {
+      "membership": "Membership",
+      "attendance": "Attendance",
+      "revenue": "Revenue",
+      "therapist": "Therapist",
+      "trainer": "Trainer",
+      "inventory": "Inventory"
+    },
     "documents": "Documents",
-    "settings": "Settings",
+    "settings": {
+      "users": "Users",
+      "roles": "Roles",
+      "branches": "Branches",
+      "system": "System"
+    },
     "audit_logs": "Audit Logs",
     "notifications": "Notifications",
     "logout": "Logout",
@@ -40,7 +52,18 @@
       "audit": "Audit",
       "administration": "Administration",
       "membership": "Membership",
-      "parking": "Parking"
+      "parking": "Parking",
+      "customers": "Customers",
+      "operations": "Operations",
+      "gym": "Gym",
+      "spa": "Spa",
+      "inventory": "Inventory",
+      "charges": "Charges",
+      "staff": "Staff",
+      "facilities": "Facilities",
+      "reports": "Reports",
+      "settings": "Settings",
+      "platform": "Platform Administration"
     },
     "section": {
       "daily_operations": "Daily Operations",
@@ -87,7 +110,73 @@
       "plans": "Plans",
       "members": "Members",
       "payments": "Payments",
+      "attendance": "Attendance",
+      "membership_plans": "Membership Plans",
+      "member_registration": "Member Registration",
+      "renewals": "Renewals",
+      "freeze_transfer": "Freeze / Transfer",
+      "digital_cards": "Digital Cards",
+      "qr_access": "QR Access"
+    },
+    "customers": {
+      "customer_profiles": "Customer Profiles",
+      "medical_records": "Medical Records",
+      "visit_history": "Visit History",
+      "loyalty": "Loyalty"
+    },
+    "operations": {
+      "check_in": "Check-In",
+      "appointments": "Appointments",
+      "sessions": "Sessions",
+      "queue": "Queue",
+      "customer_requests": "Customer Requests"
+    },
+    "gym": {
+      "trainers": "Trainers",
+      "workout_plans": "Workout Plans",
+      "fitness_assessment": "Fitness Assessment",
+      "body_measurements": "Body Measurements",
+      "classes": "Classes",
       "attendance": "Attendance"
+    },
+    "spa": {
+      "services": "Services",
+      "therapists": "Therapists",
+      "treatment_rooms": "Treatment Rooms",
+      "bookings": "Bookings",
+      "packages": "Packages",
+      "service_usage": "Service Usage"
+    },
+    "inventory": {
+      "products": "Products",
+      "consumables": "Consumables",
+      "stock_usage": "Stock Usage",
+      "suppliers": "Suppliers"
+    },
+    "charges": {
+      "pending_charges": "Pending Charges",
+      "send_to_cashier": "Send To Cashier",
+      "external_receipt": "External Receipt",
+      "payment_history": "Payment History"
+    },
+    "staff": {
+      "employees": "Employees",
+      "schedules": "Schedules",
+      "commission": "Commission",
+      "performance": "Performance"
+    },
+    "facilities": {
+      "rooms": "Rooms",
+      "lockers": "Lockers",
+      "equipment": "Equipment",
+      "maintenance": "Maintenance"
+    },
+    "platform": {
+      "admin_dashboard": "Admin Dashboard",
+      "companies": "Companies",
+      "demo_licenses": "Demo Licenses",
+      "audit_logs": "Audit Logs",
+      "manuals": "Manuals"
     }
   },
   "common": {
