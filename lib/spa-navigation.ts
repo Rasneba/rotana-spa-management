@@ -56,11 +56,13 @@ export const sidebarGroups: SidebarGroup[] = [
     icon: "bi-activity",
     moduleCode: "membership",
     links: [
-      { name: "Check-In", href: "/dashboard/spa/operations/check-in", icon: "bi-box-arrow-in-right", resource: "membership_attendance" },
+      { name: "Visits", href: "/dashboard/spa/operations/visits", icon: "bi-person-walking", resource: "spa_visits" },
       { name: "Appointments", href: "/dashboard/spa/operations/appointments", icon: "bi-calendar2-week", resource: "membership_appointments" },
       { name: "Sessions", href: "/dashboard/spa/operations/sessions", icon: "bi-stopwatch", resource: "membership_sessions" },
       { name: "Queue", href: "/dashboard/spa/operations/queue", icon: "bi-people", resource: "spa_queue" },
       { name: "Customer Requests", href: "/dashboard/spa/operations/customer-requests", icon: "bi-chat-left-text", resource: "spa_customer_requests" },
+      { name: "Towel Management", href: "/dashboard/spa/operations/towel-management", icon: "bi-layers", resource: "spa_towels" },
+      { name: "Service Orders", href: "/dashboard/spa/operations/service-orders", icon: "bi-receipt-cutoff", resource: "spa_service_orders" },
     ],
   },
   {
@@ -86,7 +88,6 @@ export const sidebarGroups: SidebarGroup[] = [
       { name: "Treatment Rooms", href: "/dashboard/spa/spa/treatment-rooms", icon: "bi-door-closed", resource: "membership_facilities" },
       { name: "Bookings", href: "/dashboard/spa/spa/bookings", icon: "bi-calendar2-plus", resource: "membership_appointments" },
       { name: "Packages", href: "/dashboard/spa/spa/packages", icon: "bi-gift", resource: "spa_packages" },
-      { name: "Service Usage", href: "/dashboard/spa/spa/service-usage", icon: "bi-activity", resource: "spa_service_usage" },
     ],
   },
   {
@@ -98,17 +99,6 @@ export const sidebarGroups: SidebarGroup[] = [
       { name: "Consumables", href: "/dashboard/spa/inventory/consumables", icon: "bi-droplet", resource: "inventory_consumables" },
       { name: "Stock Usage", href: "/dashboard/spa/inventory/stock-usage", icon: "bi-box-arrow-up-right", resource: "inventory_stock_usage" },
       { name: "Suppliers", href: "/dashboard/spa/inventory/suppliers", icon: "bi-truck", resource: "inventory_suppliers" },
-    ],
-  },
-  {
-    name: "Charges",
-    icon: "bi-cash-coin",
-    moduleCode: "membership",
-    links: [
-      { name: "Pending Charges", href: "/dashboard/spa/charges/pending-charges", icon: "bi-hourglass-split", resource: "charges_pending" },
-      { name: "Send To Cashier", href: "/dashboard/spa/charges/send-to-cashier", icon: "bi-send", resource: "charges_cashier" },
-      { name: "External Receipt", href: "/dashboard/spa/charges/external-receipts", icon: "bi-receipt", resource: "charges_external_receipts" },
-      { name: "Payment History", href: "/dashboard/spa/charges/payment-history", icon: "bi-clock-history", resource: "membership_payments" },
     ],
   },
   {
@@ -140,7 +130,7 @@ export const sidebarGroups: SidebarGroup[] = [
     links: [
       { name: "Membership", href: "/dashboard/spa/reports/membership", icon: "bi-person-badge", resource: "reports_membership" },
       { name: "Attendance", href: "/dashboard/spa/reports/attendance", icon: "bi-calendar-check", resource: "reports_attendance" },
-      { name: "Revenue", href: "/dashboard/spa/reports/revenue", icon: "bi-cash-stack", resource: "reports_revenue" },
+      { name: "Service Orders", href: "/dashboard/spa/reports/service-orders", icon: "bi-receipt-cutoff", resource: "reports_service_orders" },
       { name: "Therapist", href: "/dashboard/spa/reports/therapist", icon: "bi-person-heart", resource: "reports_therapist" },
       { name: "Trainer", href: "/dashboard/spa/reports/trainer", icon: "bi-person-arms-up", resource: "reports_trainer" },
       { name: "Inventory", href: "/dashboard/spa/reports/inventory", icon: "bi-boxes", resource: "reports_inventory" },

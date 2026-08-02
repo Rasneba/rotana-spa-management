@@ -17,7 +17,6 @@ const GROUP_ICONS: Record<string, string> = {
   Gym: "heart-pulse",
   Spa: "flower1",
   Inventory: "boxes",
-  Charges: "cash-coin",
   Staff: "person-workspace",
   Facilities: "building",
   Reports: "bar-chart",

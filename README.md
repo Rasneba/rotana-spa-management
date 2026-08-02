@@ -18,13 +18,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Spa management database
 
-The expanded Customers, Gym, Spa, Inventory, Charges, Staff, Facilities, and Reports workspaces require migration v33 after the existing spa migrations:
+The expanded Customers, Gym, Spa, Inventory, Staff, Facilities, and Reports workspaces require migrations v33 and v34 after the existing spa migrations:
 
 ```bash
 psql "$DATABASE_URL" -f db-migration-v33.sql
+psql "$DATABASE_URL" -f db-migration-v34.sql
 ```
 
-The migration adds tenant-scoped operational records, reporting indexes, audit metadata, and the new role permissions. Existing membership, scheduling, access, and payment data remains in its current tables.
+Migration v34 adds the reception visit, therapist treatment, service-line, and draft service-order workflow.
+
+### Sales/POS boundary
+
+The Spa application does **not** connect to the Sales/POS database and does not calculate prices, discounts, tax, payments, invoices, or official receipts. Finishing a treatment produces an 80 mm **Service Order (Draft)** containing visit, customer, therapist, and service quantities only. The customer takes that draft to the cashier, who completes the financial transaction in the separate POS application.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

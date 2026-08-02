@@ -29,10 +29,10 @@
     "reports": {
       "membership": "አባልነት",
       "attendance": "መገኘት",
-      "revenue": "ገቢ",
       "therapist": "ቴራፒስት",
       "trainer": "አሰልጣኝ",
-      "inventory": "ክምችት"
+      "inventory": "ክምችት",
+      "service_orders": "የአገልግሎት ትዕዛዞች"
     },
     "documents": "ሰነዶች",
     "settings": {
@@ -65,7 +65,6 @@
       "gym": "ጂም",
       "spa": "ስፓ",
       "inventory": "ክምችት",
-      "charges": "ክፍያዎች",
       "staff": "ሰራተኞች",
       "facilities": "ተቋማት",
       "reports": "ሪፖርቶች",
@@ -200,7 +199,10 @@
       "appointments": "ቀጠሮዎች",
       "sessions": "ክፍለ ጊዜያት",
       "queue": "ወረፋ",
-      "customer_requests": "የደንበኛ ጥያቄዎች"
+      "customer_requests": "የደንበኛ ጥያቄዎች",
+      "visits": "ጉብኝቶች",
+      "towel_management": "የፎጣ አስተዳደር",
+      "service_orders": "የአገልግሎት ትዕዛዞች"
     },
     "gym": {
       "trainers": "አሰልጣኞች",
@@ -215,20 +217,13 @@
       "therapists": "ቴራፒስቶች",
       "treatment_rooms": "የሕክምና ክፍሎች",
       "bookings": "ቦታ ማስያዣዎች",
-      "packages": "ጥቅሎች",
-      "service_usage": "የአገልግሎት አጠቃቀም"
+      "packages": "ጥቅሎች"
     },
     "inventory": {
       "products": "ምርቶች",
       "consumables": "ፍጆታ ዕቃዎች",
       "stock_usage": "የክምችት አጠቃቀም",
       "suppliers": "አቅራቢዎች"
-    },
-    "charges": {
-      "pending_charges": "በመጠባበቅ ላይ ያሉ ክፍያዎች",
-      "send_to_cashier": "ወደ ገንዘብ ተቀባይ ላክ",
-      "external_receipt": "ውጫዊ ደረሰኝ",
-      "payment_history": "የክፍያ ታሪክ"
     },
     "staff": {
       "employees": "ሰራተኞች",

@@ -65,14 +65,13 @@ export async function GET(req: Request, { params }: RouteParams) {
           pool.query(
             `SELECT p.name AS plan,
                     p.type,
-                    p.price,
                     COUNT(m.id)::int AS members,
                     COUNT(m.id) FILTER (WHERE m.status = 'active')::int AS active_members,
-                    COALESCE(SUM(p.price) FILTER (WHERE m.status = 'active'), 0)::numeric AS active_value
+                    COUNT(m.id) FILTER (WHERE m.status = 'expired')::int AS expired_members
              FROM membership_plans p
              LEFT JOIN membership_members m ON m.plan_id = p.id AND m.company_id = p.company_id
              WHERE p.company_id = $1
-             GROUP BY p.id, p.name, p.type, p.price
+             GROUP BY p.id, p.name, p.type
              ORDER BY members DESC, p.name`,
             [companyId]
           ),
@@ -88,10 +87,9 @@ export async function GET(req: Request, { params }: RouteParams) {
           [
             { key: "plan", label: "Plan" },
             { key: "type", label: "Type" },
-            { key: "price", label: "Price", format: "currency" },
             { key: "members", label: "Members", format: "number" },
             { key: "active_members", label: "Active", format: "number" },
-            { key: "active_value", label: "Active Value", format: "currency" },
+            { key: "expired_members", label: "Expired", format: "number" },
           ],
           planResult.rows,
           from,
@@ -144,68 +142,48 @@ export async function GET(req: Request, { params }: RouteParams) {
         );
       }
 
-      if (reportSlug === "revenue") {
+      if (reportSlug === "service-orders") {
         const [summaryResult, dailyResult] = await Promise.all([
           pool.query(
-            `WITH revenue_entries AS (
-               SELECT amount::numeric AS amount, payment_date::date AS paid_on
-               FROM membership_payments
-               WHERE company_id = $1 AND payment_date BETWEEN $2::date AND $3::date
-               UNION ALL
-               SELECT amount::numeric, record_date::date
-               FROM spa_management_records
-               WHERE company_id = $1 AND deleted_at IS NULL AND amount IS NOT NULL
-                 AND module_key IN ('charges/send-to-cashier','charges/external-receipts')
-                 AND status IN ('paid','verified','reconciled')
-                 AND record_date::date BETWEEN $2::date AND $3::date
-             )
-             SELECT COALESCE(SUM(amount), 0)::numeric AS revenue,
-                    COUNT(*)::int AS payments,
-                    COALESCE(AVG(amount), 0)::numeric AS average_payment,
-                    COALESCE(SUM(amount) FILTER (WHERE paid_on = CURRENT_DATE), 0)::numeric AS today
-             FROM revenue_entries`,
+            `SELECT COUNT(*)::int AS orders,
+                    COUNT(*) FILTER (WHERE status='draft')::int AS drafts,
+                    COUNT(*) FILTER (WHERE status='printed')::int AS printed,
+                    COUNT(*) FILTER (WHERE status='handed_to_cashier')::int AS handed_to_cashier,
+                    COALESCE(SUM(total_items), 0)::int AS total_items
+             FROM spa_service_orders
+             WHERE company_id=$1 AND generated_at::date BETWEEN $2::date AND $3::date`,
             [companyId, from, to]
           ),
           pool.query(
-            `WITH revenue_entries AS (
-               SELECT amount::numeric AS amount, payment_date::date AS paid_on,
-                      COALESCE(payment_method, 'membership') AS method
-               FROM membership_payments
-               WHERE company_id = $1 AND payment_date BETWEEN $2::date AND $3::date
-               UNION ALL
-               SELECT amount::numeric, record_date::date,
-                      COALESCE(NULLIF(details->>'payment_method',''), NULLIF(details->>'provider',''), 'external')
-               FROM spa_management_records
-               WHERE company_id = $1 AND deleted_at IS NULL AND amount IS NOT NULL
-                 AND module_key IN ('charges/send-to-cashier','charges/external-receipts')
-                 AND status IN ('paid','verified','reconciled')
-                 AND record_date::date BETWEEN $2::date AND $3::date
-             )
-             SELECT paid_on::text AS date,
-                    method,
-                    COUNT(*)::int AS payments,
-                    COALESCE(SUM(amount), 0)::numeric AS revenue,
-                    COALESCE(AVG(amount), 0)::numeric AS average_payment
-             FROM revenue_entries
-             GROUP BY paid_on, method
-             ORDER BY paid_on DESC, revenue DESC`,
+            `SELECT so.generated_at::date::text AS date,
+                    COUNT(*)::int AS orders,
+                    COALESCE(SUM(so.total_items), 0)::int AS service_items,
+                    COUNT(*) FILTER (WHERE so.print_count > 0)::int AS printed,
+                    COUNT(*) FILTER (WHERE so.status='handed_to_cashier')::int AS handed_to_cashier,
+                    COUNT(DISTINCT v.therapist_record_id)::int AS therapists
+             FROM spa_service_orders so
+             JOIN spa_visits v ON v.id=so.visit_id
+             WHERE so.company_id=$1 AND so.generated_at::date BETWEEN $2::date AND $3::date
+             GROUP BY so.generated_at::date
+             ORDER BY so.generated_at::date DESC`,
             [companyId, from, to]
           ),
         ]);
         const item = summaryResult.rows[0];
         return reportResponse(
           [
-            { label: "Revenue", value: item.revenue, format: "currency" },
-            { label: "Payments", value: item.payments, format: "number" },
-            { label: "Average Payment", value: item.average_payment, format: "currency" },
-            { label: "Today", value: item.today, format: "currency" },
+            { label: "Service Orders", value: item.orders, format: "number" },
+            { label: "Service Items", value: item.total_items, format: "number" },
+            { label: "Printed", value: item.printed, format: "number" },
+            { label: "At Cashier", value: item.handed_to_cashier, format: "number" },
           ],
           [
             { key: "date", label: "Date" },
-            { key: "method", label: "Method" },
-            { key: "payments", label: "Payments", format: "number" },
-            { key: "revenue", label: "Revenue", format: "currency" },
-            { key: "average_payment", label: "Average", format: "currency" },
+            { key: "orders", label: "Orders", format: "number" },
+            { key: "service_items", label: "Service Items", format: "number" },
+            { key: "printed", label: "Printed", format: "number" },
+            { key: "handed_to_cashier", label: "At Cashier", format: "number" },
+            { key: "therapists", label: "Therapists", format: "number" },
           ],
           dailyResult.rows,
           from,
@@ -216,43 +194,46 @@ export async function GET(req: Request, { params }: RouteParams) {
       if (reportSlug === "therapist") {
         const [summaryResult, therapistResult] = await Promise.all([
           pool.query(
-            `SELECT COUNT(*)::int AS services,
-                    COUNT(DISTINCT details->>'therapist')::int AS therapists,
-                    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed,
-                    COALESCE(SUM(amount), 0)::numeric AS generated_charges
-             FROM spa_management_records
-             WHERE company_id = $1 AND module_key = 'spa/service-usage' AND deleted_at IS NULL
-               AND record_date::date BETWEEN $2::date AND $3::date`,
+            `SELECT COUNT(DISTINCT v.therapist_record_id)::int AS therapists,
+                    COUNT(DISTINCT v.id)::int AS visits,
+                    COUNT(DISTINCT v.id) FILTER (WHERE v.finished_at IS NOT NULL)::int AS completed,
+                    COALESCE(SUM(vs.quantity), 0)::int AS service_items
+             FROM spa_visits v
+             LEFT JOIN spa_visit_services vs ON vs.visit_id=v.id
+             WHERE v.company_id=$1 AND v.therapist_record_id IS NOT NULL
+               AND v.checked_in_at::date BETWEEN $2::date AND $3::date`,
             [companyId, from, to]
           ),
           pool.query(
-            `SELECT COALESCE(NULLIF(details->>'therapist', ''), 'Unassigned') AS therapist,
-                    COUNT(*)::int AS services,
-                    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed,
-                    COUNT(DISTINCT details->>'customer_name')::int AS customers,
-                    COALESCE(SUM(amount), 0)::numeric AS generated_charges
-             FROM spa_management_records
-             WHERE company_id = $1 AND module_key = 'spa/service-usage' AND deleted_at IS NULL
-               AND record_date::date BETWEEN $2::date AND $3::date
-             GROUP BY COALESCE(NULLIF(details->>'therapist', ''), 'Unassigned')
-             ORDER BY services DESC, therapist`,
+            `SELECT COALESCE(v.therapist_name, 'Unassigned') AS therapist,
+                    COUNT(DISTINCT v.id)::int AS visits,
+                    COUNT(DISTINCT v.id) FILTER (WHERE v.finished_at IS NOT NULL)::int AS completed,
+                    COALESCE(SUM(vs.quantity), 0)::int AS service_items,
+                    COALESCE(AVG(EXTRACT(EPOCH FROM (v.finished_at-v.treatment_started_at))/60)
+                      FILTER (WHERE v.finished_at IS NOT NULL AND v.treatment_started_at IS NOT NULL), 0)::numeric AS average_minutes
+             FROM spa_visits v
+             LEFT JOIN spa_visit_services vs ON vs.visit_id=v.id
+             WHERE v.company_id=$1 AND v.therapist_record_id IS NOT NULL
+               AND v.checked_in_at::date BETWEEN $2::date AND $3::date
+             GROUP BY v.therapist_record_id, v.therapist_name
+             ORDER BY completed DESC, therapist`,
             [companyId, from, to]
           ),
         ]);
         const item = summaryResult.rows[0];
         return reportResponse(
           [
-            { label: "Services", value: item.services, format: "number" },
             { label: "Therapists", value: item.therapists, format: "number" },
+            { label: "Assigned Visits", value: item.visits, format: "number" },
             { label: "Completed", value: item.completed, format: "number" },
-            { label: "Generated Charges", value: item.generated_charges, format: "currency" },
+            { label: "Service Items", value: item.service_items, format: "number" },
           ],
           [
             { key: "therapist", label: "Therapist" },
-            { key: "services", label: "Services", format: "number" },
+            { key: "visits", label: "Visits", format: "number" },
             { key: "completed", label: "Completed", format: "number" },
-            { key: "customers", label: "Customers", format: "number" },
-            { key: "generated_charges", label: "Generated Charges", format: "currency" },
+            { key: "service_items", label: "Service Items", format: "number" },
+            { key: "average_minutes", label: "Average Treatment", format: "minutes" },
           ],
           therapistResult.rows,
           from,
@@ -367,7 +348,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
       if (code === "42P01") {
         return NextResponse.json(
-          { error: "Required report tables are not installed. Apply the latest database migrations, including db-migration-v33.sql." },
+          { error: "Required report tables are not installed. Apply the latest database migrations, including db-migration-v33.sql and db-migration-v34.sql." },
           { status: 503 }
         );
       }

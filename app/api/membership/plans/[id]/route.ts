@@ -25,7 +25,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   try {
     const body = await req.json();
-    const allowed = ["name","type","description","duration_days","price","max_members","is_active"];
+    const allowed = ["name","type","description","duration_days","max_members","is_active"];
     const sets: string[] = [];
     const vals: any[] = [];
     let idx = 1;

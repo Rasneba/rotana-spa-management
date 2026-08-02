@@ -2,34 +2,29 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { GemPage, GemCard, GemCardBare, GemBtn, GemBtnOutline, GemTable, GemBadge, GemKpi } from "@/lib/gem-ui";
-import { ArrowLeft, Clock, CalendarCheck, Layers, CreditCard, User, LogOut } from "lucide-react";
+import { GemPage, GemCard, GemCardBare, GemTable, GemBadge, GemKpi } from "@/lib/gem-ui";
+import { ArrowLeft, Clock, CalendarCheck, Layers, User, UserCheck } from "lucide-react";
 
 export default function MemberDetailPage() {
   const { id } = useParams();
   const [member, setMember] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [attendance, setAttendance] = useState<any[]>([]);
-  const [payments, setPayments] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<"overview" | "attendance" | "payments">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "attendance">("overview");
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
     if (!token || !id) return;
     const load = async () => {
       try {
-        const [mRes, aRes, pRes] = await Promise.all([
+        const [mRes, aRes] = await Promise.all([
           fetch(`/api/membership/members/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
           fetch(`/api/membership/attendance/history?member_id=${id}&limit=20`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`/api/membership/payments`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
         const mData = await mRes.json();
         const aData = await aRes.json();
-        const pData = await pRes.json();
         setMember(mData.id ? mData : null);
         setAttendance(aData.ok ? aData.data || [] : []);
-        const allPayments = Array.isArray(pData) ? pData : pData.data || [];
-        setPayments(allPayments.filter((p: any) => p.member_id == id));
       } catch {}
       setLoading(false);
     };
@@ -47,7 +42,6 @@ export default function MemberDetailPage() {
   const tabs = [
     { key: "overview" as const, label: "Overview" },
     { key: "attendance" as const, label: `Attendance (${attendance.length})` },
-    { key: "payments" as const, label: `Payments (${payments.length})` },
   ];
 
   return (
@@ -79,7 +73,7 @@ export default function MemberDetailPage() {
         <GemKpi title="Total Visits" value={totalVisits} icon={<Clock size={22} />} color="bg-blue-500" />
         <GemKpi title="This Month" value={thisMonth} icon={<CalendarCheck size={22} />} color="bg-emerald-600" />
         <GemKpi title="Plan" value={member.plan_name || "N/A"} icon={<Layers size={22} />} color="bg-purple-500" />
-        <GemKpi title="Payments" value={payments.length} icon={<CreditCard size={22} />} color="bg-amber-500" />
+        <GemKpi title="Status" value={isActive ? "Active" : "Expired"} icon={<UserCheck size={22} />} color="bg-amber-500" />
       </div>
 
       <div className="flex gap-1 mb-6 rounded-2xl p-1 shadow-sm border border-gray-100">
@@ -133,26 +127,6 @@ export default function MemberDetailPage() {
         </GemCardBare>
       )}
 
-      {activeTab === "payments" && (
-        <GemCardBare>
-          <div className="p-6">
-            {payments.length === 0 ? (
-              <div className="text-center text-gray-400 py-8"><CreditCard size={32} className="mx-auto mb-2 opacity-40" /><p className="text-sm">No payment records</p></div>
-            ) : (
-              <GemTable
-                headers={["Date", "Reference", "Amount", "Method", "Notes"]}
-                rows={payments.map((p: any) => [
-                  <span className="text-sm">{new Date(p.payment_date || p.created_at).toLocaleDateString()}</span>,
-                  <span className="font-mono text-xs text-gray-400">{p.reference}</span>,
-                  <span className="font-bold">ETB {Number(p.amount).toLocaleString()}</span>,
-                  <GemBadge variant="warning">{p.payment_method}</GemBadge>,
-                  <span className="text-sm text-gray-400">{p.notes || "-"}</span>,
-                ])}
-              />
-            )}
-          </div>
-        </GemCardBare>
-      )}
     </GemPage>
   );
 }

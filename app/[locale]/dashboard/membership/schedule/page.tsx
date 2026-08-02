@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "@/lib/i18n/navigation";
 import {
   CalendarDays,
   Check,
@@ -90,6 +91,7 @@ function eventPosition(appointment: Appointment) {
 }
 
 export default function SpaSchedulePage() {
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(() => localDateKey(new Date()));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -156,7 +158,7 @@ export default function SpaSchedulePage() {
       const [facilityResponse, memberResponse, rateResponse] = await Promise.all([
         fetch("/api/membership/facilities", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/membership/members", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/membership/rate-cards", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/spa/spa/services?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const [facilityData, memberData, rateData] = await Promise.all([
         facilityResponse.json(), memberResponse.json(), rateResponse.json(),
@@ -164,7 +166,12 @@ export default function SpaSchedulePage() {
       const loadedFacilities = Array.isArray(facilityData) ? facilityData : [];
       setFacilities(loadedFacilities);
       setMembers(Array.isArray(memberData) ? memberData : memberData.data || []);
-      setRateCards(Array.isArray(rateData) ? rateData : rateData.data || []);
+      const serviceRecords = Array.isArray(rateData?.records) ? rateData.records : [];
+      setRateCards(serviceRecords.map((record: any) => ({
+        id: Number(record.id),
+        name: record.title,
+        duration_minutes: Number(record.details?.duration_minutes) || null,
+      })));
       if (loadedFacilities.length) {
         setForm((current) => current.facility_id ? current : { ...current, facility_id: String(loadedFacilities[0].id) });
       }
@@ -234,7 +241,8 @@ export default function SpaSchedulePage() {
           member_id: form.member_id ? Number(form.member_id) : null,
           guest_name: form.guest_name,
           guest_phone: form.guest_phone,
-          rate_card_id: form.rate_card_id ? Number(form.rate_card_id) : null,
+          // Service pricing belongs to the separate POS. The appointment stores only the operational service name.
+          rate_card_id: null,
           service_name: form.service_name,
           facility_id: Number(form.facility_id),
           starts_at: start.toISOString(),
@@ -265,6 +273,26 @@ export default function SpaSchedulePage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to update appointment");
+
+      if (status === "checked_in") {
+        const visitResponse = await fetch("/api/spa/visits", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            appointment_id: selectedAppointment.id,
+            member_id: selectedAppointment.member_id || null,
+            customer_name: selectedAppointment.member_name || selectedAppointment.guest_name,
+            customer_phone: selectedAppointment.guest_phone || "",
+            notes: selectedAppointment.notes || "",
+          }),
+        });
+        const visit = await visitResponse.json();
+        if (!visitResponse.ok) throw new Error(visit.error || "Appointment checked in, but the visit could not be created");
+        setSelectedAppointment(null);
+        router.push(`/dashboard/spa/operations/visits/${visit.id}`);
+        return;
+      }
+
       setSelectedAppointment(null);
       await loadAppointments();
     } catch (statusError: unknown) {
@@ -441,7 +469,7 @@ export default function SpaSchedulePage() {
 
               <div className="booking-section-label">Treatment details</div>
               <div className="booking-field-grid two">
-                <label>Service menu<select value={form.rate_card_id} onChange={(event) => updateRateCard(event.target.value)}><option value="">Custom service</option>{rateCards.map((card) => <option key={card.id} value={card.id}>{card.name}{card.duration_minutes ? ` · ${card.duration_minutes} min` : ""}</option>)}</select></label>
+                <label>Service catalogue<select value={form.rate_card_id} onChange={(event) => updateRateCard(event.target.value)}><option value="">Custom service</option>{rateCards.map((card) => <option key={card.id} value={card.id}>{card.name}{card.duration_minutes ? ` · ${card.duration_minutes} min` : ""}</option>)}</select></label>
                 <label>Service name *<input value={form.service_name} onChange={(event) => setForm({ ...form, service_name: event.target.value })} placeholder="e.g. Aroma massage" /></label>
                 <label>Treatment area *<select value={form.facility_id} onChange={(event) => setForm({ ...form, facility_id: event.target.value })}><option value="">Choose an area</option>{facilities.map((facility) => <option key={facility.id} value={facility.id}>{facility.name}</option>)}</select></label>
                 <label>Duration<select value={form.duration} onChange={(event) => setForm({ ...form, duration: event.target.value })}>{[30, 45, 60, 75, 90, 120].map((duration) => <option key={duration} value={duration}>{duration} minutes</option>)}</select></label>
@@ -463,7 +491,7 @@ export default function SpaSchedulePage() {
             <h2 id="appointment-title">{selectedAppointment.service_name}</h2>
             <p className="detail-guest"><UserRound size={17} />{selectedAppointment.member_name || selectedAppointment.guest_name || "Walk-in guest"}</p>
             <dl><div><dt>Time</dt><dd>{displayTime(selectedAppointment.starts_at)} – {displayTime(selectedAppointment.ends_at)}</dd></div><div><dt>Area</dt><dd>{selectedAppointment.facility_name || "Spa area"}</dd></div>{selectedAppointment.notes && <div><dt>Notes</dt><dd>{selectedAppointment.notes}</dd></div>}</dl>
-            {!["completed", "cancelled", "no_show"].includes(selectedAppointment.status) && <div className="appointment-actions"><button onClick={() => setAppointmentStatus("checked_in")} disabled={saving}><UserRound size={16} /> Check in</button><button onClick={() => setAppointmentStatus("completed")} disabled={saving}><Check size={16} /> Complete</button><button className="danger" onClick={() => setAppointmentStatus("cancelled")} disabled={saving}>Cancel</button></div>}
+            {!["completed", "cancelled", "no_show"].includes(selectedAppointment.status) && <div className="appointment-actions">{selectedAppointment.status === "confirmed" && <button onClick={() => setAppointmentStatus("checked_in")} disabled={saving}><UserRound size={16} /> Check in &amp; create visit</button>}{selectedAppointment.status === "checked_in" && <button onClick={() => setAppointmentStatus("completed")} disabled={saving}><Check size={16} /> Complete</button>}<button className="danger" onClick={() => setAppointmentStatus("cancelled")} disabled={saving}>Cancel</button></div>}
           </section>
         </div>
       )}

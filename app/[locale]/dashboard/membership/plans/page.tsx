@@ -7,7 +7,7 @@ export default function MembershipPlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<any>({ name: "", type: "general", description: "", duration_days: "30", price: "", max_members: "" });
+  const [form, setForm] = useState<any>({ name: "", type: "general", description: "", duration_days: "30", max_members: "" });
   const [saving, setSaving] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -32,9 +32,9 @@ export default function MembershipPlansPage() {
       const res = await fetch("/api/membership/plans", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...form, price: parseFloat(form.price) || 0, duration_days: parseInt(form.duration_days) || 30 }),
+        body: JSON.stringify({ ...form, duration_days: parseInt(form.duration_days) || 30 }),
       });
-      if (res.ok) { setShowForm(false); setForm({ name: "", type: "general", description: "", duration_days: "30", price: "", max_members: "" }); load(); }
+      if (res.ok) { setShowForm(false); setForm({ name: "", type: "general", description: "", duration_days: "30", max_members: "" }); load(); }
       else { const err = await res.json(); alert(err.error); }
     } catch { alert("Server error"); }
     setSaving(false);
@@ -49,7 +49,7 @@ export default function MembershipPlansPage() {
     <GemPage>
       <GemHeader
         title="Membership Plans"
-        subtitle="Create and manage membership plans for gym, parking, club"
+        subtitle="Configure operational membership duration and access; pricing remains in the separate POS"
         actions={
           <GemBtn onClick={() => setShowForm(!showForm)}>
             {showForm ? <X size={16} /> : <Plus size={16} />}{showForm ? "Cancel" : "New Plan"}
@@ -60,7 +60,7 @@ export default function MembershipPlansPage() {
       {showForm && (
         <GemCard className="mb-6">
           <h3 className="font-semibold mb-4 flex items-center gap-2"><Layers size={18} />Create Plan</h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="text-sm text-gray-500 font-medium mb-1 block">Plan Name <span className="text-red-500">*</span></label>
               <GemInput type="text" required value={form.name} onChange={(e: any) => setForm({...form, name: e.target.value})} />
@@ -70,8 +70,8 @@ export default function MembershipPlansPage() {
               <GemSelect value={form.type} onChange={(e: any) => setForm({...form, type: e.target.value})}>
                 <option value="general">General</option>
                 <option value="gym">Gym</option>
-                <option value="parking">Parking</option>
-                <option value="club">Club</option>
+                <option value="spa">Spa</option>
+                <option value="cafe">Cafe</option>
               </GemSelect>
             </div>
             <div>
@@ -79,18 +79,14 @@ export default function MembershipPlansPage() {
               <GemInput type="number" value={form.duration_days} onChange={(e: any) => setForm({...form, duration_days: e.target.value})} />
             </div>
             <div>
-              <label className="text-sm text-gray-500 font-medium mb-1 block">Price (ETB)</label>
-              <GemInput type="number" value={form.price} onChange={(e: any) => setForm({...form, price: e.target.value})} />
-            </div>
-            <div>
               <label className="text-sm text-gray-500 font-medium mb-1 block">Max Members</label>
               <GemInput type="number" value={form.max_members} onChange={(e: any) => setForm({...form, max_members: e.target.value})} />
             </div>
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <label className="text-sm text-gray-500 font-medium mb-1 block">Description</label>
               <textarea className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black/30 transition-all" rows={2} value={form.description} onChange={(e: any) => setForm({...form, description: e.target.value})} />
             </div>
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <GemBtn type="submit" disabled={saving}>
                 <Save size={16} />{saving ? "Saving..." : "Create Plan"}
               </GemBtn>
@@ -107,12 +103,11 @@ export default function MembershipPlansPage() {
         ) : (
           <div className="overflow-x-auto p-6">
             <GemTable
-              headers={["Name", "Type", "Duration", "Price", "Members", "Status"]}
+              headers={["Name", "Type", "Duration", "Members", "Status"]}
               rows={plans.map(p => [
                 <span className="font-semibold">{p.name}</span>,
                 typeBadge(p.type),
                 `${p.duration_days} days`,
-                `ETB ${Number(p.price).toLocaleString()}`,
                 <GemBadge>{p.member_count || 0}</GemBadge>,
                 p.is_active ? <GemBadge variant="success">Active</GemBadge> : <GemBadge variant="danger">Inactive</GemBadge>,
               ])}

@@ -10,7 +10,7 @@ export function SubscriptionsWorkspace({ initialCreate = false }: { initialCreat
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(initialCreate);
-  const [form, setForm] = useState<any>({ member_id: "", plan_id: "", end_date: "", billing_cycle: "monthly", amount: "", auto_renew: false });
+  const [form, setForm] = useState<any>({ member_id: "", plan_id: "", end_date: "", billing_cycle: "monthly", auto_renew: false });
   const [saving, setSaving] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -43,9 +43,9 @@ export function SubscriptionsWorkspace({ initialCreate = false }: { initialCreat
       const res = await fetch("/api/membership/subscriptions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...form, member_id: parseInt(form.member_id), plan_id: form.plan_id ? parseInt(form.plan_id) : null, amount: parseFloat(form.amount) || 0 }),
+        body: JSON.stringify({ ...form, member_id: parseInt(form.member_id), plan_id: form.plan_id ? parseInt(form.plan_id) : null }),
       });
-      if (res.ok) { setShowForm(false); setForm({ member_id: "", plan_id: "", end_date: "", billing_cycle: "monthly", amount: "", auto_renew: false }); load(); }
+      if (res.ok) { setShowForm(false); setForm({ member_id: "", plan_id: "", end_date: "", billing_cycle: "monthly", auto_renew: false }); load(); }
       else { const err = await res.json(); alert(err.error); }
     } catch { alert("Server error"); }
     setSaving(false);
@@ -70,7 +70,7 @@ export function SubscriptionsWorkspace({ initialCreate = false }: { initialCreat
 
   return (
     <GemPage>
-      <GemHeader title="Subscriptions" subtitle="Recurring membership subscriptions"
+      <GemHeader title="Subscriptions" subtitle="Operational membership periods and renewals; pricing and payment stay in the separate POS"
         actions={<GemBtn onClick={() => setShowForm(!showForm)}><Plus size={16} />New Subscription</GemBtn>} />
 
       {showForm && (
@@ -121,12 +121,11 @@ export function SubscriptionsWorkspace({ initialCreate = false }: { initialCreat
         ) : (
           <div className="overflow-x-auto p-6">
             <GemTable
-              headers={["Member", "Plan", "Cycle", "Amount", "Start", "End", "Status", ""]}
+              headers={["Member", "Plan", "Cycle", "Start", "End", "Status", ""]}
               rows={items.map(s => [
                 <Link href={`/dashboard/spa/customers/profiles/${s.member_id}`} className="font-semibold hover:text-blue-600">{s.member_name}</Link>,
                 s.plan_name || "-",
                 s.billing_cycle,
-                `ETB ${Number(s.amount).toLocaleString()}`,
                 new Date(s.start_date).toLocaleDateString(),
                 new Date(s.end_date).toLocaleDateString(),
                 statusBadge(s.status),

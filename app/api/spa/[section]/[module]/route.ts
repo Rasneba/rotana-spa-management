@@ -136,6 +136,15 @@ function applyDerivedValues(
     if (currentStatus === "full" && enrolled < capacity) return "open";
   }
 
+  if (definition.key === "operations/towel-management"
+      && !["lost", "laundry"].includes(currentStatus)) {
+    const issued = Number(details.issued_quantity || 0);
+    const returned = Number(details.returned_quantity || 0);
+    if (issued > 0 && returned >= issued) return "returned";
+    if (returned > 0) return "partially-returned";
+    return "issued";
+  }
+
   return currentStatus;
 }
 

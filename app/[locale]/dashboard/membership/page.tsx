@@ -4,32 +4,29 @@ import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemKpi, GemBtn, GemBtnOutline, GemTable, GemBadge } from "@/lib/gem-ui";
 import {
   Activity,
-  BadgeDollarSign,
   BarChart3,
   Boxes,
   BriefcaseBusiness,
   Building2,
   CalendarDays,
-  CheckCircle,
-  CreditCard,
-  DollarSign,
   Dumbbell,
   Flower2,
   Layers,
+  ReceiptText,
   Users,
 } from "lucide-react";
 
 const managementAreas = [
   { name: "Customers", icon: Users, desc: "Profiles, medical records, visits and loyalty", href: "/dashboard/spa/customers/profiles", color: "text-sky-600" },
   { name: "Membership", icon: Layers, desc: "Plans, registration, renewals and access cards", href: "/dashboard/membership/plans", color: "text-blue-600" },
-  { name: "Operations", icon: Activity, desc: "Check-ins, appointments, sessions and queue", href: "/dashboard/spa/operations/check-in", color: "text-violet-600" },
+  { name: "Operations", icon: Activity, desc: "Visits, appointments, treatments and towels", href: "/dashboard/spa/operations/visits", color: "text-violet-600" },
   { name: "Gym", icon: Dumbbell, desc: "Trainers, workout plans, classes and attendance", href: "/dashboard/spa/gym/trainers", color: "text-emerald-600" },
   { name: "Spa", icon: Flower2, desc: "Services, therapists, rooms, bookings and packages", href: "/dashboard/spa/spa/services", color: "text-rose-600" },
   { name: "Inventory", icon: Boxes, desc: "Products, consumables, usage and suppliers", href: "/dashboard/spa/inventory/products", color: "text-amber-600" },
-  { name: "Charges", icon: BadgeDollarSign, desc: "Pending charges, cashier and receipt workflows", href: "/dashboard/spa/charges/pending-charges", color: "text-indigo-600" },
+  { name: "Service Orders", icon: ReceiptText, desc: "Price-free draft slips for the separate POS cashier", href: "/dashboard/spa/operations/service-orders", color: "text-indigo-600" },
   { name: "Staff", icon: BriefcaseBusiness, desc: "Employees, schedules, commission and performance", href: "/dashboard/spa/staff/employees", color: "text-cyan-600" },
   { name: "Facilities", icon: Building2, desc: "Rooms, lockers, equipment and maintenance", href: "/dashboard/spa/facilities/rooms", color: "text-orange-600" },
-  { name: "Reports", icon: BarChart3, desc: "Membership, attendance, revenue and utilization", href: "/dashboard/spa/reports/membership", color: "text-teal-600" },
+  { name: "Reports", icon: BarChart3, desc: "Membership, attendance, service orders and utilization", href: "/dashboard/spa/reports/membership", color: "text-teal-600" },
 ];
 
 export default function SpaManagementDashboard() {
@@ -39,22 +36,24 @@ export default function SpaManagementDashboard() {
   const load = async () => {
     if (!token) return;
     try {
-      const [plansRes, membersRes, paymentsRes] = await Promise.all([
+      const today = new Date().toISOString().slice(0, 10);
+      const [plansRes, membersRes, visitsRes, ordersRes] = await Promise.all([
         fetch("/api/membership/plans", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/membership/members", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/membership/payments", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`/api/spa/visits?date=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/spa/service-orders?status=draft", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const plans = await plansRes.json();
       const members = await membersRes.json();
-      const payments = await paymentsRes.json();
-      const activeMembers = Array.isArray(members) ? members.filter((m: any) => m.status === "active") : [];
-      const totalRevenue = Array.isArray(payments) ? payments.reduce((s: number, p: any) => s + Number(p.amount), 0) : 0;
+      const visitsData = visitsRes.ok ? await visitsRes.json() : { visits: [] };
+      const ordersData = ordersRes.ok ? await ordersRes.json() : { summary: { drafts: 0 } };
+      const visits = Array.isArray(visitsData.visits) ? visitsData.visits : [];
       setStats({
         totalPlans: Array.isArray(plans) ? plans.length : 0,
         totalMembers: Array.isArray(members) ? members.length : 0,
-        activeMembers: activeMembers.length,
-        totalRevenue,
-        recentPayments: Array.isArray(payments) ? payments.slice(0, 5) : [],
+        todayVisits: visits.length,
+        draftOrders: Number(ordersData.summary?.drafts || 0),
+        recentVisits: visits.slice(0, 5),
       });
     } catch {}
   };
@@ -65,10 +64,11 @@ export default function SpaManagementDashboard() {
     <GemPage>
       <GemHeader
         title="Spa Management"
-        subtitle="Manage bookings, memberships, gym access and daily operations"
+        subtitle="Manage visits, treatments, memberships and operational handoff—separate from Sales/POS"
         actions={
           <>
-            <Link href="/dashboard/spa/operations/appointments" className="text-inherit"><GemBtn><CalendarDays size={16} />Schedule</GemBtn></Link>
+            <Link href="/dashboard/spa/operations/visits" className="text-inherit"><GemBtn><Activity size={16} />Visits</GemBtn></Link>
+            <Link href="/dashboard/spa/operations/appointments" className="text-inherit"><GemBtnOutline><CalendarDays size={16} />Schedule</GemBtnOutline></Link>
             <Link href="/dashboard/spa/gym/attendance" className="text-inherit"><GemBtnOutline><Dumbbell size={16} />Gym</GemBtnOutline></Link>
             <Link href="/dashboard/spa/customers/profiles" className="text-inherit"><GemBtnOutline><Users size={16} />Members</GemBtnOutline></Link>
           </>
@@ -83,8 +83,8 @@ export default function SpaManagementDashboard() {
             {[
               { label: "Total Plans", value: stats.totalPlans, icon: <Layers size={22} />, color: "bg-black", href: "/dashboard/membership/plans" },
               { label: "Total Members", value: stats.totalMembers, icon: <Users size={22} />, color: "bg-emerald-600", href: "/dashboard/spa/customers/profiles" },
-              { label: "Active Members", value: stats.activeMembers, icon: <CheckCircle size={22} />, color: "bg-blue-500", href: "/dashboard/spa/customers/profiles" },
-              { label: "Revenue", value: `ETB ${stats.totalRevenue.toLocaleString()}`, icon: <DollarSign size={22} />, color: "bg-amber-500", href: "/dashboard/spa/charges/payment-history" },
+              { label: "Today's Visits", value: stats.todayVisits, icon: <Activity size={22} />, color: "bg-violet-600", href: "/dashboard/spa/operations/visits" },
+              { label: "Draft Orders", value: stats.draftOrders, icon: <ReceiptText size={22} />, color: "bg-amber-500", href: "/dashboard/spa/operations/service-orders" },
             ].map(card => (
               <Link key={card.label} href={card.href} className="text-inherit">
                 <GemKpi title={card.label} value={card.value} icon={card.icon} color={card.color} />
@@ -94,21 +94,21 @@ export default function SpaManagementDashboard() {
 
           <GemCardBare className="mb-8">
             <div className="p-6 flex justify-between items-center border-b border-gray-100">
-              <h2 className="font-semibold flex items-center gap-2"><CreditCard size={18} />Recent Payments</h2>
-              <Link href="/dashboard/spa/charges/payment-history" className="text-sm font-medium text-black hover:underline">View All</Link>
+              <h2 className="font-semibold flex items-center gap-2"><Activity size={18} />Today&apos;s Visits</h2>
+              <Link href="/dashboard/spa/operations/visits" className="text-sm font-medium text-black hover:underline">View All</Link>
             </div>
             <div className="overflow-x-auto">
-              {stats.recentPayments.length === 0 ? (
-                <div className="text-center text-gray-400 py-8 text-sm">No payments yet</div>
+              {stats.recentVisits.length === 0 ? (
+                <div className="text-center text-gray-400 py-8 text-sm">No visits today</div>
               ) : (
                 <GemTable
-                  headers={["Customer", "Plan", "Amount", "Method", "Date"]}
-                  rows={stats.recentPayments.map((p: any) => [
-                    <span className="font-semibold">{p.member_name}</span>,
-                    <GemBadge variant="info">{p.plan_name}</GemBadge>,
-                    `ETB ${Number(p.amount).toLocaleString()}`,
-                    <GemBadge>{p.payment_method}</GemBadge>,
-                    <span className="text-sm">{new Date(p.payment_date).toLocaleDateString()}</span>,
+                  headers={["Visit", "Customer", "Therapist", "Services", "Status"]}
+                  rows={stats.recentVisits.map((visit: any) => [
+                    <Link href={`/dashboard/spa/operations/visits/${visit.id}`} className="font-mono font-semibold">{visit.visit_no}</Link>,
+                    <span className="font-semibold">{visit.customer_name}</span>,
+                    visit.therapist_name || "Unassigned",
+                    Number(visit.total_items || 0),
+                    <GemBadge variant={visit.status === "cancelled" ? "danger" : visit.status === "in_treatment" ? "info" : "success"}>{String(visit.status).replace(/_/g, " ")}</GemBadge>,
                   ])}
                 />
               )}

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { withAuth, ok, created, err, badRequest } from "@/lib/api-utils";
+import { withAuth, ok, err } from "@/lib/api-utils";
 import { requirePermission } from "@/lib/permissions";
-import { generateSequentialId } from "@/lib/id-generator";
 
 export async function GET(req: Request) {
   return withAuth(req, async (user) => {
@@ -25,25 +24,11 @@ export async function GET(req: Request) {
   });
 }
 
-export async function POST(req: Request) {
-  return withAuth(req, async (user) => {
-    const { allowed } = await requirePermission(user, "create", "membership_payments");
-    if (!allowed) return NextResponse.json({ error: "Permission denied" }, { status: 403 });
-    try {
-      if (!user.company_id) return badRequest("Company required");
-      const body = await req.json();
-      const { member_id, amount, payment_method, reference, payment_date, notes } = body;
-      if (!member_id) return badRequest("Member is required");
-      if (!amount) return badRequest("Amount is required");
-      const ref = reference || await generateSequentialId("membership_payments", "reference", "PAY");
-      const result = await pool.query(
-        `INSERT INTO membership_payments (company_id, member_id, amount, payment_method, reference, payment_date, notes)
-         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-        [user.company_id, member_id, amount, payment_method || "cash", ref, payment_date || new Date(), notes]
-      );
-      return created(result.rows[0]);
-    } catch (e: any) {
-      return err(e.message);
-    }
-  });
+export async function POST() {
+  return NextResponse.json(
+    {
+      error: "Payments are handled by the separate Sales/POS application. Use a draft Spa Service Order for cashier handoff.",
+    },
+    { status: 410 }
+  );
 }

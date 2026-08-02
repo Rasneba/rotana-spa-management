@@ -5,21 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const modules = [
-  { name: "Spa Management", moduleCode: "membership", icon: "bi-flower1", href: "/dashboard/membership", color: "#557463", desc: "Bookings, memberships, gym and daily operations" },
+  { name: "Spa Management", moduleCode: "membership", icon: "bi-flower1", href: "/dashboard/membership", color: "#557463", desc: "Visits, treatments, memberships and service-order handoff" },
   { name: "Audit", icon: "bi-journal-text", href: "/dashboard/audit-logs", color: "#14b8a6", desc: "Audit trails, activity logs" },
 ];
 
 const quickActions = [
-  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/operations/appointments", color: "primary" },
-  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/spa/customers/profiles", color: "success" },
-  { label: "Gym Floor", icon: "bi-activity", href: "/dashboard/spa/gym/attendance", color: "info" },
-  { label: "Check In", icon: "bi-box-arrow-in-right", href: "/dashboard/spa/operations/check-in", color: "warning" },
+  { label: "New Visit", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits", color: "primary" },
+  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/operations/appointments", color: "success" },
+  { label: "Register Member", icon: "bi-person-plus", href: "/dashboard/spa/membership/member-registration", color: "info" },
+  { label: "Service Orders", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders", color: "warning" },
 ];
 
 export default function Dashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
-  const [currency, setCurrency] = useState("Birr");
   const [greeting, setGreeting] = useState("");
   const [licensedModules, setLicensedModules] = useState<string[]>([]);
   const [userRole, setUserRole] = useState("");
@@ -54,12 +53,19 @@ export default function Dashboard() {
 
     const tok = localStorage.getItem("token");
     if (!tok) return;
+    const today = new Date().toISOString().slice(0, 10);
     Promise.all([
       fetch("/api/dashboard/stats", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.json()),
-      fetch("/api/settings", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.json()).catch(() => ({})),
-    ]).then(([s, settings]) => {
-      setStats(s);
-      if (settings?.currency) setCurrency(settings.currency);
+      fetch(`/api/spa/visits?date=${today}`, { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.ok ? r.json() : { visits: [] }),
+      fetch("/api/spa/service-orders?status=draft", { headers: { Authorization: `Bearer ${tok}` } }).then(r => r.ok ? r.json() : { summary: { drafts: 0 } }),
+    ]).then(([baseStats, visitData, orderData]) => {
+      const visits = Array.isArray(visitData.visits) ? visitData.visits : [];
+      setStats({
+        ...baseStats,
+        todayVisits: visits.length,
+        inTreatment: visits.filter((visit: any) => visit.status === "in_treatment").length,
+        draftOrders: Number(orderData.summary?.drafts || 0),
+      });
     }).catch(console.error);
   }, [router]);
 
@@ -82,16 +88,13 @@ export default function Dashboard() {
     return hasLicense(m.moduleCode);
   });
 
-  const visibleQuickActions = quickActions.filter(a => {
-    if (a.href.includes("/membership")) return hasLicense("membership");
-    return false;
-  });
+  const visibleQuickActions = hasLicense("membership") ? quickActions : [];
 
   const spaCards = [
     { title: "Total Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/spa/customers/profiles" },
-    { title: "Active Members", value: stats.activeMembers || stats.activeCustomers, color: "text-success", icon: "bi-person-check", href: "/dashboard/spa/customers/profiles" },
-    { title: "Today Check-ins", value: stats.todayCheckIns || 0, color: "text-warning", icon: "bi-box-arrow-in-right", href: "/dashboard/spa/operations/check-in" },
-    { title: "Revenue", value: `${currency} ${(stats.totalRevenue || 0)?.toLocaleString()}`, color: "text-info", icon: "bi-cash-stack", href: "/dashboard/spa/charges/payment-history" },
+    { title: "Today's Visits", value: stats.todayVisits || 0, color: "text-success", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits" },
+    { title: "In Treatment", value: stats.inTreatment || 0, color: "text-warning", icon: "bi-flower1", href: "/dashboard/spa/operations/visits" },
+    { title: "Draft Orders", value: stats.draftOrders || 0, color: "text-info", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders" },
   ];
 
   return (

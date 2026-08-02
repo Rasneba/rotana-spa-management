@@ -21,7 +21,8 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
     label: "Operations",
     resources: [
       "membership_attendance", "membership_appointments", "membership_sessions",
-      "membership_access_logs", "spa_queue", "spa_customer_requests",
+      "membership_access_logs", "spa_visits", "spa_visit_services",
+      "spa_service_orders", "spa_queue", "spa_customer_requests", "spa_towels",
     ],
   },
   "Gym": {
@@ -33,18 +34,12 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   },
   "Spa": {
     label: "Spa",
-    resources: ["spa_services", "spa_therapists", "spa_packages", "spa_service_usage"],
+    resources: ["spa_services", "spa_therapists", "spa_packages"],
   },
   "Inventory": {
     label: "Inventory",
     resources: [
       "inventory_products", "inventory_consumables", "inventory_stock_usage", "inventory_suppliers",
-    ],
-  },
-  "Charges": {
-    label: "Charges",
-    resources: [
-      "charges_pending", "charges_cashier", "charges_external_receipts", "membership_payments",
     ],
   },
   "Staff": {
@@ -61,7 +56,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   "Reports": {
     label: "Reports",
     resources: [
-      "reports_membership", "reports_attendance", "reports_revenue",
+      "reports_membership", "reports_attendance", "reports_service_orders",
       "reports_therapist", "reports_trainer", "reports_inventory",
     ],
   },

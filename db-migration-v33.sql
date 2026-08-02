@@ -1,6 +1,6 @@
 -- Migration v33: Complete spa management workspaces
 -- Adds a secure, tenant-scoped operational record store used by the new
--- Customers, Gym, Spa, Inventory, Charges, Staff, Facilities and Settings
+-- Customers, Gym, Spa, Inventory, Staff, Facilities and Settings
 -- workspaces. Shared columns keep reporting fast while module-specific fields
 -- remain in validated JSONB payloads.
 
@@ -53,7 +53,7 @@ CREATE TRIGGER trg_spa_management_records_updated_at
 -- The membership license now represents the complete spa operations suite.
 UPDATE modules
 SET name = 'Spa Management',
-    description = 'Customers, memberships, gym, spa, inventory, charges, staff, facilities and reports',
+    description = 'Customers, memberships, gym, spa, inventory, staff, facilities and operational reports',
     icon = 'bi-flower1'
 WHERE code = 'membership';
 
@@ -68,14 +68,13 @@ DECLARE
     'spa_queue', 'spa_customer_requests',
     'gym_trainers', 'gym_workout_plans', 'gym_fitness_assessments',
     'gym_body_measurements', 'gym_classes',
-    'spa_services', 'spa_therapists', 'spa_packages', 'spa_service_usage',
+    'spa_services', 'spa_therapists', 'spa_packages',
     'inventory_products', 'inventory_consumables', 'inventory_stock_usage',
     'inventory_suppliers',
-    'charges_pending', 'charges_cashier', 'charges_external_receipts',
     'staff_employees', 'staff_schedules', 'staff_commission', 'staff_performance',
     'facilities_lockers', 'facilities_equipment', 'facilities_maintenance',
     'settings_branches',
-    'reports_membership', 'reports_attendance', 'reports_revenue',
+    'reports_membership', 'reports_attendance',
     'reports_therapist', 'reports_trainer', 'reports_inventory'
   ];
 BEGIN
@@ -106,8 +105,7 @@ DECLARE
   front_desk_resources TEXT[] := ARRAY[
     'spa_medical_records', 'spa_loyalty', 'membership_freeze_transfer',
     'spa_queue', 'spa_customer_requests', 'gym_classes',
-    'spa_services', 'spa_therapists', 'spa_packages', 'spa_service_usage',
-    'charges_pending', 'charges_cashier', 'charges_external_receipts',
+    'spa_services', 'spa_therapists', 'spa_packages',
     'facilities_lockers'
   ];
 BEGIN

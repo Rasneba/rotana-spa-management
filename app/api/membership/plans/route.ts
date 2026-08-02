@@ -29,12 +29,12 @@ export async function POST(req: Request) {
     if (!allowed) return NextResponse.json({ error: "Permission denied" }, { status: 403 });
     try {
       const body = await req.json();
-      const { name, type, description, duration_days, price, max_members } = body;
+      const { name, type, description, duration_days, max_members } = body;
       if (!name) return badRequest("Plan name is required");
       const result = await pool.query(
         `INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
          VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-        [user.company_id, name, type || "general", description, duration_days || 30, price || 0, max_members || null]
+        [user.company_id, name, type || "general", description, duration_days || 30, 0, max_members || null]
       );
       return created(result.rows[0]);
     } catch (e: any) {

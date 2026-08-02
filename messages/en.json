@@ -29,10 +29,10 @@
     "reports": {
       "membership": "Membership",
       "attendance": "Attendance",
-      "revenue": "Revenue",
       "therapist": "Therapist",
       "trainer": "Trainer",
-      "inventory": "Inventory"
+      "inventory": "Inventory",
+      "service_orders": "Service Orders"
     },
     "documents": "Documents",
     "settings": {
@@ -58,7 +58,6 @@
       "gym": "Gym",
       "spa": "Spa",
       "inventory": "Inventory",
-      "charges": "Charges",
       "staff": "Staff",
       "facilities": "Facilities",
       "reports": "Reports",
@@ -129,7 +128,10 @@
       "appointments": "Appointments",
       "sessions": "Sessions",
       "queue": "Queue",
-      "customer_requests": "Customer Requests"
+      "customer_requests": "Customer Requests",
+      "visits": "Visits",
+      "towel_management": "Towel Management",
+      "service_orders": "Service Orders"
     },
     "gym": {
       "trainers": "Trainers",
@@ -144,20 +146,13 @@
       "therapists": "Therapists",
       "treatment_rooms": "Treatment Rooms",
       "bookings": "Bookings",
-      "packages": "Packages",
-      "service_usage": "Service Usage"
+      "packages": "Packages"
     },
     "inventory": {
       "products": "Products",
       "consumables": "Consumables",
       "stock_usage": "Stock Usage",
       "suppliers": "Suppliers"
-    },
-    "charges": {
-      "pending_charges": "Pending Charges",
-      "send_to_cashier": "Send To Cashier",
-      "external_receipt": "External Receipt",
-      "payment_history": "Payment History"
     },
     "staff": {
       "employees": "Employees",
