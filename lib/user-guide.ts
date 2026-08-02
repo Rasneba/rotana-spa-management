@@ -160,10 +160,10 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
         fields: ["Visit Number", "Customer", "Therapist", "Services and Quantities", "Treatment Notes"],
       },
       {
-        title: "Appointments / Bookings",
+        title: "Appointments",
         route: "/dashboard/spa/operations/appointments",
         permission: "membership_appointments",
-        summary: "Facility-aware booking calendar. Checking in a confirmed appointment creates or opens its operational visit.",
+        summary: "The existing facility-aware appointment calendar remains unchanged. Checking in a confirmed appointment creates or opens its operational visit.",
         actions: ["New booking", "Navigate dates", "Check in", "Complete", "Cancel"],
         fields: ["Member or Guest *", "Facility / Room *", "Service", "Start Time *", "Duration", "Notes"],
       },
@@ -244,7 +244,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
     pages: [
       { title: "Therapists", route: "/dashboard/spa/spa/therapists", permission: "spa_therapists", summary: "Therapist profiles, specialties and certifications.", moduleKey: "spa/therapists" },
       { title: "Treatment Rooms", route: "/dashboard/spa/spa/treatment-rooms", permission: "membership_facilities", summary: "A filtered view of the single Areas & Facilities master.", actions: ["Add room", "Edit", "Activate/deactivate", "Delete"] },
-      { title: "Bookings", route: "/dashboard/spa/spa/bookings", permission: "membership_appointments", summary: "Alias of the appointment calendar using classified service/package offerings.", actions: ["Book treatment", "Check in", "Complete", "Cancel"] },
+      { title: "Spa Bookings", route: "/dashboard/spa/spa/bookings", permission: "spa_bookings", summary: "Therapist booking board with therapists listed vertically and time running horizontally. Selecting a therapist and service calculates the end time from service duration.", actions: ["Select therapist row/time", "Choose service", "Auto-calculate end time", "Edit start/end", "Move booking", "Cancel"] },
     ],
   },
   {

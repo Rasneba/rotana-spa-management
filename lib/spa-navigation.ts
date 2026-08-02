@@ -104,7 +104,7 @@ export const sidebarGroups: SidebarGroup[] = [
     links: [
       { name: "Therapists", href: "/dashboard/spa/spa/therapists", icon: "bi-person-heart", resource: "spa_therapists" },
       { name: "Treatment Rooms", href: "/dashboard/spa/spa/treatment-rooms", icon: "bi-door-closed", resource: "membership_facilities" },
-      { name: "Bookings", href: "/dashboard/spa/spa/bookings", icon: "bi-calendar2-plus", resource: "membership_appointments" },
+      { name: "Bookings", href: "/dashboard/spa/spa/bookings", icon: "bi-calendar2-plus", resource: "spa_bookings" },
     ],
   },
   {

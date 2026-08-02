@@ -43,7 +43,8 @@ export async function GET(req: Request) {
          LEFT JOIN spa_management_records o
            ON o.id=a.offering_id AND o.module_key='catalog/offerings' AND o.deleted_at IS NULL
          LEFT JOIN rate_cards r ON r.id=a.rate_card_id
-         WHERE a.starts_at < $1::timestamp
+         WHERE COALESCE(a.booking_kind,'appointment')='appointment'
+           AND a.starts_at < $1::timestamp
            AND a.ends_at > $2::timestamp
            AND ($3 = true OR a.company_id = $4)
          ORDER BY a.starts_at ASC, a.created_at ASC`,
@@ -140,8 +141,9 @@ export async function POST(req: Request) {
       const result = await pool.query(
         `INSERT INTO spa_appointments
           (company_id, member_id, facility_id, rate_card_id, offering_id,
-           guest_name, guest_phone, service_name, starts_at, ends_at, notes, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+           guest_name, guest_phone, service_name, starts_at, ends_at, notes,
+           created_by, booking_kind)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'appointment')
          RETURNING *`,
         [
           companyId,

@@ -1,1 +1,5 @@
-export { default } from "@/app/[locale]/dashboard/membership/schedule/page";
+import SpaTherapistBookingBoard from "@/components/spa/SpaTherapistBookingBoard";
+
+export default function SpaBookingsPage() {
+  return <SpaTherapistBookingBoard />;
+}

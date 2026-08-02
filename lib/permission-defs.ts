@@ -41,7 +41,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   },
   "Spa": {
     label: "Spa",
-    resources: ["spa_therapists"],
+    resources: ["spa_therapists", "spa_bookings"],
   },
   "Inventory": {
     label: "Inventory",

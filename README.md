@@ -18,18 +18,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Spa management database
 
-The expanded Spa/Gym workspaces require migrations v33 through v36 after the existing spa migrations:
+The expanded Spa/Gym workspaces require migrations v33 through v37 after the existing spa migrations:
 
 ```bash
 psql "$DATABASE_URL" -f db-migration-v33.sql
 psql "$DATABASE_URL" -f db-migration-v34.sql
 psql "$DATABASE_URL" -f db-migration-v35.sql
 psql "$DATABASE_URL" -f db-migration-v36.sql
+psql "$DATABASE_URL" -f db-migration-v37.sql
 ```
 
 Migration v34 adds the visit and draft service-order workflow. Migration v35 adds focused access control, enhanced gates, operational cameras, the controller queue and kiosk QR passes. Migration v36 consolidates customers/members into one classified customer master and plans/services/packages into one classified Offering Master.
 
 The visit treatment screen is optimized for tablets and touch devices: classified offering tiles work like a restaurant order menu, while a live cart provides large quantity and removal controls before the draft Service Order is finished.
+
+Migration v37 keeps the existing Appointments calendar unchanged and adds a separate Spa Bookings board: therapists are vertical, time is horizontal, and selecting a service calculates the editable end time from its duration.
 
 ### In-app user guide
 
