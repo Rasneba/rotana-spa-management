@@ -2219,3 +2219,16 @@ textarea.form-control {
   #spa-kiosk-pass,#spa-kiosk-pass * { visibility: visible !important; }
   #spa-kiosk-pass { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; max-width: none !important; box-shadow: none !important; }
 }
+
+/* Canonical customer and offering master */
+.master-data-notice { display: flex; align-items: flex-start; gap: .65rem; margin-bottom: .9rem; padding: .7rem .8rem; border: 1px solid #cfe1d3; border-radius: .72rem; background: #f1f7ef; color: #356049; }
+.master-data-notice > i { margin-top: .08rem; font-size: 1rem; }.master-data-notice strong,.master-data-notice span { display: block; }.master-data-notice strong { margin-bottom: .12rem; font-size: .66rem; }.master-data-notice span { color: #6b8374; font-size: .58rem; line-height: 1.45; }
+.customer-master-form-title { display: flex; align-items: center; gap: .4rem; margin: 0 0 .8rem; font-size: .75rem; }
+.customer-master-form { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .7rem; }
+.customer-master-form label > span { display: block; margin-bottom: .28rem; color: var(--text-secondary); font-size: .57rem; font-weight: 750; }
+.customer-master-form .span-two { grid-column: span 2; }.customer-master-form textarea { width: 100%; padding: .55rem .65rem; border: 1px solid var(--input-border); border-radius: .62rem; background: var(--input-bg); color: var(--text-primary); font: inherit; font-size: .66rem; }
+.customer-master-actions { display: flex; justify-content: flex-end; gap: .4rem; }
+.customer-master-toolbar { display: grid; grid-template-columns: minmax(15rem,1fr) 13rem auto; gap: .55rem; align-items: center; margin-bottom: .65rem; }.customer-master-toolbar > span { color: var(--text-tertiary); font-size: .56rem; font-weight: 700; white-space: nowrap; }
+[data-bs-theme="dark"] .master-data-notice { border-color: rgba(77,145,99,.25); background: rgba(65,121,83,.09); color: #91c5a2; }
+@media(max-width:900px){.customer-master-form{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:580px){.customer-master-form{grid-template-columns:1fr}.customer-master-form .span-two{grid-column:auto}.customer-master-toolbar{grid-template-columns:1fr}.customer-master-actions{flex-direction:column-reverse}.customer-master-actions button{width:100%}}

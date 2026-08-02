@@ -28,35 +28,17 @@ export const sidebarGroups: SidebarGroup[] = [
     ],
   },
   {
-    name: "User Guide",
-    icon: "bi-journal-bookmark",
-    direct: true,
-    links: [
-      { name: "User Guide", href: "/dashboard/guide", icon: "bi-journal-bookmark", resource: "dashboard" },
-    ],
-  },
-  {
-    name: "Spa & Gym Access",
+    name: "Access",
     icon: "bi-shield-check",
     moduleCode: "membership",
     links: [
-      { name: "Parking Dashboard", href: "/dashboard/spa/access", icon: "bi-speedometer2", resource: "access_dashboard" },
-      { name: "Zones & Lots", href: "/dashboard/spa/access/zones", icon: "bi-map", resource: "access_zones" },
-      { name: "Slots", href: "/dashboard/spa/access/slots", icon: "bi-grid-3x3-gap", resource: "access_slots" },
-      { name: "Gates", href: "/dashboard/spa/access/gates", icon: "bi-door-open", resource: "membership_gates" },
-      { name: "Cameras", href: "/dashboard/spa/access/cameras", icon: "bi-camera-video", resource: "access_cameras" },
-      { name: "Customers", href: "/dashboard/spa/access/customers", icon: "bi-people", resource: "membership_members" },
-      { name: "Vehicles", href: "/dashboard/spa/access/vehicles", icon: "bi-tools", resource: "facilities_equipment" },
-      { name: "RFID Cards", href: "/dashboard/spa/access/rfid-cards", icon: "bi-credit-card-2-front", resource: "membership_rfid_cards" },
+      { name: "Entry Gates", href: "/dashboard/spa/access/gates", icon: "bi-door-open", resource: "membership_gates" },
+      { name: "Security Cameras", href: "/dashboard/spa/access/cameras", icon: "bi-camera-video", resource: "access_cameras" },
+      { name: "Member Cards", href: "/dashboard/spa/access/rfid-cards", icon: "bi-credit-card-2-front", resource: "membership_rfid_cards" },
       { name: "Access Control", href: "/dashboard/spa/access/control", icon: "bi-shield-check", resource: "access_control" },
       { name: "QR Access", href: "/dashboard/spa/access/qr-access", icon: "bi-qr-code-scan", resource: "access_control" },
-      { name: "Subscriptions", href: "/dashboard/spa/access/subscriptions", icon: "bi-calendar-check", resource: "membership_subscriptions" },
-      { name: "Sessions", href: "/dashboard/spa/access/sessions", icon: "bi-clock-history", resource: "membership_sessions" },
-      { name: "Rates", href: "/dashboard/spa/access/rates", icon: "bi-tags", resource: "spa_services" },
-      { name: "QR Tickets", href: "/dashboard/spa/access/qr-tickets", icon: "bi-ticket-perforated", resource: "membership_qr_passes" },
-      { name: "Kiosk", href: "/dashboard/spa/access/kiosk", icon: "bi-display", resource: "access_kiosk" },
-      { name: "POS", href: "/dashboard/spa/access/pos", icon: "bi-receipt-cutoff", resource: "spa_service_orders" },
-      { name: "Reports", href: "/dashboard/spa/access/reports", icon: "bi-bar-chart", resource: "reports_access" },
+      { name: "Guest QR Passes", href: "/dashboard/spa/access/qr-tickets", icon: "bi-ticket-perforated", resource: "membership_qr_passes" },
+      { name: "Check-In Kiosk", href: "/dashboard/spa/access/kiosk", icon: "bi-display", resource: "access_kiosk" },
     ],
   },
   {
@@ -64,10 +46,19 @@ export const sidebarGroups: SidebarGroup[] = [
     icon: "bi-people",
     moduleCode: "membership",
     links: [
-      { name: "Customer Profiles", href: "/dashboard/spa/customers/profiles", icon: "bi-person-vcard", resource: "membership_members" },
+      { name: "Customer & Member Master", href: "/dashboard/spa/customers/profiles", icon: "bi-person-vcard", resource: "membership_members" },
       { name: "Medical Records", href: "/dashboard/spa/customers/medical-records", icon: "bi-clipboard2-pulse", resource: "spa_medical_records" },
       { name: "Visit History", href: "/dashboard/spa/customers/visit-history", icon: "bi-clock-history", resource: "membership_sessions" },
       { name: "Loyalty", href: "/dashboard/spa/customers/loyalty", icon: "bi-stars", resource: "spa_loyalty" },
+    ],
+  },
+  {
+    name: "Offering Master",
+    icon: "bi-collection",
+    direct: true,
+    moduleCode: "membership",
+    links: [
+      { name: "Offering Master", href: "/dashboard/spa/catalog/offerings", icon: "bi-collection", resource: "catalog_offerings" },
     ],
   },
   {
@@ -75,12 +66,8 @@ export const sidebarGroups: SidebarGroup[] = [
     icon: "bi-person-badge",
     moduleCode: "membership",
     links: [
-      { name: "Membership Plans", href: "/dashboard/membership/plans", icon: "bi-layers", resource: "membership_plans" },
-      { name: "Member Registration", href: "/dashboard/spa/membership/member-registration", icon: "bi-person-plus", resource: "membership_members" },
-      { name: "Renewals", href: "/dashboard/spa/membership/renewals", icon: "bi-arrow-repeat", resource: "membership_subscriptions" },
+      { name: "Memberships & Renewals", href: "/dashboard/spa/membership/renewals", icon: "bi-arrow-repeat", resource: "membership_subscriptions" },
       { name: "Freeze / Transfer", href: "/dashboard/spa/membership/freeze-transfer", icon: "bi-arrow-left-right", resource: "membership_freeze_transfer" },
-      { name: "Digital Cards", href: "/dashboard/spa/membership/digital-cards", icon: "bi-credit-card-2-front", resource: "membership_rfid_cards" },
-      { name: "QR Access", href: "/dashboard/spa/membership/qr-access", icon: "bi-qr-code", resource: "membership_qr_passes" },
     ],
   },
   {
@@ -115,11 +102,9 @@ export const sidebarGroups: SidebarGroup[] = [
     icon: "bi-flower1",
     moduleCode: "membership",
     links: [
-      { name: "Services", href: "/dashboard/spa/spa/services", icon: "bi-flower2", resource: "spa_services" },
       { name: "Therapists", href: "/dashboard/spa/spa/therapists", icon: "bi-person-heart", resource: "spa_therapists" },
       { name: "Treatment Rooms", href: "/dashboard/spa/spa/treatment-rooms", icon: "bi-door-closed", resource: "membership_facilities" },
       { name: "Bookings", href: "/dashboard/spa/spa/bookings", icon: "bi-calendar2-plus", resource: "membership_appointments" },
-      { name: "Packages", href: "/dashboard/spa/spa/packages", icon: "bi-gift", resource: "spa_packages" },
     ],
   },
   {
@@ -149,7 +134,7 @@ export const sidebarGroups: SidebarGroup[] = [
     icon: "bi-building",
     moduleCode: "membership",
     links: [
-      { name: "Rooms", href: "/dashboard/spa/facilities/rooms", icon: "bi-door-open", resource: "membership_facilities" },
+      { name: "Areas & Facilities", href: "/dashboard/spa/access/zones", icon: "bi-map", resource: "access_zones" },
       { name: "Lockers", href: "/dashboard/spa/facilities/lockers", icon: "bi-safe", resource: "facilities_lockers" },
       { name: "Equipment", href: "/dashboard/spa/facilities/equipment", icon: "bi-tools", resource: "facilities_equipment" },
       { name: "Maintenance", href: "/dashboard/spa/facilities/maintenance", icon: "bi-wrench-adjustable", resource: "facilities_maintenance" },
@@ -172,8 +157,8 @@ export const sidebarGroups: SidebarGroup[] = [
   {
     name: "Settings",
     icon: "bi-gear",
-    adminOnly: true,
     links: [
+      { name: "User Guide", href: "/dashboard/guide", icon: "bi-journal-bookmark", resource: "dashboard" },
       { name: "Users", href: "/dashboard/users", icon: "bi-people", resource: "users", adminOnly: true },
       { name: "Roles", href: "/dashboard/roles", icon: "bi-shield-lock", resource: "roles", adminOnly: true },
       { name: "Branches", href: "/dashboard/spa/settings/branches", icon: "bi-diagram-3", resource: "settings_branches", adminOnly: true },

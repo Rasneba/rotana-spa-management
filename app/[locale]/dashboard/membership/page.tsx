@@ -18,10 +18,11 @@ import {
 
 const managementAreas = [
   { name: "Customers", icon: Users, desc: "Profiles, medical records, visits and loyalty", href: "/dashboard/spa/customers/profiles", color: "text-sky-600" },
-  { name: "Membership", icon: Layers, desc: "Plans, registration, renewals and access cards", href: "/dashboard/membership/plans", color: "text-blue-600" },
+  { name: "Offering Master", icon: Layers, desc: "One classified master for plans, services and packages", href: "/dashboard/spa/catalog/offerings", color: "text-blue-600" },
+  { name: "Memberships", icon: CalendarDays, desc: "Assign offerings, renew, freeze or transfer", href: "/dashboard/spa/membership/renewals", color: "text-indigo-600" },
   { name: "Operations", icon: Activity, desc: "Visits, appointments, treatments and towels", href: "/dashboard/spa/operations/visits", color: "text-violet-600" },
   { name: "Gym", icon: Dumbbell, desc: "Trainers, workout plans, classes and attendance", href: "/dashboard/spa/gym/trainers", color: "text-emerald-600" },
-  { name: "Spa", icon: Flower2, desc: "Services, therapists, rooms, bookings and packages", href: "/dashboard/spa/spa/services", color: "text-rose-600" },
+  { name: "Spa", icon: Flower2, desc: "Therapists, treatment rooms and bookings", href: "/dashboard/spa/spa/therapists", color: "text-rose-600" },
   { name: "Inventory", icon: Boxes, desc: "Products, consumables, usage and suppliers", href: "/dashboard/spa/inventory/products", color: "text-amber-600" },
   { name: "Service Orders", icon: ReceiptText, desc: "Price-free draft slips for the separate POS cashier", href: "/dashboard/spa/operations/service-orders", color: "text-indigo-600" },
   { name: "Staff", icon: BriefcaseBusiness, desc: "Employees, schedules, commission and performance", href: "/dashboard/spa/staff/employees", color: "text-cyan-600" },
@@ -38,12 +39,13 @@ export default function SpaManagementDashboard() {
     try {
       const today = new Date().toISOString().slice(0, 10);
       const [plansRes, membersRes, visitsRes, ordersRes] = await Promise.all([
-        fetch("/api/membership/plans", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/spa/catalog/offerings?classification=membership_plan&status=active&limit=250", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/membership/members", { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`/api/spa/visits?date=${today}`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/spa/service-orders?status=draft", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      const plans = await plansRes.json();
+      const offeringData = await plansRes.json();
+      const plans = Array.isArray(offeringData.records) ? offeringData.records : [];
       const members = await membersRes.json();
       const visitsData = visitsRes.ok ? await visitsRes.json() : { visits: [] };
       const ordersData = ordersRes.ok ? await ordersRes.json() : { summary: { drafts: 0 } };
@@ -81,7 +83,7 @@ export default function SpaManagementDashboard() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { label: "Total Plans", value: stats.totalPlans, icon: <Layers size={22} />, color: "bg-black", href: "/dashboard/membership/plans" },
+              { label: "Membership Offerings", value: stats.totalPlans, icon: <Layers size={22} />, color: "bg-black", href: "/dashboard/spa/catalog/offerings" },
               { label: "Total Members", value: stats.totalMembers, icon: <Users size={22} />, color: "bg-emerald-600", href: "/dashboard/spa/customers/profiles" },
               { label: "Today's Visits", value: stats.todayVisits, icon: <Activity size={22} />, color: "bg-violet-600", href: "/dashboard/spa/operations/visits" },
               { label: "Draft Orders", value: stats.draftOrders, icon: <ReceiptText size={22} />, color: "bg-amber-500", href: "/dashboard/spa/operations/service-orders" },

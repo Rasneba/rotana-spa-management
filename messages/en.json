@@ -40,7 +40,8 @@
       "users": "Users",
       "roles": "Roles",
       "branches": "Branches",
-      "system": "System"
+      "system": "System",
+      "user_guide": "User Guide"
     },
     "audit_logs": "Audit Logs",
     "notifications": "Notifications",
@@ -53,7 +54,6 @@
       "audit": "Audit",
       "administration": "Administration",
       "membership": "Membership",
-      "parking": "Parking",
       "customers": "Customers",
       "operations": "Operations",
       "gym": "Gym",
@@ -64,8 +64,8 @@
       "reports": "Reports",
       "settings": "Settings",
       "platform": "Platform Administration",
-      "user_guide": "User Guide",
-      "spa_gym_access": "Spa & Gym Access"
+      "access": "Access",
+      "offering_master": "Offering Master"
     },
     "section": {
       "daily_operations": "Daily Operations",
@@ -113,18 +113,16 @@
       "members": "Members",
       "payments": "Payments",
       "attendance": "Attendance",
-      "membership_plans": "Membership Plans",
-      "member_registration": "Member Registration",
       "renewals": "Renewals",
       "freeze_transfer": "Freeze / Transfer",
-      "digital_cards": "Digital Cards",
-      "qr_access": "QR Access"
+      "memberships_renewals": "Memberships & Renewals"
     },
     "customers": {
       "customer_profiles": "Customer Profiles",
       "medical_records": "Medical Records",
       "visit_history": "Visit History",
-      "loyalty": "Loyalty"
+      "loyalty": "Loyalty",
+      "customer_member_master": "Customer & Member Master"
     },
     "operations": {
       "check_in": "Check-In",
@@ -145,11 +143,9 @@
       "attendance": "Attendance"
     },
     "spa": {
-      "services": "Services",
       "therapists": "Therapists",
       "treatment_rooms": "Treatment Rooms",
-      "bookings": "Bookings",
-      "packages": "Packages"
+      "bookings": "Bookings"
     },
     "inventory": {
       "products": "Products",
@@ -164,10 +160,10 @@
       "performance": "Performance"
     },
     "facilities": {
-      "rooms": "Rooms",
       "lockers": "Lockers",
       "equipment": "Equipment",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "areas_facilities": "Areas & Facilities"
     },
     "platform": {
       "admin_dashboard": "Admin Dashboard",
@@ -176,27 +172,17 @@
       "audit_logs": "Audit Logs",
       "manuals": "Manuals"
     },
-    "user_guide": {
-      "user_guide": "User Guide"
-    },
-    "spa_gym_access": {
-      "parking_dashboard": "Parking Dashboard",
-      "zones_lots": "Zones & Lots",
-      "slots": "Slots",
-      "gates": "Gates",
-      "cameras": "Cameras",
-      "customers": "Customers",
-      "vehicles": "Vehicles",
-      "rfid_cards": "RFID Cards",
+    "access": {
+      "entry_gates": "Entry Gates",
+      "security_cameras": "Security Cameras",
+      "member_cards": "Member Cards",
       "access_control": "Access Control",
       "qr_access": "QR Access",
-      "subscriptions": "Subscriptions",
-      "sessions": "Sessions",
-      "rates": "Rates",
-      "qr_tickets": "QR Tickets",
-      "kiosk": "Kiosk",
-      "pos": "POS",
-      "reports": "Reports"
+      "guest_qr_passes": "Guest QR Passes",
+      "check_in_kiosk": "Check-In Kiosk"
+    },
+    "offering_master": {
+      "offering_master": "Offering Master"
     }
   },
   "common": {

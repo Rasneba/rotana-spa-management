@@ -14,6 +14,7 @@ export type VisitService = {
   id: number | string;
   visit_id: number | string;
   service_record_id: number | string;
+  offering_id?: number | string | null;
   service_code: string | null;
   service_name: string;
   quantity: number;

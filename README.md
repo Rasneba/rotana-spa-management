@@ -18,23 +18,30 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Spa management database
 
-The expanded Customers, Gym, Spa, Inventory, Staff, Facilities, and Reports workspaces require migrations v33 and v34 after the existing spa migrations:
+The expanded Spa/Gym workspaces require migrations v33 through v36 after the existing spa migrations:
 
 ```bash
 psql "$DATABASE_URL" -f db-migration-v33.sql
 psql "$DATABASE_URL" -f db-migration-v34.sql
 psql "$DATABASE_URL" -f db-migration-v35.sql
+psql "$DATABASE_URL" -f db-migration-v36.sql
 ```
 
-Migration v34 adds the reception visit, therapist treatment, service-line, and draft service-order workflow. Migration v35 adds the adapted Spa/Gym access dashboard, enhanced gates, operational cameras, controller command queue, kiosk QR passes, and access-audit context.
+Migration v34 adds the visit and draft service-order workflow. Migration v35 adds focused access control, enhanced gates, operational cameras, the controller queue and kiosk QR passes. Migration v36 consolidates customers/members into one classified customer master and plans/services/packages into one classified Offering Master.
 
 ### In-app user guide
 
-The searchable, printable single-page system guide is available at `/dashboard/guide`. It is linked directly in the sidebar and through the header help icon.
+The searchable, printable single-page system guide is available at `/dashboard/guide` under **Settings** and through the header help icon.
 
 ### Adapted access components
 
-The consolidated **Spa & Gym Access** menu adapts only the pictured components from [`Rasneba/-geniouserp`](https://github.com/Rasneba/-geniouserp). Gates, camera/webcam support, QR scanning, access monitoring, kiosk check-in and dashboard patterns are fully or partially merged. Parking tables, ANPR, vehicle logic, pricing and payment code are not imported; retained source labels route to the corresponding Spa/Gym records.
+The focused **Access** menu adapts only useful components from [`Rasneba/-geniouserp`](https://github.com/Rasneba/-geniouserp): gates, camera/webcam support, member cards, QR scanning, access monitoring, guest passes and kiosk check-in. Parking Dashboard, slots, vehicles, rates, POS and duplicate customer/subscription/session/report links are removed. No parking tables, ANPR, vehicle, pricing or payment code is imported.
+
+### Canonical master data
+
+- A member is a classified customer in the single **Customer & Member Master**; duplicate email, phone or ID registration is blocked.
+- Membership plans, Spa services, Gym services, packages and access passes are classifications in one **Offering Master**.
+- Legacy plan/service/package routes are compatibility-only and cannot create duplicate master records.
 
 ### Sales/POS boundary
 

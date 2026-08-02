@@ -91,6 +91,7 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
   const [filteredCount, setFilteredCount] = useState(0);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [classificationFilter, setClassificationFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -105,6 +106,7 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
     const selected = definition.fields.filter((field) => field.list);
     return (selected.length > 0 ? selected : definition.fields).slice(0, 5);
   }, [definition]);
+  const classificationOptions = definition.fields.find((field) => field.key === "classification")?.options || [];
 
   const load = useCallback(async (signal?: AbortSignal) => {
     const token = localStorage.getItem("token");
@@ -114,6 +116,7 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
     const search = new URLSearchParams({ limit: "250" });
     if (query.trim()) search.set("q", query.trim());
     if (statusFilter) search.set("status", statusFilter);
+    if (classificationFilter) search.set("classification", classificationFilter);
 
     try {
       const response = await fetch(`${endpoint}?${search}`, {
@@ -134,7 +137,7 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [endpoint, query, statusFilter]);
+  }, [endpoint, query, statusFilter, classificationFilter]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -291,6 +294,15 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
             <span className="visually-hidden">Search {definition.title}</span>
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${definition.title.toLowerCase()}…`} />
           </label>
+          {classificationOptions.length > 0 && (
+            <label className="spa-workspace-filter">
+              <span className="visually-hidden">Filter by classification</span>
+              <select value={classificationFilter} onChange={(event) => setClassificationFilter(event.target.value)}>
+                <option value="">All classifications</option>
+                {classificationOptions.map((classification) => <option key={classification} value={classification}>{titleCase(classification)}</option>)}
+              </select>
+            </label>
+          )}
           <label className="spa-workspace-filter">
             <span className="visually-hidden">Filter by status</span>
             <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
@@ -307,9 +319,9 @@ export default function SpaModuleWorkspace({ definition }: { definition: SpaModu
           ) : records.length === 0 ? (
             <div className="spa-workspace-state empty">
               <i className={`bi bi-${definition.icon}`} />
-              <h2>{query || statusFilter ? "No matching records" : `No ${definition.title.toLowerCase()} yet`}</h2>
-              <p>{query || statusFilter ? "Try changing your search or status filter." : `Add the first ${definition.singular.toLowerCase()} to begin.`}</p>
-              {!query && !statusFilter && capabilities.create && <button type="button" className="spa-primary-button" onClick={openCreate}>Add {definition.singular}</button>}
+              <h2>{query || statusFilter || classificationFilter ? "No matching records" : `No ${definition.title.toLowerCase()} yet`}</h2>
+              <p>{query || statusFilter || classificationFilter ? "Try changing your search or status filter." : `Add the first ${definition.singular.toLowerCase()} to begin.`}</p>
+              {!query && !statusFilter && !classificationFilter && capabilities.create && <button type="button" className="spa-primary-button" onClick={openCreate}>Add {definition.singular}</button>}
             </div>
           ) : (
             <table className="spa-workspace-table">

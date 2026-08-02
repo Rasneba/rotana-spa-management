@@ -39,7 +39,7 @@ type Appointment = {
 
 type Facility = { id: number; name: string; type: string; capacity?: number | null };
 type Member = { id: number; full_name: string; customer_id?: string };
-type RateCard = { id: number; name: string; duration_minutes?: number | null; facility_id?: number | null };
+type OfferingOption = { id: number; name: string; duration_minutes?: number | null; facility_id?: number | null };
 
 const statusMeta: Record<Appointment["status"], { label: string; className: string }> = {
   confirmed: { label: "Confirmed", className: "confirmed" },
@@ -96,7 +96,7 @@ export default function SpaSchedulePage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
-  const [rateCards, setRateCards] = useState<RateCard[]>([]);
+  const [offerings, setOfferings] = useState<OfferingOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [resourcesLoading, setResourcesLoading] = useState(true);
   const [error, setError] = useState("");
@@ -108,7 +108,7 @@ export default function SpaSchedulePage() {
     member_id: "",
     guest_name: "",
     guest_phone: "",
-    rate_card_id: "",
+    offering_id: "",
     service_name: "",
     facility_id: "",
     start_time: "10:00",
@@ -158,7 +158,7 @@ export default function SpaSchedulePage() {
       const [facilityResponse, memberResponse, rateResponse] = await Promise.all([
         fetch("/api/membership/facilities", { headers: { Authorization: `Bearer ${token}` } }),
         fetch("/api/membership/members", { headers: { Authorization: `Bearer ${token}` } }),
-        fetch("/api/spa/spa/services?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/spa/catalog/offerings?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const [facilityData, memberData, rateData] = await Promise.all([
         facilityResponse.json(), memberResponse.json(), rateResponse.json(),
@@ -166,8 +166,8 @@ export default function SpaSchedulePage() {
       const loadedFacilities = Array.isArray(facilityData) ? facilityData : [];
       setFacilities(loadedFacilities);
       setMembers(Array.isArray(memberData) ? memberData : memberData.data || []);
-      const serviceRecords = Array.isArray(rateData?.records) ? rateData.records : [];
-      setRateCards(serviceRecords.map((record: any) => ({
+      const serviceRecords = (Array.isArray(rateData?.records) ? rateData.records : []).filter((record: any) => ["spa_service", "gym_service", "package"].includes(record.details?.classification));
+      setOfferings(serviceRecords.map((record: any) => ({
         id: Number(record.id),
         name: record.title,
         duration_minutes: Number(record.details?.duration_minutes) || null,
@@ -206,11 +206,11 @@ export default function SpaSchedulePage() {
     setShowForm(true);
   };
 
-  const updateRateCard = (rateCardId: string) => {
-    const rateCard = rateCards.find((item) => item.id === Number(rateCardId));
+  const updateOffering = (rateCardId: string) => {
+    const rateCard = offerings.find((item) => item.id === Number(rateCardId));
     setForm((current) => ({
       ...current,
-      rate_card_id: rateCardId,
+      offering_id: rateCardId,
       service_name: rateCard?.name || current.service_name,
       duration: rateCard?.duration_minutes ? String(rateCard.duration_minutes) : current.duration,
       facility_id: rateCard?.facility_id ? String(rateCard.facility_id) : current.facility_id,
@@ -241,8 +241,8 @@ export default function SpaSchedulePage() {
           member_id: form.member_id ? Number(form.member_id) : null,
           guest_name: form.guest_name,
           guest_phone: form.guest_phone,
-          // Service pricing belongs to the separate POS. The appointment stores only the operational service name.
-          rate_card_id: null,
+          // The appointment references the canonical Offering Master; pricing remains in the separate POS.
+          offering_id: form.offering_id ? Number(form.offering_id) : null,
           service_name: form.service_name,
           facility_id: Number(form.facility_id),
           starts_at: start.toISOString(),
@@ -469,7 +469,7 @@ export default function SpaSchedulePage() {
 
               <div className="booking-section-label">Treatment details</div>
               <div className="booking-field-grid two">
-                <label>Service catalogue<select value={form.rate_card_id} onChange={(event) => updateRateCard(event.target.value)}><option value="">Custom service</option>{rateCards.map((card) => <option key={card.id} value={card.id}>{card.name}{card.duration_minutes ? ` · ${card.duration_minutes} min` : ""}</option>)}</select></label>
+                <label>Service catalogue<select value={form.offering_id} onChange={(event) => updateOffering(event.target.value)}><option value="">Custom service</option>{offerings.map((card) => <option key={card.id} value={card.id}>{card.name}{card.duration_minutes ? ` · ${card.duration_minutes} min` : ""}</option>)}</select></label>
                 <label>Service name *<input value={form.service_name} onChange={(event) => setForm({ ...form, service_name: event.target.value })} placeholder="e.g. Aroma massage" /></label>
                 <label>Treatment area *<select value={form.facility_id} onChange={(event) => setForm({ ...form, facility_id: event.target.value })}><option value="">Choose an area</option>{facilities.map((facility) => <option key={facility.id} value={facility.id}>{facility.name}</option>)}</select></label>
                 <label>Duration<select value={form.duration} onChange={(event) => setForm({ ...form, duration: event.target.value })}>{[30, 45, 60, 75, 90, 120].map((duration) => <option key={duration} value={duration}>{duration} minutes</option>)}</select></label>

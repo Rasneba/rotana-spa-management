@@ -12,7 +12,7 @@ const modules = [
 const quickActions = [
   { label: "New Visit", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits", color: "primary" },
   { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/operations/appointments", color: "success" },
-  { label: "Register Member", icon: "bi-person-plus", href: "/dashboard/spa/membership/member-registration", color: "info" },
+  { label: "Customers", icon: "bi-people", href: "/dashboard/spa/customers/profiles", color: "info" },
   { label: "Service Orders", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders", color: "warning" },
 ];
 
@@ -91,7 +91,7 @@ export default function Dashboard() {
   const visibleQuickActions = hasLicense("membership") ? quickActions : [];
 
   const spaCards = [
-    { title: "Total Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/spa/customers/profiles" },
+    { title: "Customers & Members", value: stats.totalMembers || stats.totalCustomers, color: "text-primary", icon: "bi-people", href: "/dashboard/spa/customers/profiles" },
     { title: "Today's Visits", value: stats.todayVisits || 0, color: "text-success", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits" },
     { title: "In Treatment", value: stats.inTreatment || 0, color: "text-warning", icon: "bi-flower1", href: "/dashboard/spa/operations/visits" },
     { title: "Draft Orders", value: stats.draftOrders || 0, color: "text-info", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders" },
@@ -165,7 +165,7 @@ export default function Dashboard() {
       {stats.recentMembers?.length > 0 && (
         <div className="card border-0 shadow-sm">
           <div className="card-header fw-semibold d-flex justify-content-between align-items-center" style={{ backgroundColor: "var(--card-bg)", borderBottom: "1px solid var(--card-border)" }}>
-            <span>Recent Members</span>
+            <span>Recent Customers</span>
             <Link href="/dashboard/spa/customers/profiles" className="btn btn-sm btn-outline-primary">View All</Link>
           </div>
           <div className="card-body p-0">

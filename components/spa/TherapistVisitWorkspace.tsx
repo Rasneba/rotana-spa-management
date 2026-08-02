@@ -38,7 +38,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
   const [notice, setNotice] = useState("");
   const [selectedTherapist, setSelectedTherapist] = useState("");
   const [showServiceForm, setShowServiceForm] = useState(false);
-  const [serviceForm, setServiceForm] = useState({ service_record_id: "", quantity: "1", notes: "" });
+  const [serviceForm, setServiceForm] = useState({ offering_id: "", quantity: "1", notes: "" });
   const [notes, setNotes] = useState("");
 
   const load = useCallback(async (signal?: AbortSignal) => {
@@ -50,7 +50,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
       const [visitResponse, therapistResponse, serviceResponse] = await Promise.all([
         fetch(`/api/spa/visits?id=${visitId}`, { headers: { Authorization: `Bearer ${token}` }, signal }),
         fetch("/api/spa/spa/therapists?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` }, signal }),
-        fetch("/api/spa/spa/services?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` }, signal }),
+        fetch("/api/spa/catalog/offerings?status=active&limit=250", { headers: { Authorization: `Bearer ${token}` }, signal }),
       ]);
       const visitData = await visitResponse.json() as DetailResponse;
       const therapistData = await therapistResponse.json() as { records?: GenericRecord[] };
@@ -61,7 +61,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
       setSelectedTherapist(visitData.visit.therapist_record_id ? String(visitData.visit.therapist_record_id) : "");
       setCapabilities(visitData.capabilities);
       setTherapists(therapistResponse.ok ? therapistData.records || [] : []);
-      setCatalogue(serviceResponse.ok ? serviceData.records || [] : []);
+      setCatalogue(serviceResponse.ok ? (serviceData.records || []).filter((record) => ["spa_service", "gym_service", "package"].includes(String(record.details?.classification))) : []);
 
       if (visitData.visit.order_id) {
         const orderResponse = await fetch(`/api/spa/visits/${visitId}/service-order`, {
@@ -119,7 +119,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
   const addService = async (event: React.FormEvent) => {
     event.preventDefault();
     const token = localStorage.getItem("token");
-    if (!token || !serviceForm.service_record_id) return;
+    if (!token || !serviceForm.offering_id) return;
     setBusy("service");
     setError("");
     try {
@@ -127,7 +127,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          service_record_id: Number(serviceForm.service_record_id),
+          offering_id: Number(serviceForm.offering_id),
           quantity: Number(serviceForm.quantity),
           notes: serviceForm.notes,
         }),
@@ -135,7 +135,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
       const data = await response.json() as VisitService & { error?: string };
       if (!response.ok) throw new Error(data.error || "Unable to add service");
       setShowServiceForm(false);
-      setServiceForm({ service_record_id: "", quantity: "1", notes: "" });
+      setServiceForm({ offering_id: "", quantity: "1", notes: "" });
       await load();
       setNotice("Service list updated.");
     } catch (serviceError) {
@@ -286,7 +286,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
             <header><div><p>{visit.visit_no}</p><h2 id="add-service-title">Add Service Used</h2></div><button type="button" onClick={() => setShowServiceForm(false)} aria-label="Close"><i className="bi bi-x-lg" /></button></header>
             <form onSubmit={addService}>
               <div className="spa-record-form-grid">
-                <label className="span-two"><span>Service *</span><select required value={serviceForm.service_record_id} onChange={(event) => setServiceForm((current) => ({ ...current, service_record_id: event.target.value }))}><option value="">Select service</option>{catalogue.map((service) => <option key={service.id} value={service.id}>{service.details.service_code ? `${service.details.service_code} · ` : ""}{service.title}</option>)}</select></label>
+                <label className="span-two"><span>Service *</span><select required value={serviceForm.offering_id} onChange={(event) => setServiceForm((current) => ({ ...current, offering_id: event.target.value }))}><option value="">Select service</option>{catalogue.map((service) => <option key={service.id} value={service.id}>{service.details.offering_code ? `${service.details.offering_code} · ` : ""}{service.title}</option>)}</select></label>
                 <label><span>Quantity *</span><input type="number" min="1" max="99" required value={serviceForm.quantity} onChange={(event) => setServiceForm((current) => ({ ...current, quantity: event.target.value }))} /></label>
                 <label><span>Line Note</span><input value={serviceForm.notes} onChange={(event) => setServiceForm((current) => ({ ...current, notes: event.target.value }))} /></label>
               </div>

@@ -35,11 +35,14 @@ export async function GET(req: Request) {
       const result = await pool.query(
         `SELECT a.*, m.full_name AS member_name, m.customer_id AS member_code,
                 f.name AS facility_name, f.type AS facility_type,
-                r.name AS rate_card_name, r.duration_minutes AS rate_duration_minutes
+                COALESCE(o.title,r.name) AS offering_name,
+                COALESCE(NULLIF(o.details->>'duration_minutes','')::int,r.duration_minutes) AS offering_duration_minutes
          FROM spa_appointments a
-         LEFT JOIN membership_members m ON m.id = a.member_id
-         LEFT JOIN spa_facilities f ON f.id = a.facility_id
-         LEFT JOIN rate_cards r ON r.id = a.rate_card_id
+         LEFT JOIN membership_members m ON m.id=a.member_id
+         LEFT JOIN spa_facilities f ON f.id=a.facility_id
+         LEFT JOIN spa_management_records o
+           ON o.id=a.offering_id AND o.module_key='catalog/offerings' AND o.deleted_at IS NULL
+         LEFT JOIN rate_cards r ON r.id=a.rate_card_id
          WHERE a.starts_at < $1::timestamp
            AND a.ends_at > $2::timestamp
            AND ($3 = true OR a.company_id = $4)
@@ -64,6 +67,7 @@ export async function POST(req: Request) {
         member_id,
         facility_id,
         rate_card_id,
+        offering_id,
         guest_name,
         guest_phone,
         service_name,
@@ -99,6 +103,17 @@ export async function POST(req: Request) {
         if (member.rows.length === 0) return notFound("Member");
       }
 
+      if (offering_id) {
+        const offering = await pool.query(
+          `SELECT id FROM spa_management_records
+           WHERE id=$1 AND company_id=$2 AND module_key='catalog/offerings'
+             AND details->>'classification' IN ('spa_service','gym_service','package')
+             AND status='active' AND deleted_at IS NULL`,
+          [offering_id, companyId]
+        );
+        if (offering.rows.length === 0) return notFound("Offering");
+      }
+
       if (rate_card_id) {
         const rate = await pool.query(
           "SELECT id FROM rate_cards WHERE id = $1 AND company_id = $2 AND is_active = true",
@@ -124,15 +139,16 @@ export async function POST(req: Request) {
 
       const result = await pool.query(
         `INSERT INTO spa_appointments
-          (company_id, member_id, facility_id, rate_card_id, guest_name, guest_phone,
-           service_name, starts_at, ends_at, notes, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+          (company_id, member_id, facility_id, rate_card_id, offering_id,
+           guest_name, guest_phone, service_name, starts_at, ends_at, notes, created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
          RETURNING *`,
         [
           companyId,
           member_id || null,
           facility_id,
           rate_card_id || null,
+          offering_id || null,
           guest_name?.trim() || null,
           guest_phone?.trim() || null,
           service_name.trim(),

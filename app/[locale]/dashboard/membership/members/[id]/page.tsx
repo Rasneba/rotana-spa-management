@@ -32,7 +32,7 @@ export default function MemberDetailPage() {
   }, [id]);
 
   if (loading) return <GemPage><div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-black/20 border-t-black rounded-full animate-spin" /></div></GemPage>;
-  if (!member) return <GemPage><div className="text-center text-gray-400 py-12"><User size={32} className="mx-auto mb-2 opacity-40" /><p className="text-sm">Member not found</p></div></GemPage>;
+  if (!member) return <GemPage><div className="text-center text-gray-400 py-12"><User size={32} className="mx-auto mb-2 opacity-40" /><p className="text-sm">Customer not found</p></div></GemPage>;
 
   const isActive = member.end_date ? new Date(member.end_date) >= new Date() : true;
   const daysLeft = member.end_date ? Math.max(0, Math.ceil((new Date(member.end_date).getTime() - Date.now()) / 86400000)) : null;
@@ -72,7 +72,7 @@ export default function MemberDetailPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <GemKpi title="Total Visits" value={totalVisits} icon={<Clock size={22} />} color="bg-blue-500" />
         <GemKpi title="This Month" value={thisMonth} icon={<CalendarCheck size={22} />} color="bg-emerald-600" />
-        <GemKpi title="Plan" value={member.plan_name || "N/A"} icon={<Layers size={22} />} color="bg-purple-500" />
+        <GemKpi title="Offering" value={member.plan_name || "None"} icon={<Layers size={22} />} color="bg-purple-500" />
         <GemKpi title="Status" value={isActive ? "Active" : "Expired"} icon={<UserCheck size={22} />} color="bg-amber-500" />
       </div>
 
@@ -86,15 +86,15 @@ export default function MemberDetailPage() {
 
       {activeTab === "overview" && (
         <GemCard>
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><User size={18} />Member Information</h3>
+          <h3 className="font-semibold mb-4 flex items-center gap-2"><User size={18} />Customer Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
-              {[["Code", member.customer_id], ["Name", member.full_name], ["Phone", member.phone || "-"], ["Email", member.email || "-"], ["ID Number", member.id_number || "-"]].map(([l, v]) => (
+              {[["Code", member.customer_id], ["Classification", member.classification || "customer"], ["Name", member.full_name], ["Phone", member.phone || "-"], ["Email", member.email || "-"], ["ID Number", member.id_number || "-"]].map(([l, v]) => (
                 <div key={l} className="flex justify-between border-b border-gray-50 pb-2"><span className="text-xs text-gray-400 uppercase font-medium">{l}</span><span className="text-sm font-medium">{v}</span></div>
               ))}
             </div>
             <div className="space-y-3">
-              {[["Plan", <GemBadge variant="info">{member.plan_name || "N/A"}</GemBadge>], ["Type", member.plan_type || "-"], ["Start Date", member.start_date ? new Date(member.start_date).toLocaleDateString() : "-"], ["End Date", member.end_date ? new Date(member.end_date).toLocaleDateString() : "-"], ["Address", member.address || "-"]].map(([l, v]) => (
+              {[["Offering", <GemBadge variant="info">{member.plan_name || "None"}</GemBadge>], ["Offering Type", member.plan_type || "-"], ["Start Date", member.start_date ? new Date(member.start_date).toLocaleDateString() : "-"], ["End Date", member.end_date ? new Date(member.end_date).toLocaleDateString() : "-"], ["Address", member.address || "-"]].map(([l, v]) => (
                 <div key={l as string} className="flex justify-between border-b border-gray-50 pb-2"><span className="text-xs text-gray-400 uppercase font-medium">{l as string}</span><span className="text-sm font-medium">{v}</span></div>
               ))}
             </div>

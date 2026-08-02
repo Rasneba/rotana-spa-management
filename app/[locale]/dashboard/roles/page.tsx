@@ -13,6 +13,7 @@ const GROUP_ICONS: Record<string, string> = {
   Dashboard: "house-door",
   Customers: "people",
   Membership: "person-badge",
+  "Offering Catalog": "collection",
   Operations: "activity",
   Access: "shield-check",
   Gym: "heart-pulse",

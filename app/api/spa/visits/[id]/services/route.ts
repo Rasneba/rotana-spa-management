@@ -53,7 +53,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       const visitId = Number(id);
       const rawBody: unknown = await req.json();
       if (!Number.isInteger(visitId) || visitId < 1 || !isObject(rawBody)) return badRequest("Invalid service request");
-      const serviceId = Number(rawBody.service_record_id);
+      const serviceId = Number(rawBody.offering_id || rawBody.service_record_id);
       const quantity = Math.min(Math.max(Number(rawBody.quantity) || 1, 1), 99);
       if (!Number.isInteger(serviceId) || serviceId < 1) return badRequest("Service is required");
 
@@ -72,9 +72,10 @@ export async function POST(req: Request, { params }: RouteParams) {
       }
 
       const serviceResult = await pool.query(
-        `SELECT id, title, details->>'service_code' AS service_code
+        `SELECT id, title, details->>'offering_code' AS service_code
          FROM spa_management_records
-         WHERE id=$1 AND company_id=$2 AND module_key='spa/services'
+         WHERE id=$1 AND company_id=$2 AND module_key='catalog/offerings'
+           AND details->>'classification' IN ('spa_service','gym_service','package')
            AND status='active' AND deleted_at IS NULL`,
         [serviceId, visit.company_id]
       );
@@ -83,11 +84,12 @@ export async function POST(req: Request, { params }: RouteParams) {
 
       const result = await pool.query(
         `INSERT INTO spa_visit_services
-          (visit_id, company_id, service_record_id, service_code, service_name,
-           quantity, notes, added_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+          (visit_id, company_id, service_record_id, offering_id, service_code,
+           service_name, quantity, notes, added_by)
+         VALUES ($1,$2,$3,$3,$4,$5,$6,$7,$8)
          ON CONFLICT (visit_id, service_record_id)
          DO UPDATE SET quantity=EXCLUDED.quantity,
+                       offering_id=EXCLUDED.offering_id,
                        notes=EXCLUDED.notes,
                        service_code=EXCLUDED.service_code,
                        service_name=EXCLUDED.service_name,

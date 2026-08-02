@@ -9,12 +9,13 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
     label: "Customers",
     resources: ["membership_members", "spa_medical_records", "spa_loyalty"],
   },
+  "Offering Catalog": {
+    label: "Offering Master",
+    resources: ["catalog_offerings"],
+  },
   "Membership": {
     label: "Membership",
-    resources: [
-      "membership_plans", "membership_subscriptions", "membership_freeze_transfer",
-      "membership_day_tickets", "membership_rate_cards",
-    ],
+    resources: ["membership_subscriptions", "membership_freeze_transfer"],
   },
   "Operations": {
     label: "Operations",
@@ -27,8 +28,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   "Access": {
     label: "Spa & Gym Access",
     resources: [
-      "access_dashboard", "access_zones", "access_slots", "membership_gates",
-      "access_cameras", "membership_rfid_cards", "membership_access_logs",
+      "access_zones", "membership_gates", "access_cameras", "membership_rfid_cards", "membership_access_logs",
       "membership_qr_passes", "access_control", "access_kiosk",
     ],
   },
@@ -41,7 +41,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   },
   "Spa": {
     label: "Spa",
-    resources: ["spa_services", "spa_therapists", "spa_packages"],
+    resources: ["spa_therapists"],
   },
   "Inventory": {
     label: "Inventory",

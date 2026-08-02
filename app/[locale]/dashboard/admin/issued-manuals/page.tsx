@@ -80,7 +80,7 @@ const moduleDocs: Record<string, { name: string; icon: string; description: stri
     name: "Spa Management", icon: "bi-flower1",
     description: "Customer visits, appointments, treatments, inventory and draft service-order handoff",
     docs: [
-      { title: "Customer & Membership", content: "Register customers and manage operational membership periods. Pricing and payment remain in the separate POS." },
+      { title: "Canonical Masters", content: "Create each person once in Customer & Member Master. Classify plans, services and packages in the single Offering Master. Pricing and payment remain in the separate POS." },
       { title: "Visit & Treatment Workflow", content: "Check in customers, assign therapists, start treatment and record every service used." },
       { title: "Service Order Draft", content: "Finish treatment and print an 80 mm price-free service order for the customer to take to the separate cashier." },
       { title: "System Boundary", content: "The Spa system never calculates tax, accepts payment, creates invoices, or connects to the Sales/POS database." },

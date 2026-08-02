@@ -105,24 +105,26 @@ export async function GET(req: Request, { params }: RouteParams) {
       if (reportSlug === "membership") {
         const [summaryResult, planResult] = await Promise.all([
           pool.query(
-            `SELECT COUNT(*)::int AS total,
-                    COUNT(*) FILTER (WHERE status = 'active')::int AS active,
-                    COUNT(*) FILTER (WHERE status = 'expired')::int AS expired,
-                    COUNT(*) FILTER (WHERE created_at::date BETWEEN $2::date AND $3::date)::int AS new_members
-             FROM membership_members WHERE company_id = $1`,
+            `SELECT COUNT(*) FILTER (WHERE classification IN ('member','vip','corporate'))::int AS total,
+                    COUNT(*) FILTER (WHERE classification IN ('member','vip','corporate') AND status='active')::int AS active,
+                    COUNT(*) FILTER (WHERE classification IN ('member','vip','corporate') AND status='expired')::int AS expired,
+                    COUNT(*) FILTER (WHERE classification IN ('member','vip','corporate') AND created_at::date BETWEEN $2::date AND $3::date)::int AS new_members
+             FROM membership_members WHERE company_id=$1`,
             [companyId, from, to]
           ),
           pool.query(
-            `SELECT p.name AS plan,
-                    p.type,
+            `SELECT o.title AS plan,
+                    o.details->>'classification' AS type,
                     COUNT(m.id)::int AS members,
-                    COUNT(m.id) FILTER (WHERE m.status = 'active')::int AS active_members,
-                    COUNT(m.id) FILTER (WHERE m.status = 'expired')::int AS expired_members
-             FROM membership_plans p
-             LEFT JOIN membership_members m ON m.plan_id = p.id AND m.company_id = p.company_id
-             WHERE p.company_id = $1
-             GROUP BY p.id, p.name, p.type
-             ORDER BY members DESC, p.name`,
+                    COUNT(m.id) FILTER (WHERE m.status='active')::int AS active_members,
+                    COUNT(m.id) FILTER (WHERE m.status='expired')::int AS expired_members
+             FROM spa_management_records o
+             LEFT JOIN membership_members m ON m.offering_id=o.id AND m.company_id=o.company_id
+             WHERE o.company_id=$1 AND o.module_key='catalog/offerings'
+               AND o.details->>'classification' IN ('membership_plan','package','access_pass')
+               AND o.deleted_at IS NULL
+             GROUP BY o.id, o.title, o.details->>'classification'
+             ORDER BY members DESC, o.title`,
             [companyId]
           ),
         ]);

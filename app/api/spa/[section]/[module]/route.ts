@@ -193,6 +193,12 @@ export async function GET(req: Request, { params }: RouteParams) {
         values.push(status);
         clauses.push(`status = $${values.length}`);
       }
+      const classification = (url.searchParams.get("classification") || "").trim();
+      const classificationField = definition.fields.find((field) => field.key === "classification");
+      if (classification && classificationField?.options?.includes(classification)) {
+        values.push(classification);
+        clauses.push(`details->>'classification' = $${values.length}`);
+      }
 
       values.push(limit, offset);
       const recordsResult = await pool.query(
@@ -211,6 +217,10 @@ export async function GET(req: Request, { params }: RouteParams) {
       if (companyId) {
         summaryValues.push(companyId);
         summaryClauses.push(`company_id = $${summaryValues.length}`);
+      }
+      if (classification && classificationField?.options?.includes(classification)) {
+        summaryValues.push(classification);
+        summaryClauses.push(`details->>'classification' = $${summaryValues.length}`);
       }
       const summaryResult = await pool.query(
         `SELECT COUNT(*)::int AS total,
@@ -274,6 +284,22 @@ export async function POST(req: Request, { params }: RouteParams) {
       const titleValue = normalized.details[definition.primaryField];
       if (titleValue === null || titleValue === undefined || String(titleValue).trim() === "") {
         return badRequest(`${definition.singular} title is required`);
+      }
+      if (definition.key === "catalog/offerings") {
+        const offeringCode = String(normalized.details.offering_code || "").trim();
+        const duplicate = await pool.query(
+          `SELECT id, title FROM spa_management_records
+           WHERE company_id=$1 AND module_key='catalog/offerings'
+             AND LOWER(details->>'offering_code')=LOWER($2) AND deleted_at IS NULL
+           LIMIT 1`,
+          [companyId, offeringCode]
+        );
+        if (duplicate.rows.length > 0) {
+          return NextResponse.json(
+            { error: "This offering code already exists. Edit the existing offering instead of creating a duplicate.", existing_offering: duplicate.rows[0] },
+            { status: 409 }
+          );
+        }
       }
       const recordDate = definition.dateField ? normalized.details[definition.dateField] : null;
       const amount = definition.amountField ? normalized.details[definition.amountField] : null;
@@ -349,6 +375,22 @@ export async function PUT(req: Request, { params }: RouteParams) {
       );
       if (oldResult.rows.length === 0) {
         return NextResponse.json({ error: `${definition.singular} not found` }, { status: 404 });
+      }
+      if (definition.key === "catalog/offerings") {
+        const offeringCode = String(normalized.details.offering_code || "").trim();
+        const duplicate = await pool.query(
+          `SELECT id, title FROM spa_management_records
+           WHERE company_id=$1 AND module_key='catalog/offerings' AND id<>$2
+             AND LOWER(details->>'offering_code')=LOWER($3) AND deleted_at IS NULL
+           LIMIT 1`,
+          [oldResult.rows[0].company_id, id, offeringCode]
+        );
+        if (duplicate.rows.length > 0) {
+          return NextResponse.json(
+            { error: "This offering code belongs to another offering.", existing_offering: duplicate.rows[0] },
+            { status: 409 }
+          );
+        }
       }
 
       const recordDate = definition.dateField ? normalized.details[definition.dateField] : null;

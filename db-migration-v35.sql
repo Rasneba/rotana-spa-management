@@ -129,8 +129,8 @@ DECLARE
   role_record RECORD;
   resource_name TEXT;
   resources TEXT[] := ARRAY[
-    'access_dashboard', 'access_zones', 'access_slots',
-    'access_cameras', 'access_control', 'access_kiosk', 'reports_access'
+    'access_zones', 'access_cameras', 'access_control',
+    'access_kiosk', 'reports_access'
   ];
 BEGIN
   FOR role_record IN SELECT id, name FROM roles WHERE name IN ('admin','manager') LOOP
@@ -155,7 +155,7 @@ DO $$
 DECLARE
   receptionist_role_id INTEGER;
   resource_name TEXT;
-  resources TEXT[] := ARRAY['access_dashboard','access_control','access_kiosk'];
+  resources TEXT[] := ARRAY['access_control','access_kiosk'];
 BEGIN
   SELECT id INTO receptionist_role_id FROM roles WHERE name='receptionist' LIMIT 1;
   IF receptionist_role_id IS NOT NULL THEN
