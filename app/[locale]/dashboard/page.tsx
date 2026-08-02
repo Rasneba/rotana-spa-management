@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const modules = [
-  { name: "Membership", moduleCode: "membership", icon: "bi-person-badge", href: "/dashboard/membership", color: "#6366f1", desc: "Plans, members, renewals, payments" },
+  { name: "Spa Management", moduleCode: "membership", icon: "bi-flower1", href: "/dashboard/membership", color: "#557463", desc: "Bookings, memberships, gym and daily operations" },
   { name: "Audit", icon: "bi-journal-text", href: "/dashboard/audit-logs", color: "#14b8a6", desc: "Audit trails, activity logs" },
 ];
 

@@ -36,12 +36,36 @@
     "theme": "Toggle theme",
     "group": {
       "dashboard": "Dashboard",
+      "spa_management": "Spa Management",
       "audit": "Audit",
       "administration": "Administration",
       "membership": "Membership",
       "parking": "Parking"
     },
-
+    "section": {
+      "daily_operations": "Daily Operations",
+      "memberships": "Memberships",
+      "billing_pricing": "Billing & Pricing",
+      "access_facilities": "Access & Facilities"
+    },
+    "spa_management": {
+      "overview": "Overview",
+      "spa_schedule": "Spa Schedule",
+      "gym_management": "Gym Management",
+      "attendance": "Attendance",
+      "members": "Members",
+      "plans": "Plans",
+      "subscriptions": "Subscriptions",
+      "day_tickets": "Day Tickets",
+      "rate_cards": "Rate Cards",
+      "payments": "Payments",
+      "facilities": "Facilities",
+      "entry_gates": "Entry Gates",
+      "rfid_cards": "RFID Cards",
+      "qr_passes": "QR Passes",
+      "visit_sessions": "Visit Sessions",
+      "access_logs": "Access Logs"
+    },
     "audit": {
       "audit_logs": "Audit Logs",
       "activity_log": "Activity Log"

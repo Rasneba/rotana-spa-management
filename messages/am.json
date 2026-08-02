@@ -46,7 +46,32 @@
       "audit": "ኦዲት",
       "system": "ሲስተም",
       "administration": "አስተዳደር",
+      "spa_management": "የስፓ አስተዳደር",
       "membership": "የአባልነት"
+    },
+    "section": {
+      "daily_operations": "የዕለት ተዕለት ሥራዎች",
+      "memberships": "አባልነቶች",
+      "billing_pricing": "ክፍያ እና ዋጋ",
+      "access_facilities": "መግቢያ እና ተቋማት"
+    },
+    "spa_management": {
+      "overview": "አጠቃላይ እይታ",
+      "spa_schedule": "የስፓ መርሐግብር",
+      "gym_management": "የጂም አስተዳደር",
+      "attendance": "መገኘት",
+      "members": "አባላት",
+      "plans": "ዕቅዶች",
+      "subscriptions": "ምዝገባዎች",
+      "day_tickets": "የቀን ትኬቶች",
+      "rate_cards": "የዋጋ ካርዶች",
+      "payments": "ክፍያዎች",
+      "facilities": "ተቋማት",
+      "entry_gates": "የመግቢያ በሮች",
+      "rfid_cards": "RFID ካርዶች",
+      "qr_passes": "QR ፓሶች",
+      "visit_sessions": "የጉብኝት ክፍለ ጊዜያት",
+      "access_logs": "የመግቢያ መዝገቦች"
     },
     "sales": {
       "dashboard": "ዳሽቦርድ",

@@ -1,12 +1,37 @@
 "use client";
 
 import { Link, useRouter, usePathname } from "@/lib/i18n/navigation";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { Fragment, useEffect, useState, useRef, useCallback } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/lib/i18n/LocaleProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const sidebarGroups: any[] = [
+type SidebarLink = {
+  name: string;
+  href: string;
+  icon: string;
+  resource: string;
+  section?: string;
+  adminOnly?: boolean;
+  superAdminOnly?: boolean;
+  target?: "_blank";
+};
+
+type SidebarGroup = {
+  name: string;
+  icon: string;
+  links: SidebarLink[];
+  moduleCode?: string;
+  adminOnly?: boolean;
+};
+
+const toNavSlug = (value: string) => value
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "_")
+  .replace(/^_+|_+$/g, "");
+
+const sidebarGroups: SidebarGroup[] = [
   {
     name: "Dashboard",
     icon: "bi-speedometer2",
@@ -16,27 +41,27 @@ const sidebarGroups: any[] = [
     ]
   },
   {
-    name: "Membership",
+    name: "Spa Management",
     moduleCode: "membership",
-    icon: "bi-person-badge",
+    icon: "bi-flower1",
     adminOnly: false,
     links: [
-      { name: "Dashboard", href: "/dashboard/membership", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
-      { name: "Members", href: "/dashboard/membership/members", icon: "bi-people", adminOnly: false, resource: "membership_members" },
-      { name: "Plans", href: "/dashboard/membership/plans", icon: "bi-layers", adminOnly: false, resource: "membership_plans" },
-      { name: "Subscriptions", href: "/dashboard/membership/subscriptions", icon: "bi-arrow-repeat", adminOnly: false, resource: "membership_subscriptions" },
-      { name: "Rate Cards", href: "/dashboard/membership/rate-cards", icon: "bi-currency-dollar", adminOnly: false, resource: "membership_rate_cards" },
-      { name: "Facilities", href: "/dashboard/membership/facilities", icon: "bi-building", adminOnly: false, resource: "membership_facilities" },
-      { name: "Entry Gates", href: "/dashboard/membership/gates", icon: "bi-door-open", adminOnly: false, resource: "membership_gates" },
-      { name: "RFID Cards", href: "/dashboard/membership/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "membership_rfid_cards" },
-      { name: "QR Passes", href: "/dashboard/membership/qr-passes", icon: "bi-qr-code", adminOnly: false, resource: "membership_qr_passes" },
-      { name: "Spa Schedule", href: "/dashboard/membership/schedule", icon: "bi-calendar-week", adminOnly: false, resource: "membership_appointments" },
-      { name: "Gym Management", href: "/dashboard/membership/gym", icon: "bi-activity", adminOnly: false, resource: "membership_attendance" },
-      { name: "Visit Sessions", href: "/dashboard/membership/sessions", icon: "bi-clock-history", adminOnly: false, resource: "membership_sessions" },
-      { name: "Access Logs", href: "/dashboard/membership/access-logs", icon: "bi-shield-check", adminOnly: false, resource: "membership_access_logs" },
-      { name: "Day Tickets", href: "/dashboard/membership/day-tickets", icon: "bi-ticket-perforated", adminOnly: false, resource: "membership_day_tickets" },
-      { name: "Payments", href: "/dashboard/membership/payments", icon: "bi-credit-card", adminOnly: false, resource: "membership_payments" },
-      { name: "Attendance", href: "/dashboard/membership/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "membership_attendance" },
+      { name: "Overview", href: "/dashboard/membership", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
+      { name: "Spa Schedule", href: "/dashboard/membership/schedule", icon: "bi-calendar-week", adminOnly: false, resource: "membership_appointments", section: "Daily Operations" },
+      { name: "Gym Management", href: "/dashboard/membership/gym", icon: "bi-activity", adminOnly: false, resource: "membership_attendance", section: "Daily Operations" },
+      { name: "Attendance", href: "/dashboard/membership/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "membership_attendance", section: "Daily Operations" },
+      { name: "Members", href: "/dashboard/membership/members", icon: "bi-people", adminOnly: false, resource: "membership_members", section: "Memberships" },
+      { name: "Plans", href: "/dashboard/membership/plans", icon: "bi-layers", adminOnly: false, resource: "membership_plans", section: "Memberships" },
+      { name: "Subscriptions", href: "/dashboard/membership/subscriptions", icon: "bi-arrow-repeat", adminOnly: false, resource: "membership_subscriptions", section: "Memberships" },
+      { name: "Day Tickets", href: "/dashboard/membership/day-tickets", icon: "bi-ticket-perforated", adminOnly: false, resource: "membership_day_tickets", section: "Memberships" },
+      { name: "Rate Cards", href: "/dashboard/membership/rate-cards", icon: "bi-tags", adminOnly: false, resource: "membership_rate_cards", section: "Billing & Pricing" },
+      { name: "Payments", href: "/dashboard/membership/payments", icon: "bi-credit-card", adminOnly: false, resource: "membership_payments", section: "Billing & Pricing" },
+      { name: "Facilities", href: "/dashboard/membership/facilities", icon: "bi-building", adminOnly: false, resource: "membership_facilities", section: "Access & Facilities" },
+      { name: "Entry Gates", href: "/dashboard/membership/gates", icon: "bi-door-open", adminOnly: false, resource: "membership_gates", section: "Access & Facilities" },
+      { name: "RFID Cards", href: "/dashboard/membership/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "membership_rfid_cards", section: "Access & Facilities" },
+      { name: "QR Passes", href: "/dashboard/membership/qr-passes", icon: "bi-qr-code", adminOnly: false, resource: "membership_qr_passes", section: "Access & Facilities" },
+      { name: "Visit Sessions", href: "/dashboard/membership/sessions", icon: "bi-clock-history", adminOnly: false, resource: "membership_sessions", section: "Access & Facilities" },
+      { name: "Access Logs", href: "/dashboard/membership/access-logs", icon: "bi-shield-check", adminOnly: false, resource: "membership_access_logs", section: "Access & Facilities" },
     ]
   },
   {
@@ -116,8 +141,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               if (pathname === "/dashboard") {
                 for (const group of sidebarGroups) {
                   for (const link of group.links) {
-                    if (link.separator) continue;
-                    if (link.resource && data[link.resource]?.[0]) {
+                    if (data[link.resource]?.[0]) {
                       router.push(link.href);
                       return;
                     }
@@ -140,13 +164,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           .catch(() => {});
       }
     }
+    const defaultGroups = Object.fromEntries(
+      sidebarGroups.map((group) => [group.name, true])
+    ) as Record<string, boolean>;
     const saved = localStorage.getItem("sidebarGroups");
     if (saved) {
-      setOpenGroups(JSON.parse(saved));
+      try {
+        const storedGroups = JSON.parse(saved) as Record<string, boolean>;
+        // Preserve the previous Membership group preference after the broader
+        // Spa Management navigation replaces it.
+        if (storedGroups["Spa Management"] === undefined && storedGroups.Membership !== undefined) {
+          storedGroups["Spa Management"] = storedGroups.Membership;
+        }
+        setOpenGroups({ ...defaultGroups, ...storedGroups });
+      } catch {
+        setOpenGroups(defaultGroups);
+      }
     } else {
-      const initial: Record<string, boolean> = {};
-      sidebarGroups.forEach(g => { initial[g.name] = true; });
-      setOpenGroups(initial);
+      setOpenGroups(defaultGroups);
     }
   }, [router]);
 
@@ -209,10 +244,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (pathname === href) return true;
     if (href === "/dashboard" || !pathname.startsWith(`${href}/`)) return false;
 
-    // Keep parent links (for example Membership Dashboard) from appearing active
-    // when a more specific workspace page owns the current path.
+    // Keep overview links from appearing active when a more specific spa
+    // workspace owns the current path.
     const hasMoreSpecificMatch = sidebarGroups.some((group) =>
-      group.links.some((link: any) => typeof link.href === "string" && link.href !== href && link.href.length > href.length &&
+      group.links.some((link) => link.href !== href && link.href.length > href.length &&
         (pathname === link.href || pathname.startsWith(`${link.href}/`)))
     );
     return !hasMoreSpecificMatch;
@@ -227,11 +262,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "?";
 
-  const navKey = (group: string, link: string): string => {
-    const g = group.toLowerCase().replace(/-/g, "_");
-    const l = link.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
-    return `nav.${g}.${l}`;
+  const translatedLabel = (key: string, fallback: string): string => {
+    const label = t(key);
+    return label !== key ? label : fallback;
   };
+
+  const groupKey = (group: string): string => `nav.group.${toNavSlug(group)}`;
+  const navKey = (group: string, link: string): string =>
+    `nav.${toNavSlug(group)}.${toNavSlug(link)}`;
+  const sectionKey = (section: string): string => `nav.section.${toNavSlug(section)}`;
 
   const isAdmin = user?.role === "admin" || user?.role === "super_admin";
   const isSuper = user?.role === "super_admin";
@@ -244,30 +283,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return perms[0] === true; // can_view is index 0
   };
 
-  const visibleGroups = sidebarGroups.filter(g => {
-    if (g.adminOnly && !isAdmin) return false;
-    if (g.moduleCode && !licensedModules.includes(g.moduleCode) && !isSuper) return false;
+  const visibleGroups = sidebarGroups.filter((group) => {
+    if (group.adminOnly && !isAdmin) return false;
+    if (group.moduleCode && !licensedModules.includes(group.moduleCode) && !isSuper) return false;
     return true;
-  }).map(g => {
-    if (!isGuest) return g;
-    const filteredLinks = g.links.filter((link: any) => {
-      if (link.separator) return true;
+  }).map((group) => ({
+    ...group,
+    links: group.links.filter((link) => {
+      if (link.adminOnly && !isAdmin) return false;
       if (link.superAdminOnly && !isSuper) return false;
-      if (link.resource && !hasPermission(link.resource)) return false;
+      if (isGuest && !hasPermission(link.resource)) return false;
       return true;
-    });
-    return { ...g, links: filteredLinks };
-  }).filter(g => {
-    const nonSepLinks = g.links.filter((l: any) => !l.separator);
-    return nonSepLinks.length > 0;
-  });
+    }),
+  })).filter((group) => group.links.length > 0);
 
   const pageTitle = (() => {
     for (const group of sidebarGroups) {
       for (const link of group.links) {
         if (link.adminOnly && !isAdmin) continue;
         if (link.superAdminOnly && !isSuper) continue;
-        if (isActive(link.href)) return group.name + " / " + link.name;
+        if (isActive(link.href)) {
+          return `${translatedLabel(groupKey(group.name), group.name)} / ${translatedLabel(navKey(group.name, link.name), link.name)}`;
+        }
       }
     }
     return "Workspace";
@@ -308,62 +345,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="sidebar-nav">
           {visibleGroups.map((group) => (
             <div key={group.name} className="sidebar-group">
-              <div
-                className="sidebar-group-label"
+              <button
+                type="button"
+                className={`sidebar-group-label ${group.links.some((link) => isActive(link.href)) ? "has-active-link" : ""}`}
                 onClick={() => toggleGroup(group.name)}
+                aria-expanded={Boolean(openGroups[group.name])}
+                aria-controls={`sidebar-group-${toNavSlug(group.name)}`}
+                title={translatedLabel(groupKey(group.name), group.name)}
               >
                 <span className="d-flex align-items-center gap-2">
-                  <i className={`bi ${group.icon}`}></i>
-                  <span className="group-text">{t(group.name === "E-Commerce" ? "nav.group.e_commerce" : group.name === "Administration" ? "nav.group.administration" : `nav.group.${group.name.toLowerCase()}`)}</span>
+                  <i className={`bi ${group.icon} sidebar-group-symbol`}></i>
+                  <span className="group-text">{translatedLabel(groupKey(group.name), group.name)}</span>
                 </span>
                 <i className={`bi bi-chevron-down sidebar-group-icon ${openGroups[group.name] ? "open" : ""}`}></i>
-              </div>
+              </button>
               {openGroups[group.name] && (
-                <div className="ms-1">
-                  {group.links
-                    .filter((link: any) => {
-                      if (link.superAdminOnly && !isSuper) return false;
-                      if (isGuest && link.resource && !hasPermission(link.resource)) return false;
-                      return true;
-                    })
-                    .map((link: any, idx: number) =>
-                      link.separator ? (
-                        <div key={`sep-${idx}`} className="px-2 py-1 mt-2 mb-1">
-                          <small className="text-muted text-uppercase fw-bold" style={{ fontSize: "10px", letterSpacing: "1px" }}>{link.label}</small>
-                        </div>
-                      ) : link.target === "_blank" ? (
-                        <a
-                          key={link.href}
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
-                        >
-                          <i className={`bi ${link.icon}`}></i>
-                          <span className="flex-grow-1 text-truncate">{(() => {
-                            const key = navKey(group.name, link.name);
-                            const label = t(key);
-                            return label !== key ? label : link.name;
-                          })()}</span>
-                          <i className="bi bi-box-arrow-up-right link-arrow" style={{ fontSize: "10px", opacity: 0.5 }}></i>
-                        </a>
-                      ) : (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
-                          onClick={closeSidebar}
-                          title={link.name}
-                        >
-                          <i className={`bi ${link.icon}`}></i>
-                          <span className="flex-grow-1 text-truncate">{(() => {
-                            const key = navKey(group.name, link.name);
-                            const label = t(key);
-                            return label !== key ? label : link.name;
-                          })()}</span>
-                        </Link>
-                      )
-                    )}
+                <div id={`sidebar-group-${toNavSlug(group.name)}`} className="ms-1">
+                  {group.links.map((link, idx) => {
+                    const startsSection = Boolean(
+                      link.section && (idx === 0 || link.section !== group.links[idx - 1]?.section)
+                    );
+                    const label = translatedLabel(navKey(group.name, link.name), link.name);
+
+                    return (
+                      <Fragment key={link.href}>
+                        {startsSection && link.section && (
+                          <div className="sidebar-section-label">
+                            {translatedLabel(sectionKey(link.section), link.section)}
+                          </div>
+                        )}
+                        {link.target === "_blank" ? (
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
+                            title={label}
+                          >
+                            <i className={`bi ${link.icon}`}></i>
+                            <span className="flex-grow-1 text-truncate">{label}</span>
+                            <i className="bi bi-box-arrow-up-right link-arrow" style={{ fontSize: "10px", opacity: 0.5 }}></i>
+                          </a>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
+                            onClick={closeSidebar}
+                            title={label}
+                          >
+                            <i className={`bi ${link.icon}`}></i>
+                            <span className="flex-grow-1 text-truncate">{label}</span>
+                          </Link>
+                        )}
+                      </Fragment>
+                    );
+                  })}
                 </div>
               )}
             </div>

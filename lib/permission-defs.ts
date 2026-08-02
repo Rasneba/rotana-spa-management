@@ -44,7 +44,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
     resources: ["work_orders", "bom", "routings"],
   },
   "Membership": {
-    label: "Membership",
+    label: "Spa Management",
     resources: [
       "membership_plans", "membership_members", "membership_payments", "membership_attendance",
       "membership_subscriptions", "membership_rate_cards", "membership_facilities",

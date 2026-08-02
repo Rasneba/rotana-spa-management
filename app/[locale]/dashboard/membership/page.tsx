@@ -2,9 +2,31 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemKpi, GemBtn, GemBtnOutline, GemTable, GemBadge } from "@/lib/gem-ui";
-import { Users, CreditCard, Layers, CheckCircle, DollarSign, CalendarDays, Dumbbell } from "lucide-react";
+import {
+  Building2,
+  CalendarDays,
+  CheckCircle,
+  CreditCard,
+  DollarSign,
+  DoorOpen,
+  Dumbbell,
+  Layers,
+  RefreshCw,
+  Users,
+} from "lucide-react";
 
-export default function MembershipDashboard() {
+const managementAreas = [
+  { name: "Spa Schedule", icon: CalendarDays, desc: "Book treatments and manage room flow", href: "/dashboard/membership/schedule", color: "text-violet-600" },
+  { name: "Gym Management", icon: Dumbbell, desc: "Monitor live attendance and floor capacity", href: "/dashboard/membership/gym", color: "text-emerald-600" },
+  { name: "Members", icon: Users, desc: "View profiles, status and member history", href: "/dashboard/membership/members", color: "text-sky-600" },
+  { name: "Plans", icon: Layers, desc: "Create membership plans and benefits", href: "/dashboard/membership/plans", color: "text-blue-600" },
+  { name: "Subscriptions", icon: RefreshCw, desc: "Manage renewals and active subscriptions", href: "/dashboard/membership/subscriptions", color: "text-teal-600" },
+  { name: "Facilities", icon: Building2, desc: "Configure rooms and shared facilities", href: "/dashboard/membership/facilities", color: "text-amber-600" },
+  { name: "Access Control", icon: DoorOpen, desc: "Manage entry gates, cards and passes", href: "/dashboard/membership/gates", color: "text-rose-600" },
+  { name: "Payments", icon: CreditCard, desc: "Review collections and payment activity", href: "/dashboard/membership/payments", color: "text-indigo-600" },
+];
+
+export default function SpaManagementDashboard() {
   const [stats, setStats] = useState<any>(null);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -36,8 +58,8 @@ export default function MembershipDashboard() {
   return (
     <GemPage>
       <GemHeader
-        title="Membership Dashboard"
-        subtitle="Manage spa, gym & cafe memberships"
+        title="Spa Management"
+        subtitle="Manage bookings, memberships, gym access and daily operations"
         actions={
           <>
             <Link href="/dashboard/membership/schedule" className="text-inherit"><GemBtn><CalendarDays size={16} />Schedule</GemBtn></Link>
@@ -89,22 +111,26 @@ export default function MembershipDashboard() {
         </>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { name: "Spa Schedule", icon: <CalendarDays size={28} />, desc: "Book treatments and manage room flow", href: "/dashboard/membership/schedule", color: "text-violet-600" },
-          { name: "Gym Management", icon: <Dumbbell size={28} />, desc: "Monitor the live fitness floor", href: "/dashboard/membership/gym", color: "text-emerald-600" },
-          { name: "Members", icon: <Users size={28} />, desc: "View and manage all members", href: "/dashboard/membership/members", color: "text-black" },
-          { name: "Membership Plans", icon: <Layers size={28} />, desc: "Create plans with pricing", href: "/dashboard/membership/plans", color: "text-blue-600" },
-        ].map(module => (
-          <Link key={module.name} href={module.href} className="text-inherit">
-            <GemCard className="text-center hover:shadow-md transition-shadow">
-              <div className={`${module.color} mb-3 flex justify-center`}>{module.icon}</div>
-              <h3 className="font-bold mb-1">{module.name}</h3>
-              <p className="text-sm text-gray-500">{module.desc}</p>
-            </GemCard>
-          </Link>
-        ))}
-      </div>
+      <section aria-labelledby="management-areas-heading">
+        <div className="mb-4">
+          <h2 id="management-areas-heading" className="text-lg font-bold mb-1">Management areas</h2>
+          <p className="text-sm text-gray-500">Move quickly between the spa&apos;s core day-to-day workspaces.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {managementAreas.map((area) => {
+            const Icon = area.icon;
+            return (
+              <Link key={area.name} href={area.href} className="text-inherit">
+                <GemCard className="text-center hover:shadow-md transition-shadow h-full">
+                  <div className={`${area.color} mb-3 flex justify-center`}><Icon size={28} /></div>
+                  <h3 className="font-bold mb-1">{area.name}</h3>
+                  <p className="text-sm text-gray-500">{area.desc}</p>
+                </GemCard>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
     </GemPage>
   );
 }
