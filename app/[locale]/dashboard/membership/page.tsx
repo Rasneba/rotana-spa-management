@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemKpi, GemBtn, GemBtnOutline, GemTable, GemBadge } from "@/lib/gem-ui";
-import { Users, CreditCard, Building, Layers, CheckCircle, DollarSign } from "lucide-react";
+import { Users, CreditCard, Layers, CheckCircle, DollarSign, CalendarDays, Dumbbell } from "lucide-react";
 
 export default function MembershipDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -40,9 +40,9 @@ export default function MembershipDashboard() {
         subtitle="Manage spa, gym & cafe memberships"
         actions={
           <>
-            <Link href="/dashboard/membership/attendance" className="text-inherit"><GemBtnOutline><Building size={16} />Attendance</GemBtnOutline></Link>
+            <Link href="/dashboard/membership/schedule" className="text-inherit"><GemBtn><CalendarDays size={16} />Schedule</GemBtn></Link>
+            <Link href="/dashboard/membership/gym" className="text-inherit"><GemBtnOutline><Dumbbell size={16} />Gym</GemBtnOutline></Link>
             <Link href="/dashboard/membership/members" className="text-inherit"><GemBtnOutline><Users size={16} />Members</GemBtnOutline></Link>
-            <Link href="/dashboard/membership/payments" className="text-inherit"><GemBtnOutline><CreditCard size={16} />Payments</GemBtnOutline></Link>
           </>
         }
       />
@@ -91,10 +91,10 @@ export default function MembershipDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
+          { name: "Spa Schedule", icon: <CalendarDays size={28} />, desc: "Book treatments and manage room flow", href: "/dashboard/membership/schedule", color: "text-violet-600" },
+          { name: "Gym Management", icon: <Dumbbell size={28} />, desc: "Monitor the live fitness floor", href: "/dashboard/membership/gym", color: "text-emerald-600" },
           { name: "Members", icon: <Users size={28} />, desc: "View and manage all members", href: "/dashboard/membership/members", color: "text-black" },
-          { name: "Gym Attendance", icon: <Building size={28} />, desc: "RFID check-in / check-out tracking", href: "/dashboard/membership/attendance", color: "text-emerald-600" },
           { name: "Membership Plans", icon: <Layers size={28} />, desc: "Create plans with pricing", href: "/dashboard/membership/plans", color: "text-blue-600" },
-          { name: "Payments", icon: <CreditCard size={28} />, desc: "Track fee collections", href: "/dashboard/membership/payments", color: "text-amber-600" },
         ].map(module => (
           <Link key={module.name} href={module.href} className="text-inherit">
             <GemCard className="text-center hover:shadow-md transition-shadow">

@@ -11,6 +11,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
       "membership_subscriptions", "membership_rate_cards", "membership_facilities",
       "membership_gates", "membership_rfid_cards", "membership_qr_passes",
       "membership_sessions", "membership_access_logs", "membership_day_tickets",
+      "membership_appointments",
     ],
   },
 

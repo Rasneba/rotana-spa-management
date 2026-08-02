@@ -30,6 +30,8 @@ const sidebarGroups: any[] = [
       { name: "Entry Gates", href: "/dashboard/membership/gates", icon: "bi-door-open", adminOnly: false, resource: "membership_gates" },
       { name: "RFID Cards", href: "/dashboard/membership/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "membership_rfid_cards" },
       { name: "QR Passes", href: "/dashboard/membership/qr-passes", icon: "bi-qr-code", adminOnly: false, resource: "membership_qr_passes" },
+      { name: "Spa Schedule", href: "/dashboard/membership/schedule", icon: "bi-calendar-week", adminOnly: false, resource: "membership_appointments" },
+      { name: "Gym Management", href: "/dashboard/membership/gym", icon: "bi-activity", adminOnly: false, resource: "membership_attendance" },
       { name: "Visit Sessions", href: "/dashboard/membership/sessions", icon: "bi-clock-history", adminOnly: false, resource: "membership_sessions" },
       { name: "Access Logs", href: "/dashboard/membership/access-logs", icon: "bi-shield-check", adminOnly: false, resource: "membership_access_logs" },
       { name: "Day Tickets", href: "/dashboard/membership/day-tickets", icon: "bi-ticket-perforated", adminOnly: false, resource: "membership_day_tickets" },
@@ -204,7 +206,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const isActive = (href: string) => {
-    return pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+    if (pathname === href) return true;
+    if (href === "/dashboard" || !pathname.startsWith(`${href}/`)) return false;
+
+    // Keep parent links (for example Membership Dashboard) from appearing active
+    // when a more specific workspace page owns the current path.
+    const hasMoreSpecificMatch = sidebarGroups.some((group) =>
+      group.links.some((link: any) => typeof link.href === "string" && link.href !== href && link.href.length > href.length &&
+        (pathname === link.href || pathname.startsWith(`${link.href}/`)))
+    );
+    return !hasMoreSpecificMatch;
   };
 
   const groupedResults = searchResults.reduce((acc: any, item: any) => {

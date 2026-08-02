@@ -10,9 +10,9 @@ const modules = [
 ];
 
 const quickActions = [
-  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/membership/members", color: "primary" },
-  { label: "New Plan", icon: "bi-layers", href: "/dashboard/membership/plans", color: "success" },
-  { label: "Record Payment", icon: "bi-credit-card", href: "/dashboard/membership/payments", color: "info" },
+  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/membership/schedule", color: "primary" },
+  { label: "New Member", icon: "bi-person-plus", href: "/dashboard/membership/members", color: "success" },
+  { label: "Gym Floor", icon: "bi-activity", href: "/dashboard/membership/gym", color: "info" },
   { label: "Check In", icon: "bi-box-arrow-in-right", href: "/dashboard/membership/attendance", color: "warning" },
 ];
 
