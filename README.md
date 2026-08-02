@@ -32,7 +32,7 @@ Migration v34 adds the visit and draft service-order workflow. Migration v35 add
 
 The visit treatment screen is optimized for tablets and touch devices: classified offering tiles work like a restaurant order menu, while a live cart provides large quantity and removal controls before the draft Service Order is finished.
 
-Migration v37 keeps the existing Appointments calendar unchanged and adds a separate Spa Bookings board: therapists are vertical, time is horizontal, and selecting a service calculates the editable end time from its duration.
+Migration v37 keeps the existing Appointments calendar unchanged and adds a separate Spa Bookings board: therapists are vertical, time is horizontal, and selecting a service calculates the editable end time from its duration. The board displays standard time together with Ethiopian/Amharic periods (ጠዋት, ቀትር, ከሰዓት, ማታ), and the sidebar uses matching color accents for each workspace.
 
 ### In-app user guide
 

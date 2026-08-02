@@ -15,6 +15,25 @@ const toNavSlug = (value: string) => value
 
 const NAVIGATION_STORAGE_VERSION = "3";
 
+const SIDEBAR_ACCENTS: Record<string, string> = {
+  Dashboard: "#2f7a57",
+  Access: "#3977b8",
+  Customers: "#168b83",
+  "Offering Master": "#7c58b3",
+  Membership: "#4f67b2",
+  Operations: "#dc7844",
+  Gym: "#d05262",
+  Spa: "#b65b91",
+  Inventory: "#bd862e",
+  Staff: "#2f8b9b",
+  Facilities: "#4d835c",
+  Reports: "#6959a7",
+  Settings: "#637184",
+  Platform: "#8b5967",
+};
+
+const sidebarAccent = (group: string) => SIDEBAR_ACCENTS[group] || "#557463";
+
 const activeGroupForPath = (path: string) => {
   let match: { name: string; hrefLength: number; direct?: boolean } | null = null;
   for (const group of sidebarGroups) {
@@ -297,7 +316,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               const link = group.links[0];
               const label = translatedLabel(navKey(group.name, link.name), link.name);
               return (
-                <div key={group.name} className="sidebar-group sidebar-direct-group">
+                <div key={group.name} className="sidebar-group sidebar-direct-group" style={{ "--group-accent": sidebarAccent(group.name) } as React.CSSProperties}>
                   <Link
                     href={link.href}
                     className={`sidebar-link sidebar-direct-link ${isActive(link.href) ? "active" : ""}`}
@@ -312,7 +331,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             }
 
             return (
-              <div key={group.name} className="sidebar-group">
+              <div key={group.name} className="sidebar-group" style={{ "--group-accent": sidebarAccent(group.name) } as React.CSSProperties}>
                 <button
                   type="button"
                   className={`sidebar-group-label ${group.links.some((link) => isActive(link.href)) ? "has-active-link" : ""}`}

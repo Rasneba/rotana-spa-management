@@ -11,6 +11,7 @@ const SLOT_MINUTES = 30;
 const SLOT_WIDTH = 76;
 const ROW_HEIGHT = 92;
 const THERAPIST_WIDTH = 190;
+const THERAPIST_COLORS = ["#2f855a", "#4f6fb5", "#a15f9b", "#c47a38", "#2b8a8a", "#8a64c5", "#c15364"];
 
 type Therapist = { id: number; title: string; details?: { specialties?: string } };
 type Offering = { id: number; title: string; details: { offering_code?: string; duration_minutes?: number | string; category?: string; classification?: string } };
@@ -100,6 +101,36 @@ function timeWithDuration(startTime: string, duration: number): string {
   const [hours, minutes] = startTime.split(":").map(Number);
   const end = hours * 60 + minutes + duration;
   return `${String(Math.floor(end / 60) % 24).padStart(2, "0")}:${String(end % 60).padStart(2, "0")}`;
+}
+
+function amharicPeriod(minutes: number): { label: string; className: string } {
+  const hour = Math.floor(minutes / 60) % 24;
+  if (hour < 12) return { label: "ጠዋት", className: "morning" };
+  if (hour === 12) return { label: "ቀትር", className: "noon" };
+  if (hour < 18) return { label: "ከሰዓት", className: "afternoon" };
+  return { label: "ማታ", className: "evening" };
+}
+
+function amharicTimeFromMinutes(minutes: number): string {
+  const normalizedMinutes = ((minutes % 1440) + 1440) % 1440;
+  const standardHour = Math.floor(normalizedMinutes / 60);
+  const ethiopianHour = ((standardHour + 5) % 12) + 1;
+  const minute = normalizedMinutes % 60;
+  return `${ethiopianHour}:${String(minute).padStart(2, "0")} ${amharicPeriod(normalizedMinutes).label}`;
+}
+
+function amharicTime(value: string): string {
+  const date = new Date(value);
+  return amharicTimeFromMinutes(date.getHours() * 60 + date.getMinutes());
+}
+
+function amharicInputTime(value: string): string {
+  const [hours, minutes] = value.split(":").map(Number);
+  return amharicTimeFromMinutes(hours * 60 + minutes);
+}
+
+function periodClass(minutes: number): string {
+  return `time-period-${amharicPeriod(minutes).className}`;
 }
 
 function statusClass(status: string): string {
@@ -281,7 +312,7 @@ export default function SpaTherapistBookingBoard() {
         {capabilities.create && <button type="button" className="new-booking-button" onClick={() => openNew()}><Plus size={18} />New Booking</button>}
       </header>
 
-      <div className="spa-booking-subbar"><div><strong>{dayLabel}</strong><span>{bookings.length} booking{bookings.length === 1 ? "" : "s"}</span></div><label><i className="bi bi-search" /><input value={therapistSearch} onChange={(event) => setTherapistSearch(event.target.value)} placeholder="Find therapist…" /></label><div className="booking-legend"><span className="confirmed">Confirmed</span><span className="checked-in">Checked In</span><span className="completed">Completed</span></div></div>
+      <div className="spa-booking-subbar"><div><strong>{dayLabel}</strong><span>{bookings.length} booking{bookings.length === 1 ? "" : "s"}</span></div><label><i className="bi bi-search" /><input value={therapistSearch} onChange={(event) => setTherapistSearch(event.target.value)} placeholder="Find therapist…" /></label><div className="booking-legend"><span className="confirmed">Confirmed</span><span className="checked-in">Checked In</span><span className="completed">Completed</span></div><div className="amharic-period-legend"><span className="morning">ጠዋት</span><span className="noon">ቀትር</span><span className="afternoon">ከሰዓት</span><span className="evening">ማታ</span></div></div>
       {error && !showForm && <div className="spa-workspace-alert danger"><i className="bi bi-exclamation-circle" />{error}</div>}
 
       <section className="therapist-timeline-shell">
@@ -290,22 +321,22 @@ export default function SpaTherapistBookingBoard() {
             <div className="therapist-timeline-board" style={{ width: THERAPIST_WIDTH + totalTimelineWidth }}>
               <div className="therapist-time-header" style={{ gridTemplateColumns: `${THERAPIST_WIDTH}px ${totalTimelineWidth}px` }}>
                 <div className="therapist-column-title">Therapist</div>
-                <div className="horizontal-time-labels" style={{ gridTemplateColumns: `repeat(${timeSlots.length}, ${SLOT_WIDTH}px)` }}>{timeSlots.map((slot) => <span key={slot.value} className={slot.value.endsWith(":00") ? "hour" : "half"}>{slot.value}</span>)}</div>
+                <div className="horizontal-time-labels" style={{ gridTemplateColumns: `repeat(${timeSlots.length}, ${SLOT_WIDTH}px)` }}>{timeSlots.map((slot) => <span key={slot.value} className={`${slot.value.endsWith(":00") ? "hour" : "half"} ${periodClass(slot.minutes)}`}><b>{slot.value}</b><small>{amharicTimeFromMinutes(slot.minutes)}</small></span>)}</div>
               </div>
 
-              {visibleTherapists.map((therapist) => {
+              {visibleTherapists.map((therapist, therapistIndex) => {
                 const therapistBookings = bookings.filter((booking) => Number(booking.therapist_record_id) === Number(therapist.id));
                 return (
-                  <div className="therapist-timeline-row" key={therapist.id} style={{ gridTemplateColumns: `${THERAPIST_WIDTH}px ${totalTimelineWidth}px`, minHeight: ROW_HEIGHT }}>
+                  <div className="therapist-timeline-row" key={therapist.id} style={{ gridTemplateColumns: `${THERAPIST_WIDTH}px ${totalTimelineWidth}px`, minHeight: ROW_HEIGHT, "--therapist-color": THERAPIST_COLORS[therapistIndex % THERAPIST_COLORS.length] } as React.CSSProperties}>
                     <div className="vertical-therapist-card"><span>{therapist.title.charAt(0).toUpperCase()}</span><div><strong>{therapist.title}</strong><small>{therapist.details?.specialties || "Spa therapist"}</small><em>{therapistBookings.length} bookings</em></div></div>
                     <div className="horizontal-booking-track" style={{ width: totalTimelineWidth, minHeight: ROW_HEIGHT }}>
-                      <div className="horizontal-slot-grid" style={{ gridTemplateColumns: `repeat(${timeSlots.length}, ${SLOT_WIDTH}px)` }}>{timeSlots.map((slot) => <button key={slot.value} type="button" onClick={() => openNew(String(therapist.id), slot.value)} disabled={!capabilities.create || slot.minutes >= DAY_END * 60} aria-label={`Book ${therapist.title} at ${slot.value}`} />)}</div>
+                      <div className="horizontal-slot-grid" style={{ gridTemplateColumns: `repeat(${timeSlots.length}, ${SLOT_WIDTH}px)` }}>{timeSlots.map((slot) => <button key={slot.value} type="button" className={periodClass(slot.minutes)} onClick={() => openNew(String(therapist.id), slot.value)} disabled={!capabilities.create || slot.minutes >= DAY_END * 60} aria-label={`Book ${therapist.title} at ${slot.value} · ${amharicTimeFromMinutes(slot.minutes)}`} />)}</div>
                       {therapistBookings.map((booking) => {
                         const start = minutesFor(booking.starts_at);
                         const end = minutesFor(booking.ends_at);
                         const left = ((start - DAY_START * 60) / SLOT_MINUTES) * SLOT_WIDTH;
                         const width = Math.max(SLOT_WIDTH, ((end - start) / SLOT_MINUTES) * SLOT_WIDTH - 5);
-                        return <button type="button" key={booking.id} className={`horizontal-booking-event ${statusClass(booking.status)}`} style={{ left: Math.max(0, left), width }} onClick={() => openEdit(booking)}><strong>{booking.member_name || booking.guest_name || "Guest"}</strong><span>{inputTime(booking.starts_at)}–{inputTime(booking.ends_at)}</span><small>{booking.offering_name || booking.service_name}</small></button>;
+                        return <button type="button" key={booking.id} className={`horizontal-booking-event ${statusClass(booking.status)}`} style={{ left: Math.max(0, left), width }} onClick={() => openEdit(booking)}><strong>{booking.member_name || booking.guest_name || "Guest"}</strong><span>{inputTime(booking.starts_at)}–{inputTime(booking.ends_at)}</span><em>{amharicTime(booking.starts_at)}–{amharicTime(booking.ends_at)}</em><small>{booking.offering_name || booking.service_name}</small></button>;
                       })}
                     </div>
                   </div>
@@ -329,8 +360,8 @@ export default function SpaTherapistBookingBoard() {
                 {form.therapist_record_id && (
                   <div className="spa-booking-time-section span-two">
                     <div><Clock3 size={18} /><span>Booking Time</span><small>{selectedOffering ? `${selectedOffering.title} · ${serviceDuration} minutes` : "Choose a service to calculate end time"}</small></div>
-                    <label><span>Start Time *</span><input type="time" required step="900" value={form.start_time} onChange={(event) => setStartTime(event.target.value)} /></label>
-                    <label><span>End Time *</span><input type="time" required step="900" value={form.end_time} onChange={(event) => setForm({ ...form, end_time: event.target.value })} /></label>
+                    <label><span>Start Time · መጀመሪያ *</span><input type="time" required step="900" value={form.start_time} onChange={(event) => setStartTime(event.target.value)} /><small className="amharic-selected-time">{amharicInputTime(form.start_time)}</small></label>
+                    <label><span>End Time · መጨረሻ *</span><input type="time" required step="900" value={form.end_time} onChange={(event) => setForm({ ...form, end_time: event.target.value })} /><small className="amharic-selected-time">{amharicInputTime(form.end_time)}</small></label>
                   </div>
                 )}
 

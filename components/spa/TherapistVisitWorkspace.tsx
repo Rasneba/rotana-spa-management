@@ -308,7 +308,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
                 <button
                   type="button"
                   key={offering.id}
-                  className={`touch-service-tile ${cartLine ? "selected" : ""}`}
+                  className={`touch-service-tile category-${offering.details.classification || "service"} ${cartLine ? "selected" : ""}`}
                   onClick={() => void addOffering(offering)}
                   disabled={visit.status !== "in_treatment" || Boolean(busy)}
                 >

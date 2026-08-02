@@ -244,7 +244,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
     pages: [
       { title: "Therapists", route: "/dashboard/spa/spa/therapists", permission: "spa_therapists", summary: "Therapist profiles, specialties and certifications.", moduleKey: "spa/therapists" },
       { title: "Treatment Rooms", route: "/dashboard/spa/spa/treatment-rooms", permission: "membership_facilities", summary: "A filtered view of the single Areas & Facilities master.", actions: ["Add room", "Edit", "Activate/deactivate", "Delete"] },
-      { title: "Spa Bookings", route: "/dashboard/spa/spa/bookings", permission: "spa_bookings", summary: "Therapist booking board with therapists listed vertically and time running horizontally. Selecting a therapist and service calculates the end time from service duration.", actions: ["Select therapist row/time", "Choose service", "Auto-calculate end time", "Edit start/end", "Move booking", "Cancel"] },
+      { title: "Spa Bookings", route: "/dashboard/spa/spa/bookings", permission: "spa_bookings", summary: "Colorful therapist booking board with therapists vertically and time horizontally. Standard and Ethiopian/Amharic times show ጠዋት, ቀትር, ከሰዓት and ማታ. Service duration calculates the editable end time.", actions: ["Select therapist row/time", "Read bilingual time bands", "Choose service", "Auto-calculate end time", "Edit start/end", "Move booking", "Cancel"] },
     ],
   },
   {
