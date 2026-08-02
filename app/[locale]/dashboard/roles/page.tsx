@@ -14,6 +14,7 @@ const GROUP_ICONS: Record<string, string> = {
   Customers: "people",
   Membership: "person-badge",
   Operations: "activity",
+  Access: "shield-check",
   Gym: "heart-pulse",
   Spa: "flower1",
   Inventory: "boxes",

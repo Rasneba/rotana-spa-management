@@ -52,6 +52,56 @@ export async function GET(req: Request, { params }: RouteParams) {
     const { from, to } = dateRange(req);
 
     try {
+      if (reportSlug === "access") {
+        const [summaryResult, detailResult] = await Promise.all([
+          pool.query(
+            `SELECT COUNT(*)::int AS events,
+                    COUNT(*) FILTER (WHERE status='granted')::int AS granted,
+                    COUNT(*) FILTER (WHERE status='denied')::int AS denied,
+                    COUNT(DISTINCT member_id) FILTER (WHERE member_id IS NOT NULL)::int AS unique_members
+             FROM access_logs
+             WHERE company_id=$1 AND created_at::date BETWEEN $2::date AND $3::date`,
+            [companyId, from, to]
+          ),
+          pool.query(
+            `SELECT l.created_at::date::text AS date,
+                    COALESCE(g.name,'Unassigned') AS gate,
+                    l.method,
+                    COUNT(*) FILTER (WHERE l.access_type='entry')::int AS entries,
+                    COUNT(*) FILTER (WHERE l.access_type='exit')::int AS exits,
+                    COUNT(*) FILTER (WHERE l.status='granted')::int AS granted,
+                    COUNT(*) FILTER (WHERE l.status='denied')::int AS denied
+             FROM access_logs l
+             LEFT JOIN entry_gates g ON g.id=l.gate_id
+             WHERE l.company_id=$1 AND l.created_at::date BETWEEN $2::date AND $3::date
+             GROUP BY l.created_at::date, COALESCE(g.name,'Unassigned'), l.method
+             ORDER BY l.created_at::date DESC, gate, l.method`,
+            [companyId, from, to]
+          ),
+        ]);
+        const item = summaryResult.rows[0];
+        return reportResponse(
+          [
+            { label: "Access Events", value: item.events, format: "number" },
+            { label: "Granted", value: item.granted, format: "number" },
+            { label: "Denied", value: item.denied, format: "number" },
+            { label: "Unique Members", value: item.unique_members, format: "number" },
+          ],
+          [
+            { key: "date", label: "Date" },
+            { key: "gate", label: "Gate" },
+            { key: "method", label: "Method" },
+            { key: "entries", label: "Entries", format: "number" },
+            { key: "exits", label: "Exits", format: "number" },
+            { key: "granted", label: "Granted", format: "number" },
+            { key: "denied", label: "Denied", format: "number" },
+          ],
+          detailResult.rows,
+          from,
+          to
+        );
+      }
+
       if (reportSlug === "membership") {
         const [summaryResult, planResult] = await Promise.all([
           pool.query(
@@ -348,7 +398,7 @@ export async function GET(req: Request, { params }: RouteParams) {
       const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
       if (code === "42P01") {
         return NextResponse.json(
-          { error: "Required report tables are not installed. Apply the latest database migrations, including db-migration-v33.sql and db-migration-v34.sql." },
+          { error: "Required report tables are not installed. Apply the latest database migrations, including db-migration-v33.sql through db-migration-v35.sql." },
           { status: 503 }
         );
       }

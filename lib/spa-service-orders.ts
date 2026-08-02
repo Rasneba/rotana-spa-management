@@ -27,6 +27,7 @@ export type SpaVisit = {
   visit_no: string;
   member_id: number | null;
   appointment_id: number | null;
+  facility_id?: number | null;
   customer_name: string;
   customer_phone: string | null;
   therapist_record_id: number | string | null;

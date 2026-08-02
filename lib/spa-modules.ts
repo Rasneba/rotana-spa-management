@@ -641,6 +641,7 @@ export const SPA_MODULES: SpaModuleDefinition[] = [
 ];
 
 export const SPA_REPORTS: SpaReportDefinition[] = [
+  { key: "access", slug: "access", title: "Access Report", description: "Spa/Gym gate events, granted and denied access, methods and entry trends.", resource: "reports_access", icon: "shield-check" },
   { key: "membership", slug: "membership", title: "Membership Report", description: "Membership status, plans and subscription performance.", resource: "reports_membership", icon: "person-badge" },
   { key: "attendance", slug: "attendance", title: "Attendance Report", description: "Check-in volume, active visits and attendance trends.", resource: "reports_attendance", icon: "calendar-check" },
   { key: "service-orders", slug: "service-orders", title: "Service Order Report", description: "Draft service-order volume, printed handoffs and treatment item counts—without financial data.", resource: "reports_service_orders", icon: "receipt-cutoff" },

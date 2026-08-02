@@ -232,8 +232,34 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
     ],
   },
   {
-    id: "gym",
+    id: "access-suite",
     number: 6,
+    title: "Spa & Gym Access",
+    icon: "shield-check",
+    intro: "The pictured components from Rasneba/-geniouserp are retained as a consolidated menu, but every route is converted to Spa/Gym data. Parking, vehicles, ANPR, rates, payments and embedded POS logic are not imported.",
+    pages: [
+      { title: "Parking Dashboard", route: "/dashboard/spa/access", permission: "access_dashboard", summary: "Converted Spa/Gym access dashboard with facilities, capacity, visits, credentials, gates, cameras and recent access events.", actions: ["Open Access Control", "Open Kiosk", "Review occupancy", "Launch converted modules"], note: "The source label is retained in the consolidated menu as requested; the page contains no parking records." },
+      { title: "Zones & Lots", route: "/dashboard/spa/access/zones", permission: "access_zones", summary: "Parking zones converted to Spa/Gym rooms, zones, pools, studios and shared areas.", actions: ["Add area", "Set capacity", "Edit", "Activate/deactivate"] },
+      { title: "Slots", route: "/dashboard/spa/access/slots", permission: "access_slots", summary: "Parking slots converted to live capacity and available-space cards for Spa/Gym facilities.", actions: ["Refresh occupancy", "Open area management"] },
+      { title: "Gates", route: "/dashboard/spa/access/gates", permission: "membership_gates", summary: "Fully converted entry-point configuration with QR, RFID, NFC and optional controller networking.", actions: ["Add/edit gate", "Set reader features", "Change status", "Review camera/command counts"] },
+      { title: "Cameras", route: "/dashboard/spa/access/cameras", permission: "access_cameras", summary: "Security, occupancy, safety and check-in cameras with network streams or browser webcam detection. ANPR fields are removed.", actions: ["Detect webcam", "Preview", "Register network camera", "Assign gate/area", "Change status"] },
+      { title: "Customers", route: "/dashboard/spa/access/customers", permission: "membership_members", summary: "Reuses the Spa/Gym customer and member workspace rather than parking customers." },
+      { title: "Vehicles", route: "/dashboard/spa/access/vehicles", permission: "facilities_equipment", summary: "The retained source label opens converted Spa/Gym equipment and asset records; no vehicle table is used.", note: "This is a partial merge preserving the pictured label." },
+      { title: "RFID Cards", route: "/dashboard/spa/access/rfid-cards", permission: "membership_rfid_cards", summary: "Reuses member cards and wristbands for Spa/Gym entry." },
+      { title: "Access Control", route: "/dashboard/spa/access/control", permission: "access_control", summary: "Live access logs and optional local-relay command queue. Door commands remain pending until acknowledged by local hardware.", actions: ["Select gate", "Queue open command", "Review events", "Review relay queue"] },
+      { title: "QR Access", route: "/dashboard/spa/access/qr-access", permission: "access_control", summary: "Webcam and manual QR verification against Spa/Gym passes with access logging and optional door-command queueing.", actions: ["Start/stop scanner", "Verify token", "Select gate", "Review browser scan history"] },
+      { title: "Subscriptions", route: "/dashboard/spa/access/subscriptions", permission: "membership_subscriptions", summary: "Reuses operational membership validity periods with no payment collection." },
+      { title: "Sessions", route: "/dashboard/spa/access/sessions", permission: "membership_sessions", summary: "Reuses active and completed Spa/Gym facility sessions." },
+      { title: "Rates", route: "/dashboard/spa/access/rates", permission: "spa_services", summary: "The retained source label opens the operational service catalogue. Prices remain exclusively in the separate POS." },
+      { title: "QR Tickets", route: "/dashboard/spa/access/qr-tickets", permission: "membership_qr_passes", summary: "Reuses guest, member and day QR passes rather than parking tickets." },
+      { title: "Kiosk", route: "/dashboard/spa/access/kiosk", permission: "access_kiosk", summary: "Fully converted member/walk-in check-in that creates a Spa visit and printable 24-hour QR pass.", actions: ["Select member or walk-in", "Choose area/gate", "Check in", "Print QR pass", "Open visit"] },
+      { title: "POS", route: "/dashboard/spa/access/pos", permission: "spa_service_orders", summary: "The retained label opens draft Service Orders only. No POS, pricing, tax, payment or receipt component is merged.", note: "Official transactions stay in the separate Sales/POS application." },
+      { title: "Reports", route: "/dashboard/spa/access/reports", permission: "reports_access", summary: "Opens operational gate/access reporting with date filters and export." },
+    ],
+  },
+  {
+    id: "gym",
+    number: 7,
     title: "Gym",
     icon: "heart-pulse",
     pages: [
@@ -247,7 +273,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "spa",
-    number: 7,
+    number: 8,
     title: "Spa",
     icon: "flower1",
     pages: [
@@ -260,7 +286,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "inventory",
-    number: 8,
+    number: 9,
     title: "Inventory",
     icon: "boxes",
     pages: [
@@ -272,7 +298,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "staff",
-    number: 9,
+    number: 10,
     title: "Staff",
     icon: "person-workspace",
     pages: [
@@ -284,7 +310,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "facilities",
-    number: 10,
+    number: 11,
     title: "Facilities",
     icon: "building",
     pages: [
@@ -296,11 +322,12 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "reports",
-    number: 11,
+    number: 12,
     title: "Reports",
     icon: "bar-chart",
     intro: "Every report uses a from/to date range, summary cards, a detailed table, print and CSV export.",
     pages: [
+      { title: "Access Report", route: "/dashboard/spa/reports/access", permission: "reports_access", summary: "Gate events, granted/denied access, methods and entry/exit trends.", actions: ["Set date range", "Print", "Export CSV"] },
       { title: "Membership Report", route: "/dashboard/spa/reports/membership", permission: "reports_membership", summary: "Total, active, expired and newly registered members plus plan performance.", actions: ["Set date range", "Refresh", "Print", "Export CSV"] },
       { title: "Attendance Report", route: "/dashboard/spa/reports/attendance", permission: "reports_attendance", summary: "Check-in volume, unique members, active visits and duration trends.", actions: ["Set date range", "Print", "Export CSV"] },
       { title: "Service Order Report", route: "/dashboard/spa/reports/service-orders", permission: "reports_service_orders", summary: "Draft, printed and cashier-handoff volume with item counts and no financial data.", actions: ["Set date range", "Print", "Export CSV"] },
@@ -311,12 +338,12 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "settings-administration",
-    number: 12,
+    number: 13,
     title: "Settings & Administration",
     icon: "gear",
     pages: [
       { title: "Users", route: "/dashboard/users", permission: "users", audience: "Company administrators", summary: "Create and manage system users, role assignment, contact details and active status.", actions: ["Add user", "Edit user", "Activate/deactivate"], fields: ["Full Name *", "Email *", "Role *", "Phone", "Active"] },
-      { title: "Roles & Permissions", route: "/dashboard/roles", permission: "roles", audience: "Company administrators", summary: "Permission matrix grouped by Dashboard, Customers, Membership, Operations, Gym, Spa, Inventory, Staff, Facilities, Reports and System.", actions: ["Create role", "Toggle view/create/edit/delete/approve", "Save permissions"] },
+      { title: "Roles & Permissions", route: "/dashboard/roles", permission: "roles", audience: "Company administrators", summary: "Permission matrix grouped by Dashboard, Customers, Membership, Operations, Spa & Gym Access, Gym, Spa, Inventory, Staff, Facilities, Reports and System.", actions: ["Create role", "Toggle view/create/edit/delete/approve", "Save permissions"] },
       { title: "System Settings", route: "/dashboard/system-settings", permission: "settings", audience: "Company administrators", summary: "Company identity and operational configuration.", fields: ["Company Name", "Address", "Phone", "Email", "Currency (legacy display setting)"] },
       { title: "Audit Logs", route: "/dashboard/audit-logs", permission: "audit_logs", summary: "User, action, table, record, old/new values, client information and timestamp for audited changes.", actions: ["Review events", "Filter activity"] },
       { title: "ID Definitions", route: "/dashboard/settings/id-definitions", permission: "id_definitions", audience: "Company administrators", summary: "Numbering rules per entity.", fields: ["Prefix", "Separator", "Padding", "Starting Value", "Reset Type", "Pattern"] },
@@ -326,7 +353,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "notifications",
-    number: 13,
+    number: 14,
     title: "Notifications",
     icon: "bell",
     pages: [
@@ -335,7 +362,7 @@ export const USER_GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "shared-ui",
-    number: 14,
+    number: 15,
     title: "Shared UI Components",
     icon: "grid",
     intro: "Reusable interface patterns keep list pages, forms, statuses and reports consistent.",

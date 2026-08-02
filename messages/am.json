@@ -32,7 +32,8 @@
       "therapist": "ቴራፒስት",
       "trainer": "አሰልጣኝ",
       "inventory": "ክምችት",
-      "service_orders": "የአገልግሎት ትዕዛዞች"
+      "service_orders": "የአገልግሎት ትዕዛዞች",
+      "access": "መግቢያ"
     },
     "documents": "ሰነዶች",
     "settings": {
@@ -70,7 +71,8 @@
       "reports": "ሪፖርቶች",
       "settings": "ቅንብሮች",
       "platform": "የመድረክ አስተዳደር",
-      "user_guide": "የተጠቃሚ መመሪያ"
+      "user_guide": "የተጠቃሚ መመሪያ",
+      "spa_gym_access": "የስፓ እና ጂም መግቢያ"
     },
     "section": {
       "daily_operations": "የዕለት ተዕለት ሥራዎች",
@@ -247,6 +249,25 @@
     },
     "user_guide": {
       "user_guide": "የተጠቃሚ መመሪያ"
+    },
+    "spa_gym_access": {
+      "parking_dashboard": "የስፓ እና ጂም ዳሽቦርድ",
+      "zones_lots": "ዞኖች እና ቦታዎች",
+      "slots": "ቦታዎች",
+      "gates": "በሮች",
+      "cameras": "ካሜራዎች",
+      "customers": "ደንበኞች",
+      "vehicles": "ተሽከርካሪዎች",
+      "rfid_cards": "RFID ካርዶች",
+      "access_control": "የመግቢያ ቁጥጥር",
+      "qr_access": "QR መግቢያ",
+      "subscriptions": "ምዝገባዎች",
+      "sessions": "ክፍለ ጊዜዎች",
+      "rates": "ዋጋዎች",
+      "qr_tickets": "QR ትኬቶች",
+      "kiosk": "ኪዮስክ",
+      "pos": "POS",
+      "reports": "ሪፖርቶች"
     }
   },
   "common": {

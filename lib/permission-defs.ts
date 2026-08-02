@@ -13,16 +13,23 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
     label: "Membership",
     resources: [
       "membership_plans", "membership_subscriptions", "membership_freeze_transfer",
-      "membership_rfid_cards", "membership_qr_passes", "membership_day_tickets",
-      "membership_rate_cards",
+      "membership_day_tickets", "membership_rate_cards",
     ],
   },
   "Operations": {
     label: "Operations",
     resources: [
       "membership_attendance", "membership_appointments", "membership_sessions",
-      "membership_access_logs", "spa_visits", "spa_visit_services",
+      "spa_visits", "spa_visit_services",
       "spa_service_orders", "spa_queue", "spa_customer_requests", "spa_towels",
+    ],
+  },
+  "Access": {
+    label: "Spa & Gym Access",
+    resources: [
+      "access_dashboard", "access_zones", "access_slots", "membership_gates",
+      "access_cameras", "membership_rfid_cards", "membership_access_logs",
+      "membership_qr_passes", "access_control", "access_kiosk",
     ],
   },
   "Gym": {
@@ -49,14 +56,14 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
   "Facilities": {
     label: "Facilities",
     resources: [
-      "membership_facilities", "membership_gates", "facilities_lockers",
+      "membership_facilities", "facilities_lockers",
       "facilities_equipment", "facilities_maintenance",
     ],
   },
   "Reports": {
     label: "Reports",
     resources: [
-      "reports_membership", "reports_attendance", "reports_service_orders",
+      "reports_access", "reports_membership", "reports_attendance", "reports_service_orders",
       "reports_therapist", "reports_trainer", "reports_inventory",
     ],
   },

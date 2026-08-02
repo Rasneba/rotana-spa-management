@@ -23,13 +23,18 @@ The expanded Customers, Gym, Spa, Inventory, Staff, Facilities, and Reports work
 ```bash
 psql "$DATABASE_URL" -f db-migration-v33.sql
 psql "$DATABASE_URL" -f db-migration-v34.sql
+psql "$DATABASE_URL" -f db-migration-v35.sql
 ```
 
-Migration v34 adds the reception visit, therapist treatment, service-line, and draft service-order workflow.
+Migration v34 adds the reception visit, therapist treatment, service-line, and draft service-order workflow. Migration v35 adds the adapted Spa/Gym access dashboard, enhanced gates, operational cameras, controller command queue, kiosk QR passes, and access-audit context.
 
 ### In-app user guide
 
 The searchable, printable single-page system guide is available at `/dashboard/guide`. It is linked directly in the sidebar and through the header help icon.
+
+### Adapted access components
+
+The consolidated **Spa & Gym Access** menu adapts only the pictured components from [`Rasneba/-geniouserp`](https://github.com/Rasneba/-geniouserp). Gates, camera/webcam support, QR scanning, access monitoring, kiosk check-in and dashboard patterns are fully or partially merged. Parking tables, ANPR, vehicle logic, pricing and payment code are not imported; retained source labels route to the corresponding Spa/Gym records.
 
 ### Sales/POS boundary
 

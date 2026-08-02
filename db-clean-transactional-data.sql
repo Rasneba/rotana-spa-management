@@ -4,6 +4,7 @@
 
 -- Replace :company_id with the actual company ID to clean, or run as-is to clear everything
 
+DELETE FROM access_device_commands;
 DELETE FROM spa_service_orders;
 DELETE FROM spa_visit_services;
 DELETE FROM spa_visits;

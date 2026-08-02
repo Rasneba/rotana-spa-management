@@ -32,7 +32,8 @@
       "therapist": "Therapist",
       "trainer": "Trainer",
       "inventory": "Inventory",
-      "service_orders": "Service Orders"
+      "service_orders": "Service Orders",
+      "access": "Access"
     },
     "documents": "Documents",
     "settings": {
@@ -63,7 +64,8 @@
       "reports": "Reports",
       "settings": "Settings",
       "platform": "Platform Administration",
-      "user_guide": "User Guide"
+      "user_guide": "User Guide",
+      "spa_gym_access": "Spa & Gym Access"
     },
     "section": {
       "daily_operations": "Daily Operations",
@@ -176,6 +178,25 @@
     },
     "user_guide": {
       "user_guide": "User Guide"
+    },
+    "spa_gym_access": {
+      "parking_dashboard": "Parking Dashboard",
+      "zones_lots": "Zones & Lots",
+      "slots": "Slots",
+      "gates": "Gates",
+      "cameras": "Cameras",
+      "customers": "Customers",
+      "vehicles": "Vehicles",
+      "rfid_cards": "RFID Cards",
+      "access_control": "Access Control",
+      "qr_access": "QR Access",
+      "subscriptions": "Subscriptions",
+      "sessions": "Sessions",
+      "rates": "Rates",
+      "qr_tickets": "QR Tickets",
+      "kiosk": "Kiosk",
+      "pos": "POS",
+      "reports": "Reports"
     }
   },
   "common": {
