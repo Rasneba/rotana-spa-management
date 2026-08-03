@@ -15,25 +15,35 @@ type BookingForm = {
   notes: string;
 };
 
+type NavItem = { label: string; id: string };
+
 const content = {
   en: {
-    nav: ["About", "Treatments", "Branches", "Reviews", "Gift Cards", "Booking"],
+    nav: [
+      { label: "About", id: "about" },
+      { label: "Treatments", id: "treatments" },
+      { label: "Branches", id: "branches" },
+      { label: "Reviews", id: "reviews" },
+      { label: "Gift Cards", id: "gift-cards" },
+      { label: "Booking", id: "booking" },
+    ] satisfies NavItem[],
     staff: "Staff Portal",
-    heroKicker: "Welcome to Dagi Spa",
-    heroTitle: "Relax. Rejuvenate. Repeat.",
-    heroBody: "Unwind in our tranquil Addis Ababa sanctuary with expertly crafted treatments designed to calm your body and clear your mind.",
-    heroCta: "Book a visit",
-    aboutTitle: "Your Sanctuary of Luxury, Wellness, and Renewal",
-    aboutBody: "Since 2009, Dagi Spa has been a haven for true relaxation, radiant skin, and total rejuvenation. Our professional team combines expertise with genuine warmth so every visit leaves you refreshed, restored, and renewed.",
+    heroKicker: "Discover Peace. Discover Dagi Spa.",
+    heroTitle: "Relaxation with a modern Addis Ababa glow.",
+    heroBody: "A refined wellness escape inspired by the original Dagi Spa experience — Moroccan bath rituals, massage therapy, facials, reflexology, and warm hospitality in Bole and Imperial.",
+    heroCta: "Reserve your calm",
+    secondaryCta: "Explore treatments",
+    aboutTitle: "Your sanctuary of luxury, wellness, and renewal",
+    aboutBody: "Since 2009, Dagi Spa has welcomed guests into calm spaces where skilled hands, clean facilities, and thoughtful details transform the day. Every visit is designed to leave you refreshed, restored, and renewed.",
     call: "Call Anytime",
-    treatmentsTitle: "What We’re Offering",
-    branchesTitle: "Our Branches",
-    reviewsTitle: "What Guests Say About Dagi Spa",
+    treatmentsTitle: "Signature wellness experiences",
+    branchesTitle: "Two elegant branches, one Dagi standard",
+    reviewsTitle: "Real stories from refreshed guests",
     giftTitle: "Give the gift of relaxation.",
-    giftBody: "Treat loved ones to a rejuvenating Dagi Spa gift card — perfect for any occasion. To purchase locally, call us.",
+    giftBody: "Treat loved ones to a rejuvenating Dagi Spa gift card — perfect for birthdays, appreciation, couples’ moments, and self-care days.",
     bookingTitle: "Request a booking",
-    bookingBody: "Public requests require staff confirmation. No appointment or payment is created automatically.",
-    submit: "Send request",
+    bookingBody: "Send your preferred branch, service, and time. Our reception team confirms availability before creating any appointment or payment.",
+    submit: "Send booking request",
     success: "Thank you. Your request was received and our team will contact you to confirm availability.",
     footer: "Where every visit is a journey to inner peace, outer beauty, and total well-being.",
     fields: {
@@ -47,22 +57,30 @@ const content = {
     },
   },
   am: {
-    nav: ["ስለ እኛ", "አገልግሎቶች", "ቅርንጫፎች", "አስተያየቶች", "የስጦታ ካርድ", "ቦታ ማስያዝ"],
+    nav: [
+      { label: "ስለ እኛ", id: "about" },
+      { label: "አገልግሎቶች", id: "treatments" },
+      { label: "ቅርንጫፎች", id: "branches" },
+      { label: "አስተያየቶች", id: "reviews" },
+      { label: "የስጦታ ካርድ", id: "gift-cards" },
+      { label: "ቦታ ማስያዝ", id: "booking" },
+    ] satisfies NavItem[],
     staff: "የሰራተኞች መግቢያ",
-    heroKicker: "እንኳን ወደ Dagi Spa በደህና መጡ",
-    heroTitle: "ዘና ይበሉ። ይታደሱ። ይድገሙ።",
-    heroBody: "በአዲስ አበባ ውስጥ በሚገኘው የሰላም ስፍራችን ሰውነትዎን ለማረጋጋትና አእምሮዎን ለማደስ የተዘጋጁ የስፓ አገልግሎቶችን ይሞክሩ።",
+    heroKicker: "ሰላምን ያግኙ። Dagi Spaን ያግኙ።",
+    heroTitle: "በአዲስ አበባ ዘመናዊ እና የተረጋጋ የስፓ ተሞክሮ።",
+    heroBody: "በDagi Spa የሞሮካን ባዝ፣ ማሳጅ፣ ፊያሻል፣ ሪፍሌክሶሎጂ እና ሙቀት ያለው አገልግሎት በቦሌ እና ኢምፔሪያል ቅርንጫፎቻችን ይጠብቅዎታል።",
     heroCta: "ቦታ ያስይዙ",
+    secondaryCta: "አገልግሎቶችን ይመልከቱ",
     aboutTitle: "የቅንጦት፣ የጤና እና የእድሳት መዳረሻዎ",
-    aboutBody: "ከ2009 ጀምሮ Dagi Spa ለእውነተኛ እረፍት፣ ለብሩህ ቆዳ እና ለሙሉ እድሳት የሚመረጥ ቦታ ነው። ባለሙያ ቡድናችን በሙቀትና በትኩረት ያገለግላል።",
+    aboutBody: "ከ2009 ጀምሮ Dagi Spa እንግዶችን ወደ ሰላማዊ አካባቢ፣ የተማሩ ባለሙያዎች፣ ንጹህ ፋሲሊቲዎች እና የተንከባከበ አገልግሎት ያመጣል።",
     call: "በማንኛውም ጊዜ ይደውሉ",
-    treatmentsTitle: "የምናቀርባቸው አገልግሎቶች",
-    branchesTitle: "ቅርንጫፎቻችን",
-    reviewsTitle: "ደንበኞች ስለ Dagi Spa የሚሉት",
+    treatmentsTitle: "የተመረጡ የዌልነስ አገልግሎቶች",
+    branchesTitle: "ሁለት ውብ ቅርንጫፎች፣ አንድ የDagi ደረጃ",
+    reviewsTitle: "ከተደሰቱ እንግዶች የተሰሙ አስተያየቶች",
     giftTitle: "የእረፍት ስጦታ ይስጡ።",
-    giftBody: "ለወዳጅ ዘመዶችዎ ለማንኛውም አጋጣሚ የሚሆን የDagi Spa የስጦታ ካርድ ይግዙ። በአካባቢ ለመግዛት ይደውሉ።",
+    giftBody: "ለልደት፣ ለምስጋና፣ ለጥንዶች ጊዜ ወይም ለራስ እንክብካቤ የሚሆን የDagi Spa የስጦታ ካርድ ይግዙ።",
     bookingTitle: "የቦታ ማስያዝ ጥያቄ",
-    bookingBody: "የድር ጥያቄዎች በሰራተኞች መረጋገጥ ያስፈልጋቸዋል። ቀጠሮ ወይም ክፍያ በራስ-ሰር አይፈጠርም።",
+    bookingBody: "ቅርንጫፍ፣ አገልግሎት እና የሚመችዎትን ጊዜ ይላኩ። ቀጠሮ ወይም ክፍያ ከመፈጠሩ በፊት የሪሴፕሽን ቡድናችን ያረጋግጣል።",
     submit: "ጥያቄ ላክ",
     success: "እናመሰግናለን። ጥያቄዎ ደርሶናል፣ ቡድናችን ለማረጋገጥ ያገናኝዎታል።",
     footer: "እያንዳንዱ ጉብኝት ወደ ውስጣዊ ሰላም፣ ውጫዊ ውበት እና ሙሉ ጤና የሚወስድ ጉዞ ነው።",
@@ -79,14 +97,14 @@ const content = {
 };
 
 const treatments = [
-  { title: "Moroccan Bath", am: "ሞሮካን ባዝ", body: "Cleanse, exfoliate, and leave your skin glowing.", image: "/dagi/moroccan-bath.jpg" },
-  { title: "Massages", am: "ማሳጅ", body: "Customized massage that soothes muscles and tension.", image: "/dagi/massage.jpg" },
-  { title: "Reflexology", am: "ሪፍሌክሶሎጂ", body: "Targeted foot therapy to relieve stress and restore balance.", image: "/dagi/moroccan-bath.jpg" },
+  { title: "Moroccan Bath", am: "ሞሮካን ባዝ", body: "Cleanse, exfoliate, steam, and leave your skin glowing.", image: "/dagi/moroccan-bath.jpg", icon: "✦" },
+  { title: "Massages", am: "ማሳጅ", body: "Customized massage therapy for tension, balance, and deep calm.", image: "/dagi/massage.jpg", icon: "◆" },
+  { title: "Reflexology", am: "ሪፍሌክሶሎጂ", body: "Targeted foot therapy to relieve stress and restore circulation.", image: "/dagi/moroccan-bath.jpg", icon: "●" },
 ];
 
 const branches = [
-  { title: "Yoly Hotel", detail: "Near Bole Atlas, Addis Ababa · 0912923692 / 0917923692", image: "/dagi/yoly.png" },
-  { title: "Alfoz Plaza", detail: "Near Bole Imperial, Addis Ababa · 0910888853", image: "/dagi/alfo.png" },
+  { title: "Yoly Hotel", detail: "Near Bole Atlas, Addis Ababa", phone: "0912923692 / 0917923692", image: "/dagi/yoly.png" },
+  { title: "Alfoz Plaza", detail: "Near Bole Imperial, Addis Ababa", phone: "0910888853", image: "/dagi/alfo.png" },
 ];
 
 const reviews = [
@@ -95,7 +113,21 @@ const reviews = [
   "Facilities are top-notch, professional, and welcoming from the moment you walk in.",
 ];
 
+const rituals = ["Moroccan Bath", "Massage", "Facial", "Wax", "Hair Salon", "Manicure", "Pedicure"];
 const initialForm: BookingForm = { full_name: "", phone: "", email: "", branch: "", treatment: "", preferred_at: "", notes: "" };
+
+function handleTilt(event: React.MouseEvent<HTMLElement>) {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const x = ((event.clientX - rect.left) / rect.width - 0.5) * 14;
+  const y = ((event.clientY - rect.top) / rect.height - 0.5) * -14;
+  event.currentTarget.style.setProperty("--tilt-x", `${y.toFixed(2)}deg`);
+  event.currentTarget.style.setProperty("--tilt-y", `${x.toFixed(2)}deg`);
+}
+
+function resetTilt(event: React.MouseEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty("--tilt-x", "0deg");
+  event.currentTarget.style.setProperty("--tilt-y", "0deg");
+}
 
 export default function DagiLandingPage({ locale }: { locale: string }) {
   const lang: Locale = locale === "am" ? "am" : "en";
@@ -104,7 +136,6 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const direction = lang === "am" ? "ltr" : "ltr";
 
   const branchOptions = useMemo(() => branches.map((branch) => branch.title), []);
   const treatmentOptions = useMemo(() => treatments.map((treatment) => treatment.title), []);
@@ -132,14 +163,15 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
   }
 
   return (
-    <main className="dagi-site" dir={direction}>
-      <header className="dagi-nav">
+    <main className="dagi-site dagi-site-v2">
+      <div className="dagi-ambient" aria-hidden="true"><span /><span /><span /></div>
+      <header className="dagi-nav dagi-nav-v2">
         <Link className="dagi-brand" href={`/${lang}`} aria-label="Dagi Spa home">
           <img src="/dagi/logo.jpg" alt="Dagi Spa" />
-          <span>Dagi Spa</span>
+          <span>Dagi Spa<small>Discover Peace</small></span>
         </Link>
         <nav aria-label="Dagi Spa navigation">
-          {t.nav.map((item) => <a key={item} href={`#${item.toLowerCase().replaceAll(" ", "-")}`}>{item}</a>)}
+          {t.nav.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
         </nav>
         <div className="dagi-nav-actions">
           <Link href={lang === "en" ? "/am" : "/en"}>{lang === "en" ? "አማ" : "EN"}</Link>
@@ -147,80 +179,109 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
         </div>
       </header>
 
-      <section className="dagi-hero" id="home">
+      <section className="dagi-hero dagi-hero-v2" id="home">
         <div className="dagi-hero-copy">
           <p>{t.heroKicker}</p>
           <h1>{t.heroTitle}</h1>
           <span>{t.heroBody}</span>
           <div className="dagi-hero-actions">
             <a href="#booking">{t.heroCta}</a>
-            <strong>{t.call}: +251912923692 / +251910888853</strong>
+            <a className="dagi-ghost-link" href="#treatments">{t.secondaryCta}</a>
+          </div>
+          <div className="dagi-hero-metrics" aria-label="Dagi Spa highlights">
+            <strong><span>2009</span>Since</strong>
+            <strong><span>2</span>Branches</strong>
+            <strong><span>12/7</span>Open</strong>
           </div>
         </div>
-        <div className="dagi-hero-image"><img src="/dagi/massage.jpg" alt="Dagi Spa treatment room" /></div>
+
+        <aside className="dagi-3d-stage" aria-label="Dagi Spa featured experience">
+          <div className="dagi-orbit" aria-hidden="true"><span /><span /><span /></div>
+          <article className="dagi-hero-card" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
+            <div className="dagi-hero-card-glow" />
+            <img src="/dagi/massage.jpg" alt="Dagi Spa massage treatment" />
+            <div className="dagi-card-caption">
+              <small>Signature ritual</small>
+              <strong>Massage • Moroccan Bath • Facial</strong>
+            </div>
+          </article>
+          <div className="dagi-floating-card one"><span>★★★★★</span>Guest-loved calm</div>
+          <div className="dagi-floating-card two">+251912923692</div>
+          <div className="dagi-floating-card three">Yoly Hotel · Alfoz Plaza</div>
+        </aside>
       </section>
 
-      <section className="dagi-section dagi-about" id={t.nav[0].toLowerCase().replaceAll(" ", "-")}>
-        <div><img src="/dagi/logo-white.png" alt="Dagi Spa mark" /></div>
+      <section className="dagi-ritual-marquee" aria-label="Dagi Spa services">
+        <div>{[...rituals, ...rituals].map((ritual, index) => <span key={`${ritual}-${index}`}>{ritual}</span>)}</div>
+      </section>
+
+      <section className="dagi-section dagi-about dagi-about-v2" id="about">
+        <div className="dagi-logo-sculpture" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
+          <img src="/dagi/logo-white.png" alt="Dagi Spa mark" />
+          <span aria-hidden="true" />
+        </div>
         <article>
           <p>{t.heroKicker}</p>
           <h2>{t.aboutTitle}</h2>
           <span>{t.aboutBody}</span>
-          <ul>
-            <li>Comprehensive Treatment Options</li>
-            <li>Exceptional Moroccan Bath Experience</li>
-            <li>Warm and Professional Staff</li>
-            <li>High Standard of Cleanliness</li>
-          </ul>
+          <div className="dagi-feature-grid">
+            <strong>Comprehensive treatments</strong>
+            <strong>Exceptional Moroccan bath</strong>
+            <strong>Warm professional staff</strong>
+            <strong>High cleanliness standard</strong>
+          </div>
         </article>
       </section>
 
-      <section className="dagi-section" id={t.nav[1].toLowerCase().replaceAll(" ", "-")}>
+      <section className="dagi-section dagi-treatments-v2" id="treatments">
         <p className="dagi-eyebrow">Our Treatments</p>
         <h2>{t.treatmentsTitle}</h2>
         <div className="dagi-card-grid">
           {treatments.map((treatment) => (
-            <article className="dagi-treatment-card" key={treatment.title}>
+            <article className="dagi-treatment-card dagi-treatment-card-v2" key={treatment.title} onMouseMove={handleTilt} onMouseLeave={resetTilt}>
               <img src={treatment.image} alt={treatment.title} />
+              <div className="dagi-treatment-icon">{treatment.icon}</div>
               <div><h3>{lang === "am" ? treatment.am : treatment.title}</h3><p>{treatment.body}</p><a href="#booking">Book now</a></div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="dagi-section dagi-branches" id={t.nav[2].toLowerCase().replaceAll(" ", "-")}>
+      <section className="dagi-section dagi-branches dagi-branches-v2" id="branches">
         <p className="dagi-eyebrow">Two branches open to serve you better</p>
         <h2>{t.branchesTitle}</h2>
         <div className="dagi-card-grid two">
           {branches.map((branch, index) => (
-            <article key={branch.title} className="dagi-branch-card">
+            <article key={branch.title} className="dagi-branch-card dagi-branch-card-v2" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
               <img src={branch.image} alt={`${branch.title} Dagi Spa branch`} />
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h3>{branch.title}</h3>
               <p>{branch.detail}</p>
+              <a href={`tel:+251${branch.phone.replace(/\D/g, "").slice(1, 10)}`}>{branch.phone}</a>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="dagi-section dagi-reviews" id={t.nav[3].toLowerCase().replaceAll(" ", "-")}>
+      <section className="dagi-section dagi-reviews dagi-reviews-v2" id="reviews">
         <p className="dagi-eyebrow">Customer Reviews</p>
         <h2>{t.reviewsTitle}</h2>
         <div className="dagi-card-grid three">
-          {reviews.map((review) => <article key={review}><strong>★★★★★</strong><p>“{review}”</p></article>)}
+          {reviews.map((review) => <article key={review} onMouseMove={handleTilt} onMouseLeave={resetTilt}><strong>★★★★★</strong><p>“{review}”</p></article>)}
         </div>
       </section>
 
-      <section className="dagi-section dagi-gift" id={t.nav[4].toLowerCase().replaceAll(" ", "-")}>
-        <div><h2>{t.giftTitle}</h2><p>{t.giftBody}</p></div>
-        <a href="tel:+251912923692">+251912923692</a>
+      <section className="dagi-section dagi-gift dagi-gift-v2" id="gift-cards">
+        <div><p className="dagi-eyebrow">Gift Cards</p><h2>{t.giftTitle}</h2><span>{t.giftBody}</span></div>
+        <a href="tel:+251912923692">Call to buy</a>
       </section>
 
-      <section className="dagi-section dagi-booking" id="booking">
+      <section className="dagi-section dagi-booking dagi-booking-v2" id="booking">
         <article>
           <p className="dagi-eyebrow">Book Now</p>
           <h2>{t.bookingTitle}</h2>
           <span>{t.bookingBody}</span>
+          <div className="dagi-confirmation-note"><b>No auto-payment.</b><br />Staff confirms each request personally.</div>
         </article>
         <form onSubmit={submit}>
           {message && <div className="dagi-form-message success">{message}</div>}
@@ -236,7 +297,7 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
         </form>
       </section>
 
-      <footer className="dagi-footer">
+      <footer className="dagi-footer dagi-footer-v2">
         <img src="/dagi/logo-white.png" alt="Dagi Spa" />
         <p>{t.footer}</p>
         <address>
