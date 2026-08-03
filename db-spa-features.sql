@@ -1,4 +1,4 @@
--- Rotana Spa - Feature Tables Migration
+-- Dagi Spa - Feature Tables Migration
 -- Facilities, Gates, RFID Cards, Access Logs, QR Passes, Subscriptions, Sessions, Rate Cards, Day Tickets
 
 -- 1. Spa Facilities (treatment rooms, gym zones, pool, sauna, steam, cafe areas)

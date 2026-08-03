@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Rotana Spa",
+    "name": "Dagi Spa",
     "tagline": "Spa Management System"
   },
   "nav": {
@@ -230,7 +230,7 @@
     "password": "Password",
     "button": "Sign In",
     "error": "Invalid email or password",
-    "welcome": "Welcome to Rotana Spa"
+    "welcome": "Welcome to Dagi Spa"
   },
   "settings": {
     "title": "System Settings",

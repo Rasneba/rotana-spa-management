@@ -102,7 +102,7 @@ export default function Dashboard() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h3 className="fw-bold mb-1">{greeting}</h3>
-          <p className="text-muted mb-0 small">Welcome to {companyName || "Rotana Spa"}</p>
+          <p className="text-muted mb-0 small">Welcome to {companyName || "Dagi Spa"}</p>
         </div>
         <div className="d-flex gap-2">
           {visibleQuickActions.map((a) => (
@@ -202,8 +202,8 @@ export default function Dashboard() {
       )}
 
       <div className="text-center text-muted small mt-4">
-        <i className="bi bi-building me-1"></i>{companyName || "Rotana Spa"} &middot;
-        <i className="bi bi-laptop ms-2 me-1"></i>Rotana Spa Management System
+        <i className="bi bi-building me-1"></i>{companyName || "Dagi Spa"} &middot;
+        <i className="bi bi-laptop ms-2 me-1"></i>Dagi Spa Management System
       </div>
     </div>
   );

@@ -1,5 +1,8 @@
-import { redirect } from "next/navigation";
+import DagiLandingPage from "@/components/public/DagiLandingPage";
 
-export default function Home() {
-  redirect("/dashboard");
+type Props = { params: Promise<{ locale: string }> };
+
+export default async function Home({ params }: Props) {
+  const { locale } = await params;
+  return <DagiLandingPage locale={locale} />;
 }

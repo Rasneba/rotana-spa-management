@@ -299,7 +299,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <i className="bi bi-grid-fill text-white" style={{ fontSize: "16px" }}></i>
           </div>
-          <span className="fw-bold gradient-text" style={{ fontSize: "1rem" }}>Rotana Spa</span>
+          <span className="fw-bold gradient-text" style={{ fontSize: "1rem" }}>Dagi Spa</span>
         </div>
 
         {/* Company Info */}

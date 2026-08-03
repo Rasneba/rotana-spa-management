@@ -148,7 +148,7 @@ export default function AdminDashboard() {
 
       <div className="text-center text-muted small mt-4">
         <i className="bi bi-shield-lock me-1"></i>Super Admin &middot;
-        <i className="bi bi-laptop ms-2 me-1"></i>Rotana Spa Management System
+        <i className="bi bi-laptop ms-2 me-1"></i>Dagi Spa Management System
       </div>
     </div>
   );

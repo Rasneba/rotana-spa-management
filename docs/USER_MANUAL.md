@@ -1,6 +1,6 @@
 # User Manual
 
-**Rotana Spa Management System** — operator guide.
+**Dagi Spa Management System** — operator guide.
 
 ---
 
@@ -20,8 +20,8 @@ This manual explains, step by step, how spa, gym and front-desk staff use the sy
 3. Click **Sign In**.
 
 > Demo accounts (change passwords on first real use):
-> - Company admin: `admin@rotanaspa.com` / `admin123`
-> - Super admin: `super@rotanaspa.com` / `admin123`
+> - Company admin: `admin@dagispa.com` / `admin123`
+> - Super admin: `super@dagispa.com` / `admin123`
 
 ### 2.2 The dashboard
 After signing in you land on the **Dashboard**:

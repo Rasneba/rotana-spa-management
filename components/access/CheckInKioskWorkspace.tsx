@@ -104,7 +104,7 @@ export default function CheckInKioskWorkspace() {
           <strong>{result.visit.visit_no}</strong>
           <span>Show this QR at the Spa/Gym access point</span>
           <dl><div><dt>Check-In</dt><dd>{new Date(result.visit.checked_in_at).toLocaleString()}</dd></div><div><dt>Valid Until</dt><dd>{new Date(result.pass.expiry_date).toLocaleDateString()}</dd></div><div><dt>Maximum Scans</dt><dd>{result.pass.max_uses}</dd></div></dl>
-          <footer>ROTANA SPA · ACCESS PASS</footer>
+          <footer>DAGI SPA · ACCESS PASS</footer>
         </article>
       </div>
     );

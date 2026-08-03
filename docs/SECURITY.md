@@ -1,6 +1,6 @@
 # Security Document
 
-**Rotana Spa Management System**
+**Dagi Spa Management System**
 
 ---
 

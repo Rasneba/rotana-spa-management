@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Rotana Spa Management System** — how to build, extend and maintain.
+**Dagi Spa Management System** — how to build, extend and maintain.
 
 ---
 
@@ -21,7 +21,7 @@
 ## 2. Project structure
 
 ```
-rotana-spa-management/
+dagi-spa-management/
 ├── app/
 │   ├── [locale]/                 # next-intl locale segment (en, am)
 │   │   ├── dashboard/            # authenticated UI pages
@@ -157,7 +157,7 @@ export async function POST(req: Request) {
 |---|---|
 | `npx tsc --noEmit` | Type check (run with dev server stopped / `.next` clean to avoid generated-file noise). |
 | `npm run lint` | ESLint. |
-| `node scripts/_crud-test.cjs` | 66-point CRUD/API suite against the running server (expects `admin@rotanaspa.com`). |
+| `node scripts/_crud-test.cjs` | 66-point CRUD/API suite against the running server (expects `admin@dagispa.com`). |
 | `node scripts/_spa-workflow-test.cjs` | 12-point visit → service-order handoff flow. |
 | `node scripts/_seed-dagi.cjs` | Idempotent demo dataset (also a smoke test of many endpoints). |
 

@@ -12,7 +12,7 @@ interface StorageConfig {
 
 const config: StorageConfig = {
   backend: (process.env.STORAGE_BACKEND as StorageBackend) || "local",
-  bucket: process.env.STORAGE_BUCKET || "rotana-spa",
+  bucket: process.env.STORAGE_BUCKET || "dagi-spa",
   endpoint: process.env.S3_ENDPOINT,
   region: process.env.S3_REGION || "us-east-1",
   accessKey: process.env.S3_ACCESS_KEY || process.env.MINIO_ACCESS_KEY,

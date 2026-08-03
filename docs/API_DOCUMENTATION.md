@@ -1,6 +1,6 @@
 # API Documentation
 
-**Rotana Spa Management System** — HTTP API reference.
+**Dagi Spa Management System** — HTTP API reference.
 
 ---
 
@@ -19,7 +19,7 @@
 ### `POST /api/login`
 Authenticates a tenant user.
 ```json
-{ "email": "admin@rotanaspa.com", "password": "admin123" }
+{ "email": "admin@dagispa.com", "password": "admin123" }
 ```
 ```json
 { "token": "<jwt>", "user": { "id": 1, "name": "Admin", "email": "…", "role": "admin", "company_id": 1, "company_name": "…" } }
@@ -201,7 +201,7 @@ Response:
 ### Create a visit and run the handoff flow
 ```bash
 TOKEN=$(curl -s -X POST $BASE/api/login -H 'Content-Type: application/json' \
-  -d '{"email":"admin@rotanaspa.com","password":"admin123"}' | jq -r .token)
+  -d '{"email":"admin@dagispa.com","password":"admin123"}' | jq -r .token)
 
 # check-in
 VISIT=$(curl -s -X POST $BASE/api/spa/visits -H "Authorization: Bearer $TOKEN" \

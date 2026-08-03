@@ -1,6 +1,6 @@
 # Page / UI Guide
 
-**Rotana Spa Management System** — screen-by-screen definition.
+**Dagi Spa Management System** — screen-by-screen definition.
 
 Each page lists the route, who can see it (permission resource), the main widgets/actions, and the fields used. Most operational workspaces are rendered by a single dynamic page (`/dashboard/spa/[section]/[module]`) driven by a module definition — the fields below are the definitions for that module.
 

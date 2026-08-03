@@ -22,7 +22,7 @@ export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[
     resources: [
       "membership_attendance", "membership_appointments", "membership_sessions",
       "spa_visits", "spa_visit_services",
-      "spa_service_orders", "spa_queue", "spa_customer_requests", "spa_towels",
+      "spa_service_orders", "spa_queue", "spa_customer_requests", "website_requests", "spa_towels",
     ],
   },
   "Access": {

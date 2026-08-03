@@ -1,11 +1,11 @@
 # Software Requirements Specification (SRS)
 
-**Rotana Spa Management System**
+**Dagi Spa Management System**
 
 | | |
 |---|---|
 | **Document** | Software Requirements Specification |
-| **Project** | Rotana Spa Management System |
+| **Project** | Dagi Spa Management System |
 | **Version** | 1.0 |
 | **Status** | Approved |
 | **Prepared for** | Business owner / client |
@@ -16,10 +16,10 @@
 ## 1. Introduction
 
 ### 1.1 Project Name
-**Rotana Spa Management System**
+**Dagi Spa Management System**
 
 ### 1.2 Purpose
-The Rotana Spa Management System is a web application that digitises the day-to-day operations of a spa and gym: member registration and membership plans, visits and treatments, therapist and trainer workloads, inventory and towels, facilities and gates, service orders handed to the cashier, and operational reports.
+The Dagi Spa Management System is a web application that digitises the day-to-day operations of a spa and gym: member registration and membership plans, visits and treatments, therapist and trainer workloads, inventory and towels, facilities and gates, service orders handed to the cashier, and operational reports.
 
 ### 1.3 Scope
 The system covers the following functional areas:

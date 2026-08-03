@@ -1,6 +1,6 @@
 # Client Presentation
 
-**Rotana Spa Management System**
+**Dagi Spa Management System**
 *Presented to the business owner / client*
 
 ---
@@ -18,7 +18,7 @@ Spa and gym operators face daily operational pain:
 
 ## 2. The solution
 
-The **Rotana Spa Management System** is a web application that digitises the whole front of house:
+The **Dagi Spa Management System** is a web application that digitises the whole front of house:
 
 | Area | What it gives you |
 |---|---|

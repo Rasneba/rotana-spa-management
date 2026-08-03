@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "ጂኒየስ ኤችአርኤምኤስ",
-    "tagline": "የሰው ሀብት አስተዳደር ሥርዓት"
+    "name": "Dagi Spa",
+    "tagline": "የስፓ አስተዳደር ሥርዓት"
   },
   "nav": {
     "dashboard": "ዳሽቦርድ",
@@ -350,7 +350,7 @@
     "password": "የይለፍ ቃል",
     "button": "ግባ",
     "error": "ልክ ያልሆነ ኢሜይል ወይም የይለፍ ቃል",
-    "welcome": "እንኳን ወደ ጂኒየስ ኤችአርኤምኤስ በደህና መጡ"
+    "welcome": "እንኳን ወደ Dagi Spa በደህና መጡ"
   },
   "dashboard": {
     "title": "ዳሽቦርድ",

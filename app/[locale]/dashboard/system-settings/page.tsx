@@ -113,7 +113,7 @@ export default function SystemSettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1.5 block">Company Name</label>
-                <GemInput value={settings.company_name || ""} onChange={e => updateSetting("company_name", e.target.value)} placeholder="Rotana Spa" />
+                <GemInput value={settings.company_name || ""} onChange={e => updateSetting("company_name", e.target.value)} placeholder="Dagi Spa" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1.5 block">Company Address</label>
@@ -125,7 +125,7 @@ export default function SystemSettingsPage() {
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1.5 block">Company Email</label>
-                <GemInput value={settings.company_email || ""} onChange={e => updateSetting("company_email", e.target.value)} placeholder="info@rotanaspa.com" />
+                <GemInput value={settings.company_email || ""} onChange={e => updateSetting("company_email", e.target.value)} placeholder="info@dagispa.com" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-gray-600 mb-1.5 block">Currency</label>

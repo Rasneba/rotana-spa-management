@@ -1,6 +1,6 @@
 # Deployment Guide
 
-**Rotana Spa Management System**
+**Dagi Spa Management System**
 
 ---
 
@@ -65,7 +65,7 @@ npm i -g pm2
 pm2 start ecosystem.config.js
 pm2 save
 pm2 startup   # enable boot persistence
-pm2 logs rotana-spa
+pm2 logs dagi-spa
 ```
 
 ## 6. Reverse proxy (Nginx example)
@@ -116,7 +116,7 @@ Add TLS (Let's Encrypt / certbot) and force HTTPS.
 2. `npm ci` (exact lockfile install).
 3. If new migrations exist: apply them **before** starting the new build (in `vN` order).
 4. `npm run build`.
-5. Restart the process: `pm2 reload rotana-spa` (or systemd restart).
+5. Restart the process: `pm2 reload dagi-spa` (or systemd restart).
 6. Smoke test: login, dashboard stats, one visit + service-order flow, one report.
 7. On failure, roll back: redeploy previous release and restore DB to pre-migration snapshot (only if a migration caused the issue).
 

@@ -1,4 +1,4 @@
--- Rotana Spa - Complete Database Schema Migration
+-- Dagi Spa - Complete Database Schema Migration
 -- Core + Membership (plans, members, payments, attendance, gym check-ins)
 -- No HRMS, no parking, no stock, no sales, no finance
 
@@ -190,10 +190,10 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 INSERT INTO settings (company_id, key, value, description) VALUES
-  (NULL, 'company_name', 'Rotana Spa', 'Company name'),
+  (NULL, 'company_name', 'Dagi Spa', 'Company name'),
   (NULL, 'company_address', 'Addis Ababa, Ethiopia', 'Company address'),
   (NULL, 'company_phone', '+251-XXX-XXXXXX', 'Company phone'),
-  (NULL, 'company_email', 'info@rotanaspa.com', 'Company email'),
+  (NULL, 'company_email', 'info@dagispa.com', 'Company email'),
   (NULL, 'currency', 'ETB', 'Currency symbol')
 ON CONFLICT (company_id, key) DO NOTHING;
 
@@ -379,54 +379,54 @@ CREATE TRIGGER trg_demo_licenses_updated_at BEFORE UPDATE ON demo_licenses FOR E
 
 -- 18. Seed default company
 INSERT INTO companies (name, code, tin, contact_email, license_type, status)
-SELECT 'Rotana Wellness PLC', 'CMP-ROTANA', 'TIN-ROTANA-001', 'admin@rotanaspa.com', 'enterprise', 'active'
-WHERE NOT EXISTS (SELECT 1 FROM companies WHERE tin = 'TIN-ROTANA-001');
+SELECT 'Dagi Spa', 'CMP-DAGI', 'TIN-DAGI-001', 'admin@dagispa.com', 'enterprise', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM companies WHERE tin = 'TIN-DAGI-001');
 
 -- 18. Assign all modules to default company
 INSERT INTO company_modules (company_id, module_id)
 SELECT c.id, m.id FROM companies c, modules m
-WHERE c.tin = 'TIN-ROTANA-001'
+WHERE c.tin = 'TIN-DAGI-001'
 AND NOT EXISTS (SELECT 1 FROM company_modules cm WHERE cm.company_id = c.id AND cm.module_id = m.id);
 
 -- 19. Seed default admin user (password: admin123)
 INSERT INTO users (name, email, password, role, role_id, is_active, company_id)
-SELECT 'Admin', 'admin@rotanaspa.com',   '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
+SELECT 'Admin', 'admin@dagispa.com',   '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
   'admin', r.id, true, c.id
 FROM companies c, roles r
-WHERE c.tin = 'TIN-ROTANA-001' AND r.name = 'admin'
-AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@rotanaspa.com');
+WHERE c.tin = 'TIN-DAGI-001' AND r.name = 'admin'
+AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@dagispa.com');
 
 -- Seed super admin user (password: admin123)
 INSERT INTO users (name, email, password, role, role_id, is_active)
-SELECT 'Super Admin', 'super@rotanaspa.com', '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
+SELECT 'Super Admin', 'super@dagispa.com', '$2b$10$eWQbUmaazwgDUN57of17Ze.m7e0nmWDbcAjiMAnnjrcpGWW.IFcz2',
   'super_admin', r.id, true
 FROM roles r
 WHERE r.name = 'super_admin'
-AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'super@rotanaspa.com');
+AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'super@dagispa.com');
 
 -- 20. Seed ID definitions for default company
-SELECT seed_id_definitions(c.id) FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT seed_id_definitions(c.id) FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM id_definitions WHERE company_id = c.id);
 
 -- 21. Seed default membership plans
 INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-SELECT c.id, 'Basic Gym', 'gym', 'Standard gym access - all equipment', 30, 500, 200 FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT c.id, 'Basic Gym', 'gym', 'Standard gym access - all equipment', 30, 500, 200 FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM membership_plans WHERE name = 'Basic Gym' AND company_id = c.id);
 
 INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-SELECT c.id, 'Premium Gym', 'gym', 'Full gym + sauna + personal trainer', 30, 1500, 100 FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT c.id, 'Premium Gym', 'gym', 'Full gym + sauna + personal trainer', 30, 1500, 100 FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM membership_plans WHERE name = 'Premium Gym' AND company_id = c.id);
 
 INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-SELECT c.id, 'Spa Package', 'spa', 'Full spa access - massage, steam, jacuzzi', 30, 2000, 50 FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT c.id, 'Spa Package', 'spa', 'Full spa access - massage, steam, jacuzzi', 30, 2000, 50 FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM membership_plans WHERE name = 'Spa Package' AND company_id = c.id);
 
 INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-SELECT c.id, 'Cafe Voucher', 'cafe', 'Monthly cafe credit voucher', 30, 800, NULL FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT c.id, 'Cafe Voucher', 'cafe', 'Monthly cafe credit voucher', 30, 800, NULL FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM membership_plans WHERE name = 'Cafe Voucher' AND company_id = c.id);
 
 INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-SELECT c.id, 'VIP All Access', 'general', 'Full access - gym, spa, cafe, all facilities', 30, 3500, 30 FROM companies c WHERE c.tin = 'TIN-ROTANA-001'
+SELECT c.id, 'VIP All Access', 'general', 'Full access - gym, spa, cafe, all facilities', 30, 3500, 30 FROM companies c WHERE c.tin = 'TIN-DAGI-001'
   AND NOT EXISTS (SELECT 1 FROM membership_plans WHERE name = 'VIP All Access' AND company_id = c.id);
 
 -- 22. Performance indexes (tenant-first)

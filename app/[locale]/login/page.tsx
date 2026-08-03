@@ -16,7 +16,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const rememberedEmail = localStorage.getItem("rotana-remembered-email");
+      const rememberedEmail = localStorage.getItem("dagi-remembered-email");
       if (rememberedEmail) setEmail(rememberedEmail);
     }, 0);
     return () => window.clearTimeout(timer);
@@ -38,8 +38,8 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
-        if (remember) localStorage.setItem("rotana-remembered-email", email);
-        else localStorage.removeItem("rotana-remembered-email");
+        if (remember) localStorage.setItem("dagi-remembered-email", email);
+        else localStorage.removeItem("dagi-remembered-email");
         router.push("/dashboard");
         return;
       }
@@ -53,10 +53,10 @@ export default function LoginPage() {
 
   return (
     <main className="auth-shell">
-      <section className="auth-showcase" aria-label="Rotana Spa welcome">
+      <section className="auth-showcase" aria-label="Dagi Spa welcome">
         <div className="auth-brand">
           <span className="auth-brand-mark"><Leaf /></span>
-          <span>Rotana Spa<small>Operations suite</small></span>
+          <span>Dagi Spa<small>Operations suite</small></span>
         </div>
 
         <div className="auth-story">
@@ -66,17 +66,17 @@ export default function LoginPage() {
           <div className="auth-quote"><i />Thoughtful service begins with a clear day.</div>
         </div>
 
-        <div className="auth-showcase-footer"><span>ROTANA SPA MANAGEMENT</span><span>PRIVATE &amp; SECURE</span></div>
+        <div className="auth-showcase-footer"><span>DAGI SPA MANAGEMENT</span><span>PRIVATE &amp; SECURE</span></div>
       </section>
 
       <section className="auth-main">
         <div className="auth-language"><LanguageSwitcher /></div>
         <div className="auth-form-wrap">
-          <div className="auth-mobile-brand"><span className="auth-brand-mark"><Leaf size={18} /></span>Rotana Spa</div>
+          <div className="auth-mobile-brand"><span className="auth-brand-mark"><Leaf size={18} /></span>Dagi Spa</div>
           <header className="auth-form-header">
             <div className="eyebrow">WELCOME BACK</div>
             <h2>Sign in to your space</h2>
-            <p>Use your staff account to continue to the Rotana workspace.</p>
+            <p>Use your staff account to continue to the Dagi workspace.</p>
           </header>
 
           <form onSubmit={login} noValidate>
@@ -86,7 +86,7 @@ export default function LoginPage() {
               <label className="auth-form-label" htmlFor="email">Work email</label>
               <div className="auth-field">
                 <Mail className="field-icon" size={17} />
-                <input id="email" type="email" autoComplete="email" placeholder="you@rotanaspa.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                <input id="email" type="email" autoComplete="email" placeholder="you@dagispa.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
               </div>
             </div>
 

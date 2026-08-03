@@ -99,7 +99,7 @@ export default function UserGuide() {
       <header className="guide-hero">
         <div className="guide-hero-copy">
           <div className="guide-eyebrow"><i className="bi bi-compass" /> Page / UI Guide · August 2026</div>
-          <h1>Rotana Spa<br /><em>Management System</em></h1>
+          <h1>Dagi Spa<br /><em>Management System</em></h1>
           <p>A screen-by-screen guide to routes, access permissions, actions, widgets and operational fields.</p>
           <div className="guide-hero-actions">
             <a href="#guide-contents" className="guide-primary-action"><i className="bi bi-list-ul" /> Browse contents</a>
