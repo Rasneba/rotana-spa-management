@@ -235,7 +235,6 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
         </nav>
         <div className="dagi-nav-actions">
           <Link href={lang === "en" ? "/am" : "/en"}>{lang === "en" ? "አማ" : "EN"}</Link>
-          <Link className="dagi-staff" href="/login">{t.staff}</Link>
         </div>
       </header>
 
