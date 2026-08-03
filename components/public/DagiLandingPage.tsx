@@ -140,10 +140,10 @@ const detailedTreatments = [
 const gallery = [
   { title: "Massage Therapy", image: "/dagi/massage.jpg" },
   { title: "Moroccan Bath", image: "/dagi/moroccan-bath.jpg" },
+  { title: "Dagi Spa Interior", image: "/dagi/gallery-photo-1.jpg" },
+  { title: "Spa Ritual Room", image: "/dagi/gallery-thr.jpg" },
   { title: "Yoly Hotel Branch", image: "/dagi/yoly.png" },
   { title: "Alfoz Plaza Branch", image: "/dagi/alfo.png" },
-  { title: "Dagi Spa Brand", image: "/dagi/logo.jpg" },
-  { title: "Wellness Gift", image: "/dagi/logo-white.png" },
 ];
 
 const branches = [
@@ -192,6 +192,7 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [selectedGallery, setSelectedGallery] = useState<(typeof gallery)[number] | null>(null);
 
   const branchOptions = useMemo(() => branches.map((branch) => branch.title), []);
   const treatmentOptions = useMemo(() => treatments.map((treatment) => treatment.title), []);
@@ -227,6 +228,7 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
           <span>Dagi Spa<small>Discover Peace</small></span>
         </Link>
         <nav aria-label="Dagi Spa navigation">
+          <a href="#home">{lang === "am" ? "መነሻ" : "Home"}</a>
           {t.nav.map((item) => <a key={item.id} href={`#${item.id}`}>{item.label}</a>)}
         </nav>
         <div className="dagi-nav-actions">
@@ -326,13 +328,30 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
         <h2>{lang === "am" ? "የDagi Spa ጋለሪ" : "A glimpse of the Dagi Spa atmosphere"}</h2>
         <div className="dagi-gallery-grid">
           {gallery.map((item, index) => (
-            <figure key={`${item.title}-${index}`} className={index === 0 ? "featured" : ""}>
+            <figure
+              key={`${item.title}-${index}`}
+              className={index === 0 ? "featured" : ""}
+              role="button"
+              tabIndex={0}
+              onClick={() => setSelectedGallery(item)}
+              onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setSelectedGallery(item); }}
+            >
               <img src={item.image} alt={item.title} />
               <figcaption><i className="bi bi-stars" />{item.title}</figcaption>
             </figure>
           ))}
         </div>
       </section>
+
+      {selectedGallery && (
+        <div className="dagi-gallery-lightbox" role="dialog" aria-modal="true" aria-label={selectedGallery.title} onClick={() => setSelectedGallery(null)}>
+          <button type="button" aria-label="Close gallery image" onClick={() => setSelectedGallery(null)}><i className="bi bi-x-lg" /></button>
+          <figure onClick={(event) => event.stopPropagation()}>
+            <img src={selectedGallery.image} alt={selectedGallery.title} />
+            <figcaption>{selectedGallery.title}</figcaption>
+          </figure>
+        </div>
+      )}
 
       <section className="dagi-section dagi-branches dagi-branches-v2" id="branches">
         <p className="dagi-eyebrow">Two branches open to serve you better</p>
