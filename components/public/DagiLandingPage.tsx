@@ -22,7 +22,9 @@ const content = {
     nav: [
       { label: "About", id: "about" },
       { label: "Treatments", id: "treatments" },
+      { label: "Gallery", id: "gallery" },
       { label: "Branches", id: "branches" },
+      { label: "Map", id: "map" },
       { label: "Reviews", id: "reviews" },
       { label: "Gift Cards", id: "gift-cards" },
       { label: "Booking", id: "booking" },
@@ -60,7 +62,9 @@ const content = {
     nav: [
       { label: "ስለ እኛ", id: "about" },
       { label: "አገልግሎቶች", id: "treatments" },
+      { label: "ጋለሪ", id: "gallery" },
       { label: "ቅርንጫፎች", id: "branches" },
+      { label: "ካርታ", id: "map" },
       { label: "አስተያየቶች", id: "reviews" },
       { label: "የስጦታ ካርድ", id: "gift-cards" },
       { label: "ቦታ ማስያዝ", id: "booking" },
@@ -102,9 +106,61 @@ const treatments = [
   { title: "Reflexology", am: "ሪፍሌክሶሎጂ", body: "Targeted foot therapy to relieve stress and restore circulation.", image: "/dagi/moroccan-bath.jpg", icon: "●" },
 ];
 
+const detailedTreatments = [
+  {
+    title: "Moroccan Bath",
+    am: "ሞሮካን ባዝ",
+    duration: "60–90 min",
+    image: "/dagi/moroccan-bath.jpg",
+    details: ["Steam ritual", "Deep exfoliation", "Skin glow finish", "Detox refreshment"],
+  },
+  {
+    title: "Therapeutic Massage",
+    am: "ቴራፒዩቲክ ማሳጅ",
+    duration: "45–90 min",
+    image: "/dagi/massage.jpg",
+    details: ["Back & shoulder relief", "Hot stone option", "Couples room option", "Custom pressure"],
+  },
+  {
+    title: "Facial & Beauty Care",
+    am: "ፊያሻል እና የውበት እንክብካቤ",
+    duration: "45–75 min",
+    image: "/dagi/logo.jpg",
+    details: ["Skin cleansing", "Hydrating mask", "Wax service", "Manicure & pedicure"],
+  },
+  {
+    title: "Reflexology",
+    am: "ሪፍሌክሶሎጂ",
+    duration: "30–60 min",
+    image: "/dagi/yoly.png",
+    details: ["Foot pressure points", "Circulation support", "Stress release", "Balance restoration"],
+  },
+];
+
+const gallery = [
+  { title: "Massage Therapy", image: "/dagi/massage.jpg" },
+  { title: "Moroccan Bath", image: "/dagi/moroccan-bath.jpg" },
+  { title: "Yoly Hotel Branch", image: "/dagi/yoly.png" },
+  { title: "Alfoz Plaza Branch", image: "/dagi/alfo.png" },
+  { title: "Dagi Spa Brand", image: "/dagi/logo.jpg" },
+  { title: "Wellness Gift", image: "/dagi/logo-white.png" },
+];
+
 const branches = [
-  { title: "Yoly Hotel", detail: "Near Bole Atlas, Addis Ababa", phone: "0912923692 / 0917923692", image: "/dagi/yoly.png" },
-  { title: "Alfoz Plaza", detail: "Near Bole Imperial, Addis Ababa", phone: "0910888853", image: "/dagi/alfo.png" },
+  {
+    title: "Yoly Hotel",
+    detail: "Near Bole Atlas, Addis Ababa",
+    phone: "0912923692 / 0917923692",
+    image: "/dagi/yoly.png",
+    map: "https://www.google.com/maps?q=Yoly%20Hotel%20Bole%20Atlas%20Addis%20Ababa%20Ethiopia&output=embed",
+  },
+  {
+    title: "Alfoz Plaza",
+    detail: "Near Bole Imperial, Addis Ababa",
+    phone: "0910888853",
+    image: "/dagi/alfo.png",
+    map: "https://www.google.com/maps?q=Alfoz%20Plaza%20Bole%20Imperial%20Addis%20Ababa%20Ethiopia&output=embed",
+  },
 ];
 
 const reviews = [
@@ -247,6 +303,37 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
         </div>
       </section>
 
+      <section className="dagi-section dagi-treatment-details" aria-label="Detailed treatments">
+        <p className="dagi-eyebrow">Detailed Treatments</p>
+        <h2>{lang === "am" ? "እያንዳንዱን አገልግሎት በዝርዝር" : "Choose the ritual that fits your day"}</h2>
+        <div className="dagi-treatment-detail-grid">
+          {detailedTreatments.map((item) => (
+            <article key={item.title} className="dagi-treatment-detail-card" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
+              <img src={item.image} alt={`${item.title} at Dagi Spa`} />
+              <div>
+                <span>{item.duration}</span>
+                <h3>{lang === "am" ? item.am : item.title}</h3>
+                <ul>{item.details.map((detail) => <li key={detail}><i className="bi bi-check2-circle" />{detail}</li>)}</ul>
+                <a href="#booking">{lang === "am" ? "ይህን ይመርጡ" : "Select this treatment"}</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="dagi-section dagi-gallery" id="gallery">
+        <p className="dagi-eyebrow">Gallery</p>
+        <h2>{lang === "am" ? "የDagi Spa ጋለሪ" : "A glimpse of the Dagi Spa atmosphere"}</h2>
+        <div className="dagi-gallery-grid">
+          {gallery.map((item, index) => (
+            <figure key={`${item.title}-${index}`} className={index === 0 ? "featured" : ""}>
+              <img src={item.image} alt={item.title} />
+              <figcaption><i className="bi bi-stars" />{item.title}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       <section className="dagi-section dagi-branches dagi-branches-v2" id="branches">
         <p className="dagi-eyebrow">Two branches open to serve you better</p>
         <h2>{t.branchesTitle}</h2>
@@ -258,6 +345,26 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
               <h3>{branch.title}</h3>
               <p>{branch.detail}</p>
               <a href={`tel:+251${branch.phone.replace(/\D/g, "").slice(1, 10)}`}>{branch.phone}</a>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="dagi-section dagi-map-section" id="map">
+        <div className="dagi-map-heading">
+          <p className="dagi-eyebrow">Find Us</p>
+          <h2>{lang === "am" ? "በካርታ ላይ ቅርንጫፎቻችንን ያግኙ" : "Find your nearest Dagi Spa branch"}</h2>
+        </div>
+        <div className="dagi-map-grid">
+          {branches.map((branch) => (
+            <article key={`${branch.title}-map`} className="dagi-map-card">
+              <div>
+                <img src={branch.image} alt={`${branch.title} icon`} />
+                <span>{branch.title}</span>
+                <strong>{branch.detail}</strong>
+                <a href={`tel:+251${branch.phone.replace(/\D/g, "").slice(1, 10)}`}><i className="bi bi-telephone-fill" />{branch.phone}</a>
+              </div>
+              <iframe title={`${branch.title} map`} src={branch.map} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
             </article>
           ))}
         </div>
@@ -306,11 +413,11 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
           <span>2 - Alfoz Branch near Bole Imperial, Addis Ababa, Ethiopia 0910888853</span>
           <a href="mailto:dagispainfo@gmail.com">dagispainfo@gmail.com</a>
         </address>
-        <div className="dagi-socials" aria-label="Social media links">
-          <a href="https://www.facebook.com/share/1Lmpiy94b9/" target="_blank" rel="noreferrer">Facebook</a>
-          <a href="https://www.instagram.com/dagi_spa_ethiopia?igsh=dnhkaHdqdnd1NjFs" target="_blank" rel="noreferrer">Instagram</a>
-          <a href="https://www.tiktok.com/@dagi_spa_ethiopia" target="_blank" rel="noreferrer">TikTok</a>
-          <a href="https://youtube.com/@dagispa?si=uQLGR99Fd16R2yb0" target="_blank" rel="noreferrer">YouTube</a>
+        <div className="dagi-socials dagi-social-icons" aria-label="Social media links">
+          <a href="https://www.facebook.com/share/1Lmpiy94b9/" target="_blank" rel="noreferrer" aria-label="Dagi Spa on Facebook"><i className="bi bi-facebook" /><span>Facebook</span></a>
+          <a href="https://www.instagram.com/dagi_spa_ethiopia?igsh=dnhkaHdqdnd1NjFs" target="_blank" rel="noreferrer" aria-label="Dagi Spa on Instagram"><i className="bi bi-instagram" /><span>Instagram</span></a>
+          <a href="https://www.tiktok.com/@dagi_spa_ethiopia" target="_blank" rel="noreferrer" aria-label="Dagi Spa on TikTok"><i className="bi bi-tiktok" /><span>TikTok</span></a>
+          <a href="https://youtube.com/@dagispa?si=uQLGR99Fd16R2yb0" target="_blank" rel="noreferrer" aria-label="Dagi Spa on YouTube"><i className="bi bi-youtube" /><span>YouTube</span></a>
         </div>
       </footer>
     </main>
