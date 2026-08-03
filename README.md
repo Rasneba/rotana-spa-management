@@ -16,6 +16,42 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Spa management database
+
+The expanded Spa/Gym workspaces require migrations v33 through v37 after the existing spa migrations:
+
+```bash
+psql "$DATABASE_URL" -f db-migration-v33.sql
+psql "$DATABASE_URL" -f db-migration-v34.sql
+psql "$DATABASE_URL" -f db-migration-v35.sql
+psql "$DATABASE_URL" -f db-migration-v36.sql
+psql "$DATABASE_URL" -f db-migration-v37.sql
+```
+
+Migration v34 adds the visit and draft service-order workflow. Migration v35 adds focused access control, enhanced gates, operational cameras, the controller queue and kiosk QR passes. Migration v36 consolidates customers/members into one classified customer master and plans/services/packages into one classified Offering Master.
+
+The visit treatment screen is optimized for tablets and touch devices: classified offering tiles work like a restaurant order menu, while a live cart provides large quantity and removal controls before the draft Service Order is finished.
+
+Migration v37 keeps the existing Appointments calendar unchanged and adds a separate Spa Bookings board: therapists are vertical, time is horizontal, and selecting a service calculates the editable end time from its duration. The board displays standard time together with Ethiopian/Amharic periods (ጠዋት, ቀትር, ከሰዓት, ማታ), and the sidebar uses matching color accents for each workspace.
+
+### In-app user guide
+
+The searchable, printable single-page system guide is available at `/dashboard/guide` under **Settings** and through the header help icon.
+
+### Adapted access components
+
+The focused **Access** menu adapts only useful components from [`Rasneba/-geniouserp`](https://github.com/Rasneba/-geniouserp): gates, camera/webcam support, member cards, QR scanning, access monitoring, guest passes and kiosk check-in. Parking Dashboard, slots, vehicles, rates, POS and duplicate customer/subscription/session/report links are removed. No parking tables, ANPR, vehicle, pricing or payment code is imported.
+
+### Canonical master data
+
+- A member is a classified customer in the single **Customer & Member Master**; duplicate email, phone or ID registration is blocked.
+- Membership plans, Spa services, Gym services, packages and access passes are classifications in one **Offering Master**.
+- Legacy plan/service/package routes are compatibility-only and cannot create duplicate master records.
+
+### Sales/POS boundary
+
+The Spa application does **not** connect to the Sales/POS database and does not calculate prices, discounts, tax, payments, invoices, or official receipts. Finishing a treatment produces an 80 mm **Service Order (Draft)** containing visit, customer, therapist, and service quantities only. The customer takes that draft to the cashier, who completes the financial transaction in the separate POS application.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

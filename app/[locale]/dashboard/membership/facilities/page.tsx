@@ -4,12 +4,12 @@ import Link from "next/link";
 import { GemPage, GemHeader, GemCard, GemCardBare, GemBtn, GemBtnOutline, GemTable, GemBadge, GemInput, GemSelect } from "@/lib/gem-ui";
 import { Building2, Plus, X, Save } from "lucide-react";
 
-export default function FacilitiesPage() {
+export function FacilitiesWorkspace({ roomsOnly = false, title = "Facilities" }: { roomsOnly?: boolean; title?: string }) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState<any>({ name: "", type: "other", capacity: "", description: "" });
+  const [form, setForm] = useState<any>({ name: "", type: roomsOnly ? "room" : "other", capacity: "", description: "" });
   const [saving, setSaving] = useState(false);
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -26,7 +26,9 @@ export default function FacilitiesPage() {
 
   useEffect(() => { load(); }, []);
 
-  const openNew = () => { setEditing(null); setForm({ name: "", type: "other", capacity: "", description: "" }); setShowForm(true); };
+  const openNew = () => { setEditing(null); setForm({ name: "", type: roomsOnly ? "room" : "other", capacity: "", description: "" }); setShowForm(true); };
+
+  const visibleItems = roomsOnly ? items.filter((item) => item.type === "room") : items;
 
   const openEdit = (item: any) => { setEditing(item); setForm({ name: item.name, type: item.type, capacity: item.capacity || "", description: item.description || "" }); setShowForm(true); };
 
@@ -60,7 +62,7 @@ export default function FacilitiesPage() {
 
   return (
     <GemPage>
-      <GemHeader title="Facilities" subtitle="Spa treatment rooms, gym zones, pool, sauna, steam, cafe areas"
+      <GemHeader title={title} subtitle={roomsOnly ? "Manage spa treatment and service rooms" : "Spa treatment rooms, gym zones, pool, sauna, steam, cafe areas"}
         actions={<GemBtn onClick={openNew}><Plus size={16} />Add Facility</GemBtn>} />
 
       {showForm && (
@@ -104,13 +106,13 @@ export default function FacilitiesPage() {
       <GemCardBare>
         {loading ? (
           <div className="flex justify-center py-8"><div className="w-8 h-8 border-4 border-black/20 border-t-black rounded-full animate-spin" /></div>
-        ) : items.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <div className="text-center text-gray-400 py-8"><Building2 size={32} className="mx-auto mb-2 opacity-40" /><p className="text-sm">No facilities created yet</p></div>
         ) : (
           <div className="overflow-x-auto p-6">
             <GemTable
               headers={["Name", "Type", "Capacity", "Status", ""]}
-              rows={items.map(f => [
+              rows={visibleItems.map(f => [
                 <span className="font-semibold">{f.name}</span>,
                 typeBadge(f.type),
                 f.capacity || "-",
@@ -126,4 +128,8 @@ export default function FacilitiesPage() {
       </GemCardBare>
     </GemPage>
   );
+}
+
+export default function FacilitiesPage() {
+  return <FacilitiesWorkspace />;
 }

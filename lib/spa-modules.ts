@@ -1,0 +1,656 @@
+export type SpaFieldType =
+  | "text"
+  | "textarea"
+  | "number"
+  | "currency"
+  | "date"
+  | "datetime-local"
+  | "email"
+  | "tel"
+  | "url"
+  | "select";
+
+export type SpaFieldDefinition = {
+  key: string;
+  label: string;
+  type: SpaFieldType;
+  required?: boolean;
+  placeholder?: string;
+  options?: string[];
+  list?: boolean;
+  min?: number;
+  max?: number;
+  step?: number;
+};
+
+export type SpaModuleDefinition = {
+  key: string;
+  section: string;
+  slug: string;
+  title: string;
+  singular: string;
+  description: string;
+  resource: string;
+  icon: string;
+  primaryField: string;
+  dateField?: string;
+  amountField?: string;
+  defaultStatus: string;
+  statusOptions: string[];
+  fields: SpaFieldDefinition[];
+};
+
+export type SpaReportDefinition = {
+  key: string;
+  slug: string;
+  title: string;
+  description: string;
+  resource: string;
+  icon: string;
+};
+
+const moduleDefinition = (
+  definition: Omit<SpaModuleDefinition, "key">
+): SpaModuleDefinition => ({
+  ...definition,
+  key: `${definition.section}/${definition.slug}`,
+});
+
+export const SPA_MODULES: SpaModuleDefinition[] = [
+  moduleDefinition({
+    section: "catalog",
+    slug: "offerings",
+    title: "Offering Master",
+    singular: "Offering",
+    description: "One classified master for membership plans, Spa services, Gym services, packages and access passes. Pricing remains in the separate POS.",
+    resource: "catalog_offerings",
+    icon: "collection",
+    primaryField: "offering_name",
+    defaultStatus: "active",
+    statusOptions: ["draft", "active", "inactive", "retired"],
+    fields: [
+      { key: "offering_name", label: "Offering Name", type: "text", required: true, list: true },
+      { key: "offering_code", label: "Offering Code", type: "text", required: true, list: true },
+      { key: "classification", label: "Classification", type: "select", required: true, options: ["membership_plan", "spa_service", "gym_service", "package", "access_pass"], list: true },
+      { key: "category", label: "Category", type: "text", list: true },
+      { key: "duration_minutes", label: "Service Duration (minutes)", type: "number", min: 0, step: 5 },
+      { key: "validity_days", label: "Membership / Pass Validity (days)", type: "number", min: 1, step: 1, list: true },
+      { key: "usage_limit", label: "Usage Limit", type: "number", min: 1, step: 1 },
+      { key: "included_offerings", label: "Included Offering Codes", type: "textarea", placeholder: "For packages, list included offering codes" },
+      { key: "description", label: "Description", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "customers",
+    slug: "medical-records",
+    title: "Medical Records",
+    singular: "Medical Record",
+    description: "Document consultations, conditions, allergies, medication and follow-up care.",
+    resource: "spa_medical_records",
+    icon: "clipboard2-pulse",
+    primaryField: "customer_name",
+    dateField: "record_date",
+    defaultStatus: "active",
+    statusOptions: ["active", "follow-up", "resolved", "archived"],
+    fields: [
+      { key: "customer_name", label: "Customer Name", type: "text", required: true, list: true },
+      { key: "member_code", label: "Member Code", type: "text", list: true },
+      { key: "record_type", label: "Record Type", type: "select", required: true, options: ["consultation", "condition", "allergy", "medication", "injury", "other"], list: true },
+      { key: "provider", label: "Provider / Therapist", type: "text", list: true },
+      { key: "record_date", label: "Record Date", type: "date", required: true, list: true },
+      { key: "follow_up_date", label: "Follow-up Date", type: "date" },
+      { key: "notes", label: "Clinical Notes", type: "textarea", required: true, placeholder: "Symptoms, observations, advice and precautions" },
+    ],
+  }),
+  moduleDefinition({
+    section: "customers",
+    slug: "loyalty",
+    title: "Loyalty",
+    singular: "Loyalty Account",
+    description: "Manage loyalty tiers, point balances and member rewards.",
+    resource: "spa_loyalty",
+    icon: "stars",
+    primaryField: "customer_name",
+    dateField: "enrolled_on",
+    defaultStatus: "active",
+    statusOptions: ["active", "redeemed", "suspended", "closed"],
+    fields: [
+      { key: "customer_name", label: "Customer Name", type: "text", required: true, list: true },
+      { key: "member_code", label: "Member Code", type: "text", list: true },
+      { key: "tier", label: "Tier", type: "select", required: true, options: ["bronze", "silver", "gold", "platinum"], list: true },
+      { key: "points", label: "Available Points", type: "number", required: true, min: 0, step: 1, list: true },
+      { key: "lifetime_points", label: "Lifetime Points", type: "number", min: 0, step: 1 },
+      { key: "enrolled_on", label: "Enrolled On", type: "date", required: true },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "membership",
+    slug: "freeze-transfer",
+    title: "Freeze / Transfer",
+    singular: "Membership Request",
+    description: "Process membership freeze periods and transfers with an auditable approval status.",
+    resource: "membership_freeze_transfer",
+    icon: "arrow-left-right",
+    primaryField: "member_name",
+    dateField: "start_date",
+    defaultStatus: "pending",
+    statusOptions: ["pending", "approved", "rejected", "completed", "cancelled"],
+    fields: [
+      { key: "member_name", label: "Member Name", type: "text", required: true, list: true },
+      { key: "member_code", label: "Member Code", type: "text", list: true },
+      { key: "request_type", label: "Request Type", type: "select", required: true, options: ["freeze", "transfer"], list: true },
+      { key: "start_date", label: "Effective Date", type: "date", required: true, list: true },
+      { key: "end_date", label: "Freeze End Date", type: "date" },
+      { key: "transfer_to", label: "Transfer To", type: "text", placeholder: "Member or branch receiving the membership" },
+      { key: "reason", label: "Reason", type: "textarea", required: true },
+    ],
+  }),
+  moduleDefinition({
+    section: "operations",
+    slug: "queue",
+    title: "Queue",
+    singular: "Queue Entry",
+    description: "Coordinate waiting customers, priorities and service assignments in real time.",
+    resource: "spa_queue",
+    icon: "people",
+    primaryField: "customer_name",
+    dateField: "joined_at",
+    defaultStatus: "waiting",
+    statusOptions: ["waiting", "called", "in-service", "completed", "cancelled", "no-show"],
+    fields: [
+      { key: "customer_name", label: "Customer Name", type: "text", required: true, list: true },
+      { key: "service", label: "Service", type: "text", required: true, list: true },
+      { key: "assigned_to", label: "Assigned To", type: "text", list: true },
+      { key: "priority", label: "Priority", type: "select", required: true, options: ["normal", "priority", "urgent"], list: true },
+      { key: "joined_at", label: "Joined At", type: "datetime-local", required: true },
+      { key: "estimated_minutes", label: "Estimated Wait (minutes)", type: "number", min: 0, step: 5 },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "operations",
+    slug: "customer-requests",
+    title: "Customer Requests",
+    singular: "Customer Request",
+    description: "Track customer requests from intake through assignment and resolution.",
+    resource: "spa_customer_requests",
+    icon: "chat-left-text",
+    primaryField: "customer_name",
+    dateField: "requested_for",
+    defaultStatus: "open",
+    statusOptions: ["open", "in-progress", "resolved", "cancelled"],
+    fields: [
+      { key: "customer_name", label: "Customer Name", type: "text", required: true, list: true },
+      { key: "request_type", label: "Request Type", type: "select", required: true, options: ["booking", "reschedule", "facility", "service-order", "complaint", "special-assistance", "other"], list: true },
+      { key: "channel", label: "Channel", type: "select", options: ["front-desk", "phone", "email", "website", "other"], list: true },
+      { key: "requested_for", label: "Requested For", type: "datetime-local" },
+      { key: "assigned_to", label: "Assigned To", type: "text", list: true },
+      { key: "details", label: "Request Details", type: "textarea", required: true },
+      { key: "resolution", label: "Resolution", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "operations",
+    slug: "towel-management",
+    title: "Towel Management",
+    singular: "Towel Issue",
+    description: "Track towels issued to each visit and confirm returns or losses.",
+    resource: "spa_towels",
+    icon: "layers",
+    primaryField: "visit_no",
+    dateField: "issued_at",
+    defaultStatus: "issued",
+    statusOptions: ["issued", "partially-returned", "returned", "lost", "laundry"],
+    fields: [
+      { key: "visit_no", label: "Visit Number", type: "text", required: true, list: true, placeholder: "SPA-000145" },
+      { key: "customer_name", label: "Customer Name", type: "text", required: true, list: true },
+      { key: "towel_type", label: "Towel Type", type: "select", required: true, options: ["bath", "hand", "face", "robe", "other"], list: true },
+      { key: "issued_quantity", label: "Quantity Issued", type: "number", required: true, min: 1, step: 1, list: true },
+      { key: "returned_quantity", label: "Quantity Returned", type: "number", min: 0, step: 1, list: true },
+      { key: "issued_at", label: "Issued At", type: "datetime-local", required: true },
+      { key: "returned_at", label: "Returned At", type: "datetime-local" },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "gym",
+    slug: "trainers",
+    title: "Trainers",
+    singular: "Trainer",
+    description: "Maintain trainer profiles, specialties, certifications and commission rates.",
+    resource: "gym_trainers",
+    icon: "person-arms-up",
+    primaryField: "full_name",
+    dateField: "hire_date",
+    defaultStatus: "active",
+    statusOptions: ["active", "on-leave", "inactive"],
+    fields: [
+      { key: "full_name", label: "Full Name", type: "text", required: true, list: true },
+      { key: "phone", label: "Phone", type: "tel", list: true },
+      { key: "email", label: "Email", type: "email" },
+      { key: "specialties", label: "Specialties", type: "text", required: true, placeholder: "Strength, mobility, cardio", list: true },
+      { key: "certifications", label: "Certifications", type: "textarea" },
+      { key: "hire_date", label: "Hire Date", type: "date" },
+      { key: "commission_rate", label: "Commission Rate (%)", type: "number", min: 0, max: 100, step: 0.1 },
+    ],
+  }),
+  moduleDefinition({
+    section: "gym",
+    slug: "workout-plans",
+    title: "Workout Plans",
+    singular: "Workout Plan",
+    description: "Build goal-oriented member workout plans and track their lifecycle.",
+    resource: "gym_workout_plans",
+    icon: "clipboard-check",
+    primaryField: "plan_name",
+    dateField: "start_date",
+    defaultStatus: "draft",
+    statusOptions: ["draft", "active", "paused", "completed", "cancelled"],
+    fields: [
+      { key: "plan_name", label: "Plan Name", type: "text", required: true, list: true },
+      { key: "member_name", label: "Member Name", type: "text", required: true, list: true },
+      { key: "trainer", label: "Trainer", type: "text", list: true },
+      { key: "goal", label: "Goal", type: "select", options: ["strength", "weight-loss", "mobility", "endurance", "rehabilitation", "general-fitness"], list: true },
+      { key: "start_date", label: "Start Date", type: "date", required: true },
+      { key: "end_date", label: "End Date", type: "date" },
+      { key: "sessions_per_week", label: "Sessions / Week", type: "number", min: 1, max: 14, step: 1 },
+      { key: "exercises", label: "Exercises and Instructions", type: "textarea", required: true },
+    ],
+  }),
+  moduleDefinition({
+    section: "gym",
+    slug: "fitness-assessments",
+    title: "Fitness Assessment",
+    singular: "Fitness Assessment",
+    description: "Record baseline and follow-up fitness evaluations for gym members.",
+    resource: "gym_fitness_assessments",
+    icon: "heart-pulse",
+    primaryField: "member_name",
+    dateField: "assessment_date",
+    defaultStatus: "completed",
+    statusOptions: ["scheduled", "completed", "review-needed"],
+    fields: [
+      { key: "member_name", label: "Member Name", type: "text", required: true, list: true },
+      { key: "trainer", label: "Trainer", type: "text", required: true, list: true },
+      { key: "assessment_date", label: "Assessment Date", type: "date", required: true, list: true },
+      { key: "fitness_level", label: "Fitness Level", type: "select", options: ["beginner", "intermediate", "advanced", "athlete"], list: true },
+      { key: "resting_heart_rate", label: "Resting Heart Rate", type: "number", min: 20, max: 240 },
+      { key: "blood_pressure", label: "Blood Pressure", type: "text", placeholder: "120/80" },
+      { key: "body_fat_percentage", label: "Body Fat (%)", type: "number", min: 0, max: 100, step: 0.1 },
+      { key: "notes", label: "Assessment Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "gym",
+    slug: "body-measurements",
+    title: "Body Measurements",
+    singular: "Body Measurement",
+    description: "Capture body composition and circumference measurements over time.",
+    resource: "gym_body_measurements",
+    icon: "rulers",
+    primaryField: "member_name",
+    dateField: "measured_on",
+    defaultStatus: "recorded",
+    statusOptions: ["recorded", "verified"],
+    fields: [
+      { key: "member_name", label: "Member Name", type: "text", required: true, list: true },
+      { key: "measured_on", label: "Measured On", type: "date", required: true, list: true },
+      { key: "weight", label: "Weight (kg)", type: "number", min: 0, step: 0.1, list: true },
+      { key: "height", label: "Height (cm)", type: "number", min: 0, step: 0.1 },
+      { key: "bmi", label: "BMI", type: "number", min: 0, step: 0.1, list: true },
+      { key: "chest", label: "Chest (cm)", type: "number", min: 0, step: 0.1 },
+      { key: "waist", label: "Waist (cm)", type: "number", min: 0, step: 0.1 },
+      { key: "hips", label: "Hips (cm)", type: "number", min: 0, step: 0.1 },
+      { key: "body_fat", label: "Body Fat (%)", type: "number", min: 0, max: 100, step: 0.1 },
+    ],
+  }),
+  moduleDefinition({
+    section: "gym",
+    slug: "classes",
+    title: "Classes",
+    singular: "Gym Class",
+    description: "Schedule classes, assign trainers and monitor enrollment capacity.",
+    resource: "gym_classes",
+    icon: "calendar2-event",
+    primaryField: "class_name",
+    dateField: "starts_at",
+    defaultStatus: "scheduled",
+    statusOptions: ["scheduled", "open", "full", "in-progress", "completed", "cancelled"],
+    fields: [
+      { key: "class_name", label: "Class Name", type: "text", required: true, list: true },
+      { key: "trainer", label: "Trainer", type: "text", required: true, list: true },
+      { key: "location", label: "Location", type: "text", list: true },
+      { key: "starts_at", label: "Starts At", type: "datetime-local", required: true, list: true },
+      { key: "duration_minutes", label: "Duration (minutes)", type: "number", required: true, min: 5, step: 5 },
+      { key: "capacity", label: "Capacity", type: "number", required: true, min: 1, step: 1 },
+      { key: "enrolled", label: "Enrolled", type: "number", min: 0, step: 1 },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "spa",
+    slug: "therapists",
+    title: "Therapists",
+    singular: "Therapist",
+    description: "Maintain therapist profiles, specialties, certifications and commission rates.",
+    resource: "spa_therapists",
+    icon: "person-heart",
+    primaryField: "full_name",
+    dateField: "hire_date",
+    defaultStatus: "active",
+    statusOptions: ["active", "on-leave", "inactive"],
+    fields: [
+      { key: "full_name", label: "Full Name", type: "text", required: true, list: true },
+      { key: "phone", label: "Phone", type: "tel", list: true },
+      { key: "email", label: "Email", type: "email" },
+      { key: "specialties", label: "Specialties", type: "text", required: true, list: true },
+      { key: "certifications", label: "Certifications", type: "textarea" },
+      { key: "commission_rate", label: "Commission Rate (%)", type: "number", min: 0, max: 100, step: 0.1, list: true },
+      { key: "hire_date", label: "Hire Date", type: "date" },
+    ],
+  }),
+  moduleDefinition({
+    section: "inventory",
+    slug: "products",
+    title: "Products",
+    singular: "Product",
+    description: "Manage operational product stock and replenishment thresholds. Sales pricing stays in the separate POS.",
+    resource: "inventory_products",
+    icon: "box-seam",
+    primaryField: "product_name",
+    dateField: "expiry_date",
+    defaultStatus: "in-stock",
+    statusOptions: ["in-stock", "low-stock", "out-of-stock", "inactive"],
+    fields: [
+      { key: "product_name", label: "Product Name", type: "text", required: true, list: true },
+      { key: "sku", label: "SKU", type: "text", required: true, list: true },
+      { key: "category", label: "Category", type: "text", list: true },
+      { key: "unit", label: "Unit", type: "select", options: ["piece", "bottle", "box", "pack", "kg", "liter"], list: true },
+      { key: "quantity", label: "Quantity", type: "number", required: true, min: 0, step: 1, list: true },
+      { key: "reorder_level", label: "Reorder Level", type: "number", min: 0, step: 1 },
+      { key: "expiry_date", label: "Expiry Date", type: "date" },
+    ],
+  }),
+  moduleDefinition({
+    section: "inventory",
+    slug: "consumables",
+    title: "Consumables",
+    singular: "Consumable",
+    description: "Track treatment consumables, expiry, storage and replenishment levels.",
+    resource: "inventory_consumables",
+    icon: "droplet",
+    primaryField: "item_name",
+    dateField: "expiry_date",
+    defaultStatus: "in-stock",
+    statusOptions: ["in-stock", "low-stock", "out-of-stock", "expired"],
+    fields: [
+      { key: "item_name", label: "Item Name", type: "text", required: true, list: true },
+      { key: "sku", label: "SKU", type: "text", required: true, list: true },
+      { key: "category", label: "Category", type: "text", list: true },
+      { key: "unit", label: "Unit", type: "select", options: ["piece", "bottle", "box", "pack", "kg", "liter", "ml"], list: true },
+      { key: "quantity", label: "Quantity", type: "number", required: true, min: 0, step: 0.01, list: true },
+      { key: "reorder_level", label: "Reorder Level", type: "number", min: 0, step: 0.01 },
+      { key: "expiry_date", label: "Expiry Date", type: "date" },
+      { key: "storage_location", label: "Storage Location", type: "text" },
+    ],
+  }),
+  moduleDefinition({
+    section: "inventory",
+    slug: "stock-usage",
+    title: "Stock Usage",
+    singular: "Stock Usage",
+    description: "Post consumable and product usage against services, facilities or staff.",
+    resource: "inventory_stock_usage",
+    icon: "box-arrow-up-right",
+    primaryField: "item_name",
+    dateField: "usage_date",
+    defaultStatus: "recorded",
+    statusOptions: ["recorded", "approved", "reversed"],
+    fields: [
+      { key: "item_name", label: "Item Name", type: "text", required: true, list: true },
+      { key: "quantity", label: "Quantity Used", type: "number", required: true, min: 0.01, step: 0.01, list: true },
+      { key: "usage_date", label: "Usage Date", type: "date", required: true, list: true },
+      { key: "used_for", label: "Used For", type: "text", required: true, list: true },
+      { key: "staff_name", label: "Recorded By / Staff", type: "text" },
+      { key: "reference", label: "Reference", type: "text" },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "inventory",
+    slug: "suppliers",
+    title: "Suppliers",
+    singular: "Supplier",
+    description: "Maintain supplier contacts, supplied items and payment terms.",
+    resource: "inventory_suppliers",
+    icon: "truck",
+    primaryField: "supplier_name",
+    defaultStatus: "active",
+    statusOptions: ["active", "inactive", "blocked"],
+    fields: [
+      { key: "supplier_name", label: "Supplier Name", type: "text", required: true, list: true },
+      { key: "contact_person", label: "Contact Person", type: "text", list: true },
+      { key: "phone", label: "Phone", type: "tel", list: true },
+      { key: "email", label: "Email", type: "email" },
+      { key: "address", label: "Address", type: "textarea" },
+      { key: "tax_id", label: "Tax ID", type: "text" },
+      { key: "supplied_items", label: "Supplied Items", type: "textarea" },
+      { key: "payment_terms", label: "Payment Terms", type: "text" },
+    ],
+  }),
+  moduleDefinition({
+    section: "staff",
+    slug: "employees",
+    title: "Employees",
+    singular: "Employee",
+    description: "Manage spa and gym employee profiles, roles and compensation details.",
+    resource: "staff_employees",
+    icon: "person-vcard",
+    primaryField: "full_name",
+    dateField: "hire_date",
+    amountField: "base_salary",
+    defaultStatus: "active",
+    statusOptions: ["active", "on-leave", "inactive", "terminated"],
+    fields: [
+      { key: "full_name", label: "Full Name", type: "text", required: true, list: true },
+      { key: "employee_code", label: "Employee Code", type: "text", required: true, list: true },
+      { key: "role", label: "Role", type: "text", required: true, list: true },
+      { key: "department", label: "Department", type: "select", options: ["spa", "gym", "front-desk", "cashier", "inventory", "management", "maintenance"], list: true },
+      { key: "phone", label: "Phone", type: "tel" },
+      { key: "email", label: "Email", type: "email" },
+      { key: "hire_date", label: "Hire Date", type: "date" },
+      { key: "base_salary", label: "Base Salary (ETB)", type: "currency", min: 0, step: 0.01 },
+      { key: "commission_rate", label: "Commission Rate (%)", type: "number", min: 0, max: 100, step: 0.1 },
+    ],
+  }),
+  moduleDefinition({
+    section: "staff",
+    slug: "schedules",
+    title: "Schedules",
+    singular: "Staff Schedule",
+    description: "Assign staff shifts, work locations and daily responsibilities.",
+    resource: "staff_schedules",
+    icon: "calendar3",
+    primaryField: "employee_name",
+    dateField: "starts_at",
+    defaultStatus: "scheduled",
+    statusOptions: ["scheduled", "confirmed", "completed", "absent", "cancelled"],
+    fields: [
+      { key: "employee_name", label: "Employee Name", type: "text", required: true, list: true },
+      { key: "starts_at", label: "Starts At", type: "datetime-local", required: true, list: true },
+      { key: "ends_at", label: "Ends At", type: "datetime-local", required: true, list: true },
+      { key: "location", label: "Location", type: "text", list: true },
+      { key: "assignment", label: "Assignment", type: "text", list: true },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "staff",
+    slug: "commission",
+    title: "Commission",
+    singular: "Commission Entry",
+    description: "Calculate and approve employee commission from services and sales.",
+    resource: "staff_commission",
+    icon: "percent",
+    primaryField: "employee_name",
+    dateField: "period_start",
+    amountField: "commission_amount",
+    defaultStatus: "pending",
+    statusOptions: ["pending", "approved", "paid", "rejected"],
+    fields: [
+      { key: "employee_name", label: "Employee Name", type: "text", required: true, list: true },
+      { key: "period_start", label: "Period Start", type: "date", required: true, list: true },
+      { key: "period_end", label: "Period End", type: "date", required: true },
+      { key: "source", label: "Source", type: "select", options: ["spa-service", "gym-session", "product-sale", "package", "other"], list: true },
+      { key: "reference", label: "Reference", type: "text" },
+      { key: "base_amount", label: "Base Amount (ETB)", type: "currency", min: 0, step: 0.01 },
+      { key: "rate", label: "Rate (%)", type: "number", min: 0, max: 100, step: 0.1 },
+      { key: "commission_amount", label: "Commission (ETB)", type: "currency", min: 0, step: 0.01, placeholder: "Calculated from base amount and rate", list: true },
+    ],
+  }),
+  moduleDefinition({
+    section: "staff",
+    slug: "performance",
+    title: "Performance",
+    singular: "Performance Review",
+    description: "Record employee reviews, scores, strengths and development goals.",
+    resource: "staff_performance",
+    icon: "graph-up-arrow",
+    primaryField: "employee_name",
+    defaultStatus: "draft",
+    statusOptions: ["draft", "completed", "acknowledged"],
+    fields: [
+      { key: "employee_name", label: "Employee Name", type: "text", required: true, list: true },
+      { key: "review_period", label: "Review Period", type: "text", required: true, placeholder: "2026 Q3", list: true },
+      { key: "reviewer", label: "Reviewer", type: "text", required: true, list: true },
+      { key: "score", label: "Score / 100", type: "number", required: true, min: 0, max: 100, step: 1, list: true },
+      { key: "strengths", label: "Strengths", type: "textarea" },
+      { key: "improvement_areas", label: "Improvement Areas", type: "textarea" },
+      { key: "goals", label: "Next-period Goals", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "facilities",
+    slug: "lockers",
+    title: "Lockers",
+    singular: "Locker",
+    description: "Track locker availability, assignments and maintenance state.",
+    resource: "facilities_lockers",
+    icon: "safe",
+    primaryField: "locker_code",
+    dateField: "assignment_end",
+    defaultStatus: "available",
+    statusOptions: ["available", "assigned", "reserved", "maintenance", "inactive"],
+    fields: [
+      { key: "locker_code", label: "Locker Code", type: "text", required: true, list: true },
+      { key: "location", label: "Location", type: "text", required: true, list: true },
+      { key: "size", label: "Size", type: "select", options: ["small", "medium", "large"], list: true },
+      { key: "assigned_to", label: "Assigned To", type: "text", list: true },
+      { key: "assignment_end", label: "Assignment End", type: "date" },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "facilities",
+    slug: "equipment",
+    title: "Equipment",
+    singular: "Equipment",
+    description: "Maintain an asset register for gym, spa and facility equipment.",
+    resource: "facilities_equipment",
+    icon: "tools",
+    primaryField: "equipment_name",
+    dateField: "last_service_date",
+    defaultStatus: "operational",
+    statusOptions: ["operational", "maintenance", "out-of-service", "retired"],
+    fields: [
+      { key: "equipment_name", label: "Equipment Name", type: "text", required: true, list: true },
+      { key: "asset_code", label: "Asset Code", type: "text", required: true, list: true },
+      { key: "category", label: "Category", type: "select", options: ["gym", "spa", "room", "it", "safety", "other"], list: true },
+      { key: "location", label: "Location", type: "text", list: true },
+      { key: "purchase_date", label: "Purchase Date", type: "date" },
+      { key: "warranty_end", label: "Warranty End", type: "date" },
+      { key: "last_service_date", label: "Last Service Date", type: "date" },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "facilities",
+    slug: "maintenance",
+    title: "Maintenance",
+    singular: "Maintenance Request",
+    description: "Log facility issues, assignments, costs and resolutions.",
+    resource: "facilities_maintenance",
+    icon: "wrench-adjustable",
+    primaryField: "asset_name",
+    dateField: "reported_on",
+    amountField: "estimated_cost",
+    defaultStatus: "open",
+    statusOptions: ["open", "scheduled", "in-progress", "completed", "cancelled"],
+    fields: [
+      { key: "asset_name", label: "Asset / Room", type: "text", required: true, list: true },
+      { key: "asset_type", label: "Type", type: "select", options: ["room", "locker", "equipment", "utility", "building", "other"], list: true },
+      { key: "issue", label: "Issue", type: "textarea", required: true },
+      { key: "priority", label: "Priority", type: "select", options: ["low", "normal", "high", "critical"], list: true },
+      { key: "reported_on", label: "Reported On", type: "datetime-local", required: true, list: true },
+      { key: "assigned_to", label: "Assigned To", type: "text", list: true },
+      { key: "scheduled_for", label: "Scheduled For", type: "datetime-local" },
+      { key: "estimated_cost", label: "Estimated Cost (ETB)", type: "currency", min: 0, step: 0.01 },
+      { key: "resolution", label: "Resolution", type: "textarea" },
+    ],
+  }),
+  moduleDefinition({
+    section: "settings",
+    slug: "branches",
+    title: "Branches",
+    singular: "Branch",
+    description: "Configure operating branches, contact details and branch managers.",
+    resource: "settings_branches",
+    icon: "diagram-3",
+    primaryField: "branch_name",
+    dateField: "opening_date",
+    defaultStatus: "active",
+    statusOptions: ["active", "inactive", "planned"],
+    fields: [
+      { key: "branch_name", label: "Branch Name", type: "text", required: true, list: true },
+      { key: "branch_code", label: "Branch Code", type: "text", required: true, list: true },
+      { key: "address", label: "Address", type: "textarea", required: true },
+      { key: "phone", label: "Phone", type: "tel", list: true },
+      { key: "email", label: "Email", type: "email" },
+      { key: "manager", label: "Manager", type: "text", list: true },
+      { key: "opening_date", label: "Opening Date", type: "date" },
+      { key: "timezone", label: "Timezone", type: "text", placeholder: "Africa/Addis_Ababa" },
+    ],
+  }),
+];
+
+export const SPA_REPORTS: SpaReportDefinition[] = [
+  { key: "access", slug: "access", title: "Access Report", description: "Spa/Gym gate events, granted and denied access, methods and entry trends.", resource: "reports_access", icon: "shield-check" },
+  { key: "membership", slug: "membership", title: "Membership Report", description: "Membership status, plans and subscription performance.", resource: "reports_membership", icon: "person-badge" },
+  { key: "attendance", slug: "attendance", title: "Attendance Report", description: "Check-in volume, active visits and attendance trends.", resource: "reports_attendance", icon: "calendar-check" },
+  { key: "service-orders", slug: "service-orders", title: "Service Order Report", description: "Draft service-order volume, printed handoffs and treatment item counts—without financial data.", resource: "reports_service_orders", icon: "receipt-cutoff" },
+  { key: "therapist", slug: "therapist", title: "Therapist Report", description: "Therapist treatment volume, service usage and completion trends.", resource: "reports_therapist", icon: "person-heart" },
+  { key: "trainer", slug: "trainer", title: "Trainer Report", description: "Trainer assignments, classes and member activity.", resource: "reports_trainer", icon: "person-arms-up" },
+  { key: "inventory", slug: "inventory", title: "Inventory Report", description: "Stock position, low-stock items and recorded usage.", resource: "reports_inventory", icon: "boxes" },
+];
+
+export const SPA_MODULE_MAP = new Map(SPA_MODULES.map((definition) => [definition.key, definition]));
+export const SPA_REPORT_MAP = new Map(SPA_REPORTS.map((definition) => [definition.slug, definition]));
+
+export function getSpaModule(section: string, slug: string): SpaModuleDefinition | undefined {
+  return SPA_MODULE_MAP.get(`${section}/${slug}`);
+}
+
+export function getSpaReport(slug: string): SpaReportDefinition | undefined {
+  return SPA_REPORT_MAP.get(slug);
+}
+
+export function getListFields(definition: SpaModuleDefinition): SpaFieldDefinition[] {
+  const selected = definition.fields.filter((field) => field.list);
+  return selected.length > 0 ? selected.slice(0, 5) : definition.fields.slice(0, 4);
+}
+
+export const SPA_MANAGEMENT_RESOURCES = [
+  ...SPA_MODULES.map((definition) => definition.resource),
+  ...SPA_REPORTS.map((definition) => definition.resource),
+];

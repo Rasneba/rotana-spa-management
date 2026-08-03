@@ -9,6 +9,22 @@ const ACTION_LABELS: Record<string, string> = {
   view: "View", create: "Create", edit: "Edit", delete: "Delete", approve: "Approve",
 };
 
+const GROUP_ICONS: Record<string, string> = {
+  Dashboard: "house-door",
+  Customers: "people",
+  Membership: "person-badge",
+  "Offering Catalog": "collection",
+  Operations: "activity",
+  Access: "shield-check",
+  Gym: "heart-pulse",
+  Spa: "flower1",
+  Inventory: "boxes",
+  Staff: "person-workspace",
+  Facilities: "building",
+  Reports: "bar-chart",
+  System: "gear-wide-connected",
+};
+
 export default function RolesPage() {
   const [roles, setRoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,7 +204,7 @@ export default function RolesPage() {
                       <Fragment key={groupKey}>
                         <tr className="table-secondary">
                           <td colSpan={7} className="fw-bold small py-2">
-                            <i className={`bi bi-${groupKey === "HR Core" ? "people" : groupKey === "People" ? "person-badge" : groupKey === "Payroll" ? "wallet" : groupKey === "Stock" ? "box" : groupKey === "Sales" ? "cart" : groupKey === "Procurement" ? "truck" : groupKey === "Production" ? "gear" : groupKey === "Membership" ? "card-checklist" : groupKey === "Parking" ? "car-front" : "gear-wide"} me-2`}></i>
+                            <i className={`bi bi-${GROUP_ICONS[groupKey] || "gear-wide"} me-2`}></i>
                             {group.label}
                           </td>
                         </tr>

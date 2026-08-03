@@ -26,9 +26,23 @@
     "self_service": "ራስን ማገልገል",
     "users": "ተጠቃሚዎች",
     "roles": "ሚናዎች እና ፈቃዶች",
-    "reports": "ሪፖርቶች",
+    "reports": {
+      "membership": "አባልነት",
+      "attendance": "መገኘት",
+      "therapist": "ቴራፒስት",
+      "trainer": "አሰልጣኝ",
+      "inventory": "ክምችት",
+      "service_orders": "የአገልግሎት ትዕዛዞች",
+      "access": "መግቢያ"
+    },
     "documents": "ሰነዶች",
-    "settings": "ቅንብሮች",
+    "settings": {
+      "users": "ተጠቃሚዎች",
+      "roles": "ሚናዎች",
+      "branches": "ቅርንጫፎች",
+      "system": "ሲስተም",
+      "user_guide": "የተጠቃሚ መመሪያ"
+    },
     "audit_logs": "የምርመራ መዝገቦች",
     "notifications": "ማሳወቂያዎች",
     "logout": "ውጣ",
@@ -46,7 +60,44 @@
       "audit": "ኦዲት",
       "system": "ሲስተም",
       "administration": "አስተዳደር",
-      "membership": "የአባልነት"
+      "spa_management": "የስፓ አስተዳደር",
+      "membership": "አባልነት",
+      "customers": "ደንበኞች",
+      "operations": "ኦፕሬሽኖች",
+      "gym": "ጂም",
+      "spa": "ስፓ",
+      "inventory": "ክምችት",
+      "staff": "ሰራተኞች",
+      "facilities": "ተቋማት",
+      "reports": "ሪፖርቶች",
+      "settings": "ቅንብሮች",
+      "platform": "የመድረክ አስተዳደር",
+      "access": "መግቢያ",
+      "offering_master": "የአገልግሎት ማስተር"
+    },
+    "section": {
+      "daily_operations": "የዕለት ተዕለት ሥራዎች",
+      "memberships": "አባልነቶች",
+      "billing_pricing": "ክፍያ እና ዋጋ",
+      "access_facilities": "መግቢያ እና ተቋማት"
+    },
+    "spa_management": {
+      "overview": "አጠቃላይ እይታ",
+      "spa_schedule": "የስፓ መርሐግብር",
+      "gym_management": "የጂም አስተዳደር",
+      "attendance": "መገኘት",
+      "members": "አባላት",
+      "plans": "ዕቅዶች",
+      "subscriptions": "ምዝገባዎች",
+      "day_tickets": "የቀን ትኬቶች",
+      "rate_cards": "የዋጋ ካርዶች",
+      "payments": "ክፍያዎች",
+      "facilities": "ተቋማት",
+      "entry_gates": "የመግቢያ በሮች",
+      "rfid_cards": "RFID ካርዶች",
+      "qr_passes": "QR ፓሶች",
+      "visit_sessions": "የጉብኝት ክፍለ ጊዜያት",
+      "access_logs": "የመግቢያ መዝገቦች"
     },
     "sales": {
       "dashboard": "ዳሽቦርድ",
@@ -119,21 +170,83 @@
       "plans": "ዕቅዶች",
       "members": "አባላት",
       "payments": "ክፍያዎች",
-      "parking_dashboard": "የፓርኪንግ ዳሽቦርድ",
-      "zones___lots": "ዞኖች እና ቦታዎች",
-      "slots": "ቦታዎች",
       "gates": "በሮች",
-      "cameras": "ካሜራዎች",
       "customers": "ደንበኞች",
-      "vehicles": "ተሽከርካሪዎች",
       "subscriptions": "ምዝገባዎች",
       "sessions": "ክፍለ ጊዜያት",
-      "rates": "ዋጋዎች",
-      "qr_tickets": "QR ቲኬቶች",
       "rfid_cards": "RFID ካርዶች",
       "access_control": "የመዳረሻ ቁጥጥር",
-      "pos": "POS",
-      "reports": "ሪፖርቶች"
+      "reports": "ሪፖርቶች",
+      "renewals": "እድሳት",
+      "freeze_transfer": "ማቆም / ማስተላለፍ",
+      "memberships_renewals": "አባልነቶች እና እድሳት"
+    },
+    "customers": {
+      "customer_profiles": "የደንበኛ መገለጫዎች",
+      "medical_records": "የሕክምና መዝገቦች",
+      "visit_history": "የጉብኝት ታሪክ",
+      "loyalty": "ታማኝነት",
+      "customer_member_master": "የደንበኛ እና አባል ማስተር"
+    },
+    "operations": {
+      "check_in": "መግቢያ",
+      "appointments": "ቀጠሮዎች",
+      "sessions": "ክፍለ ጊዜያት",
+      "queue": "ወረፋ",
+      "customer_requests": "የደንበኛ ጥያቄዎች",
+      "visits": "ጉብኝቶች",
+      "towel_management": "የፎጣ አስተዳደር",
+      "service_orders": "የአገልግሎት ትዕዛዞች"
+    },
+    "gym": {
+      "trainers": "አሰልጣኞች",
+      "workout_plans": "የእንቅስቃሴ ዕቅዶች",
+      "fitness_assessment": "የአካል ብቃት ግምገማ",
+      "body_measurements": "የሰውነት መለኪያዎች",
+      "classes": "ክፍሎች",
+      "attendance": "መገኘት"
+    },
+    "spa": {
+      "therapists": "ቴራፒስቶች",
+      "treatment_rooms": "የሕክምና ክፍሎች",
+      "bookings": "ቦታ ማስያዣዎች"
+    },
+    "inventory": {
+      "products": "ምርቶች",
+      "consumables": "ፍጆታ ዕቃዎች",
+      "stock_usage": "የክምችት አጠቃቀም",
+      "suppliers": "አቅራቢዎች"
+    },
+    "staff": {
+      "employees": "ሰራተኞች",
+      "schedules": "መርሐግብሮች",
+      "commission": "ኮሚሽን",
+      "performance": "አፈጻጸም"
+    },
+    "facilities": {
+      "lockers": "ሎከሮች",
+      "equipment": "መሣሪያዎች",
+      "maintenance": "ጥገና",
+      "areas_facilities": "አካባቢዎች እና ተቋማት"
+    },
+    "platform": {
+      "admin_dashboard": "የአስተዳዳሪ ዳሽቦርድ",
+      "companies": "ኩባንያዎች",
+      "demo_licenses": "የማሳያ ፈቃዶች",
+      "audit_logs": "የኦዲት መዝገቦች",
+      "manuals": "መመሪያዎች"
+    },
+    "access": {
+      "entry_gates": "የመግቢያ በሮች",
+      "security_cameras": "የደህንነት ካሜራዎች",
+      "member_cards": "የአባል ካርዶች",
+      "access_control": "የመግቢያ ቁጥጥር",
+      "qr_access": "QR መግቢያ",
+      "guest_qr_passes": "የእንግዳ QR ፓሶች",
+      "check_in_kiosk": "የመግቢያ ኪዮስክ"
+    },
+    "offering_master": {
+      "offering_master": "የአገልግሎት ማስተር"
     }
   },
   "common": {

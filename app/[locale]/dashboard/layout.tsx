@@ -5,69 +5,47 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/lib/i18n/LocaleProvider";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { sidebarGroups } from "@/lib/spa-navigation";
 
-const sidebarGroups: any[] = [
-  {
-    name: "Dashboard",
-    icon: "bi-speedometer2",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
-    ]
-  },
-  {
-    name: "Membership",
-    moduleCode: "membership",
-    icon: "bi-person-badge",
-    adminOnly: false,
-    links: [
-      { name: "Dashboard", href: "/dashboard/membership", icon: "bi-speedometer2", adminOnly: false, resource: "membership_members" },
-      { name: "Members", href: "/dashboard/membership/members", icon: "bi-people", adminOnly: false, resource: "membership_members" },
-      { name: "Plans", href: "/dashboard/membership/plans", icon: "bi-layers", adminOnly: false, resource: "membership_plans" },
-      { name: "Subscriptions", href: "/dashboard/membership/subscriptions", icon: "bi-arrow-repeat", adminOnly: false, resource: "membership_subscriptions" },
-      { name: "Rate Cards", href: "/dashboard/membership/rate-cards", icon: "bi-currency-dollar", adminOnly: false, resource: "membership_rate_cards" },
-      { name: "Facilities", href: "/dashboard/membership/facilities", icon: "bi-building", adminOnly: false, resource: "membership_facilities" },
-      { name: "Entry Gates", href: "/dashboard/membership/gates", icon: "bi-door-open", adminOnly: false, resource: "membership_gates" },
-      { name: "RFID Cards", href: "/dashboard/membership/rfid-cards", icon: "bi-credit-card-2-front", adminOnly: false, resource: "membership_rfid_cards" },
-      { name: "QR Passes", href: "/dashboard/membership/qr-passes", icon: "bi-qr-code", adminOnly: false, resource: "membership_qr_passes" },
-      { name: "Spa Schedule", href: "/dashboard/membership/schedule", icon: "bi-calendar-week", adminOnly: false, resource: "membership_appointments" },
-      { name: "Gym Management", href: "/dashboard/membership/gym", icon: "bi-activity", adminOnly: false, resource: "membership_attendance" },
-      { name: "Visit Sessions", href: "/dashboard/membership/sessions", icon: "bi-clock-history", adminOnly: false, resource: "membership_sessions" },
-      { name: "Access Logs", href: "/dashboard/membership/access-logs", icon: "bi-shield-check", adminOnly: false, resource: "membership_access_logs" },
-      { name: "Day Tickets", href: "/dashboard/membership/day-tickets", icon: "bi-ticket-perforated", adminOnly: false, resource: "membership_day_tickets" },
-      { name: "Payments", href: "/dashboard/membership/payments", icon: "bi-credit-card", adminOnly: false, resource: "membership_payments" },
-      { name: "Attendance", href: "/dashboard/membership/attendance", icon: "bi-calendar-check", adminOnly: false, resource: "membership_attendance" },
-    ]
-  },
-  {
-    name: "Audit",
-    moduleCode: "audit",
-    icon: "bi-journal-text",
-    adminOnly: false,
-    links: [
-      { name: "Audit Logs", href: "/dashboard/audit-logs", icon: "bi-journal-text", adminOnly: false, resource: "audit_logs" },
-      { name: "Activity Log", href: "/dashboard/audit/activity", icon: "bi-activity", adminOnly: false, resource: "audit_logs" },
-    ]
-  },
-  {
-    name: "Administration",
-    icon: "bi-shield-lock",
-    adminOnly: true,
-    links: [
-      { name: "Admin Dashboard", href: "/dashboard/admin", icon: "bi-shield-lock", adminOnly: true, superAdminOnly: true, resource: "companies" },
-       { name: "Companies", href: "/dashboard/companies", icon: "bi-building", adminOnly: true, superAdminOnly: true, resource: "companies" },
-       { name: "Demo Licenses", href: "/dashboard/demo-licenses", icon: "bi-key", adminOnly: true, superAdminOnly: true, resource: "demo_licenses" },
-       { name: "Users", href: "/dashboard/users", icon: "bi-people", adminOnly: true, resource: "users" },
-       { name: "Roles & Permissions", href: "/dashboard/roles", icon: "bi-shield-lock", adminOnly: true, resource: "roles" },
-       { name: "Settings", href: "/dashboard/settings", icon: "bi-gear", adminOnly: true, resource: "settings" },
-       { name: "System Settings", href: "/dashboard/system-settings", icon: "bi-gear-wide-connected", adminOnly: true, resource: "settings" },
-       { name: "Documents", href: "/dashboard/documents", icon: "bi-file-text", adminOnly: true, resource: "documents" },
-       { name: "Notifications", href: "/dashboard/notifications", icon: "bi-bell", adminOnly: true, resource: "notifications" },
-       { name: "Manuals", href: "/dashboard/admin/manuals", icon: "bi-journal-bookmark-fill", adminOnly: true, superAdminOnly: true, resource: "documents" },
-       { name: "Issued Licensed Manuals", href: "/dashboard/admin/issued-manuals", icon: "bi-journal-bookmark-fill", adminOnly: true, resource: "documents" },
-    ]
+const toNavSlug = (value: string) => value
+  .trim()
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "_")
+  .replace(/^_+|_+$/g, "");
+
+const NAVIGATION_STORAGE_VERSION = "3";
+
+const SIDEBAR_ACCENTS: Record<string, string> = {
+  Dashboard: "#2f7a57",
+  Access: "#3977b8",
+  Customers: "#168b83",
+  "Offering Master": "#7c58b3",
+  Membership: "#4f67b2",
+  Operations: "#dc7844",
+  Gym: "#d05262",
+  Spa: "#b65b91",
+  Inventory: "#bd862e",
+  Staff: "#2f8b9b",
+  Facilities: "#4d835c",
+  Reports: "#6959a7",
+  Settings: "#637184",
+  Platform: "#8b5967",
+};
+
+const sidebarAccent = (group: string) => SIDEBAR_ACCENTS[group] || "#557463";
+
+const activeGroupForPath = (path: string) => {
+  let match: { name: string; hrefLength: number; direct?: boolean } | null = null;
+  for (const group of sidebarGroups) {
+    for (const link of group.links) {
+      const matches = path === link.href || (link.href !== "/dashboard" && path.startsWith(`${link.href}/`));
+      if (matches && (!match || link.href.length > match.hrefLength)) {
+        match = { name: group.name, hrefLength: link.href.length, direct: group.direct };
+      }
+    }
   }
-];
+  return match;
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -83,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [showSearch, setShowSearch] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [guestPermissions, setGuestPermissions] = useState<Record<string, boolean[]>>({});
+  const [userPermissions, setUserPermissions] = useState<Record<string, boolean[]>>({});
   const searchRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -104,20 +82,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const u = JSON.parse(stored);
       setUser(u);
       const role = (u.role || "").toLowerCase();
-      // Fetch guest permissions for sidebar filtering
-      if (role === "guest" && u.role_id) {
+      // Fetch role permissions for navigation filtering.
+      if (role !== "admin" && role !== "super_admin" && u.role_id) {
         const tok = localStorage.getItem("token");
         fetch(`/api/roles/${u.role_id}/permissions`, { headers: { Authorization: `Bearer ${tok}` } })
           .then(r => r.json())
           .then(data => {
             if (data && typeof data === "object") {
-              setGuestPermissions(data);
-              // Redirect guest to first permitted page if on /dashboard root
-              if (pathname === "/dashboard") {
+              setUserPermissions(data);
+              // Guests start on the first workspace explicitly granted to them.
+              if (role === "guest" && pathname === "/dashboard") {
                 for (const group of sidebarGroups) {
                   for (const link of group.links) {
-                    if (link.separator) continue;
-                    if (link.resource && data[link.resource]?.[0]) {
+                    if (data[link.resource]?.[0]) {
                       router.push(link.href);
                       return;
                     }
@@ -140,14 +117,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           .catch(() => {});
       }
     }
+    const defaultGroups = Object.fromEntries(
+      sidebarGroups.map((group) => [group.name, false])
+    ) as Record<string, boolean>;
+    const activeGroup = activeGroupForPath(pathname);
+    if (activeGroup && !activeGroup.direct) defaultGroups[activeGroup.name] = true;
+
     const saved = localStorage.getItem("sidebarGroups");
-    if (saved) {
-      setOpenGroups(JSON.parse(saved));
+    const savedVersion = localStorage.getItem("sidebarGroupsVersion");
+    if (saved && savedVersion === NAVIGATION_STORAGE_VERSION) {
+      try {
+        const storedGroups = JSON.parse(saved) as Record<string, boolean>;
+        const nextGroups = { ...defaultGroups, ...storedGroups };
+        if (activeGroup && !activeGroup.direct) nextGroups[activeGroup.name] = true;
+        setOpenGroups(nextGroups);
+      } catch {
+        setOpenGroups(defaultGroups);
+      }
     } else {
-      const initial: Record<string, boolean> = {};
-      sidebarGroups.forEach(g => { initial[g.name] = true; });
-      setOpenGroups(initial);
+      setOpenGroups(defaultGroups);
     }
+    localStorage.setItem("sidebarGroupsVersion", NAVIGATION_STORAGE_VERSION);
   }, [router]);
 
   useEffect(() => {
@@ -155,6 +145,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       localStorage.setItem("sidebarGroups", JSON.stringify(openGroups));
     }
   }, [openGroups]);
+
+  useEffect(() => {
+    const activeGroup = activeGroupForPath(pathname);
+    if (!activeGroup || activeGroup.direct) return;
+    setOpenGroups((current) => current[activeGroup.name]
+      ? current
+      : { ...current, [activeGroup.name]: true });
+  }, [pathname]);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -209,10 +207,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (pathname === href) return true;
     if (href === "/dashboard" || !pathname.startsWith(`${href}/`)) return false;
 
-    // Keep parent links (for example Membership Dashboard) from appearing active
-    // when a more specific workspace page owns the current path.
+    // Keep overview links from appearing active when a more specific spa
+    // workspace owns the current path.
     const hasMoreSpecificMatch = sidebarGroups.some((group) =>
-      group.links.some((link: any) => typeof link.href === "string" && link.href !== href && link.href.length > href.length &&
+      group.links.some((link) => link.href !== href && link.href.length > href.length &&
         (pathname === link.href || pathname.startsWith(`${link.href}/`)))
     );
     return !hasMoreSpecificMatch;
@@ -227,47 +225,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : "?";
 
-  const navKey = (group: string, link: string): string => {
-    const g = group.toLowerCase().replace(/-/g, "_");
-    const l = link.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
-    return `nav.${g}.${l}`;
+  const translatedLabel = (key: string, fallback: string): string => {
+    const label = t(key);
+    return label !== key ? label : fallback;
   };
+
+  const groupKey = (group: string): string => `nav.group.${toNavSlug(group)}`;
+  const navKey = (group: string, link: string): string =>
+    group === "Dashboard" && link === "Dashboard"
+      ? "nav.dashboard"
+      : `nav.${toNavSlug(group)}.${toNavSlug(link)}`;
 
   const isAdmin = user?.role === "admin" || user?.role === "super_admin";
   const isSuper = user?.role === "super_admin";
-  const isGuest = user?.role === "guest";
 
   const hasPermission = (resource: string): boolean => {
-    if (!isGuest) return true;
-    const perms = guestPermissions[resource];
+    if (isAdmin) return true;
+    const perms = userPermissions[resource];
     if (!perms) return false;
     return perms[0] === true; // can_view is index 0
   };
 
-  const visibleGroups = sidebarGroups.filter(g => {
-    if (g.adminOnly && !isAdmin) return false;
-    if (g.moduleCode && !licensedModules.includes(g.moduleCode) && !isSuper) return false;
+  const visibleGroups = sidebarGroups.filter((group) => {
+    if (group.adminOnly && !isAdmin) return false;
+    if (group.superAdminOnly && !isSuper) return false;
+    if (group.moduleCode && !licensedModules.includes(group.moduleCode) && !isSuper) return false;
     return true;
-  }).map(g => {
-    if (!isGuest) return g;
-    const filteredLinks = g.links.filter((link: any) => {
-      if (link.separator) return true;
+  }).map((group) => ({
+    ...group,
+    links: group.links.filter((link) => {
+      if (link.adminOnly && !isAdmin) return false;
       if (link.superAdminOnly && !isSuper) return false;
-      if (link.resource && !hasPermission(link.resource)) return false;
+      if (user && !isAdmin && !hasPermission(link.resource)) return false;
       return true;
-    });
-    return { ...g, links: filteredLinks };
-  }).filter(g => {
-    const nonSepLinks = g.links.filter((l: any) => !l.separator);
-    return nonSepLinks.length > 0;
-  });
+    }),
+  })).filter((group) => group.links.length > 0);
 
   const pageTitle = (() => {
+    if (pathname === "/dashboard/membership") return translatedLabel("nav.group.spa_management", "Spa Management");
     for (const group of sidebarGroups) {
       for (const link of group.links) {
         if (link.adminOnly && !isAdmin) continue;
         if (link.superAdminOnly && !isSuper) continue;
-        if (isActive(link.href)) return group.name + " / " + link.name;
+        if (isActive(link.href)) {
+          const linkLabel = translatedLabel(navKey(group.name, link.name), link.name);
+          return group.direct
+            ? linkLabel
+            : `${translatedLabel(groupKey(group.name), group.name)} / ${linkLabel}`;
+        }
       }
     }
     return "Workspace";
@@ -305,69 +310,80 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
 
         {/* Sidebar Navigation */}
-        <nav className="sidebar-nav">
-          {visibleGroups.map((group) => (
-            <div key={group.name} className="sidebar-group">
-              <div
-                className="sidebar-group-label"
-                onClick={() => toggleGroup(group.name)}
-              >
-                <span className="d-flex align-items-center gap-2">
-                  <i className={`bi ${group.icon}`}></i>
-                  <span className="group-text">{t(group.name === "E-Commerce" ? "nav.group.e_commerce" : group.name === "Administration" ? "nav.group.administration" : `nav.group.${group.name.toLowerCase()}`)}</span>
-                </span>
-                <i className={`bi bi-chevron-down sidebar-group-icon ${openGroups[group.name] ? "open" : ""}`}></i>
-              </div>
-              {openGroups[group.name] && (
-                <div className="ms-1">
-                  {group.links
-                    .filter((link: any) => {
-                      if (link.superAdminOnly && !isSuper) return false;
-                      if (isGuest && link.resource && !hasPermission(link.resource)) return false;
-                      return true;
-                    })
-                    .map((link: any, idx: number) =>
-                      link.separator ? (
-                        <div key={`sep-${idx}`} className="px-2 py-1 mt-2 mb-1">
-                          <small className="text-muted text-uppercase fw-bold" style={{ fontSize: "10px", letterSpacing: "1px" }}>{link.label}</small>
-                        </div>
-                      ) : link.target === "_blank" ? (
-                        <a
-                          key={link.href}
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
-                        >
-                          <i className={`bi ${link.icon}`}></i>
-                          <span className="flex-grow-1 text-truncate">{(() => {
-                            const key = navKey(group.name, link.name);
-                            const label = t(key);
-                            return label !== key ? label : link.name;
-                          })()}</span>
-                          <i className="bi bi-box-arrow-up-right link-arrow" style={{ fontSize: "10px", opacity: 0.5 }}></i>
-                        </a>
-                      ) : (
+        <nav className="sidebar-nav" aria-label="Spa management navigation">
+          {visibleGroups.map((group) => {
+            if (group.direct) {
+              const link = group.links[0];
+              const label = translatedLabel(navKey(group.name, link.name), link.name);
+              return (
+                <div key={group.name} className="sidebar-group sidebar-direct-group" style={{ "--group-accent": sidebarAccent(group.name) } as React.CSSProperties}>
+                  <Link
+                    href={link.href}
+                    className={`sidebar-link sidebar-direct-link ${isActive(link.href) ? "active" : ""}`}
+                    onClick={closeSidebar}
+                    title={label}
+                  >
+                    <i className={`bi ${link.icon}`}></i>
+                    <span className="flex-grow-1 text-truncate">{label}</span>
+                  </Link>
+                </div>
+              );
+            }
+
+            return (
+              <div key={group.name} className="sidebar-group" style={{ "--group-accent": sidebarAccent(group.name) } as React.CSSProperties}>
+                <button
+                  type="button"
+                  className={`sidebar-group-label ${group.links.some((link) => isActive(link.href)) ? "has-active-link" : ""}`}
+                  onClick={() => toggleGroup(group.name)}
+                  aria-expanded={Boolean(openGroups[group.name])}
+                  aria-controls={`sidebar-group-${toNavSlug(group.name)}`}
+                  title={translatedLabel(groupKey(group.name), group.name)}
+                >
+                  <span className="d-flex align-items-center gap-2">
+                    <i className={`bi ${group.icon} sidebar-group-symbol`}></i>
+                    <span className="group-text">{translatedLabel(groupKey(group.name), group.name)}</span>
+                  </span>
+                  <i className={`bi bi-chevron-down sidebar-group-icon ${openGroups[group.name] ? "open" : ""}`}></i>
+                </button>
+                {openGroups[group.name] && (
+                  <div id={`sidebar-group-${toNavSlug(group.name)}`} className="ms-1">
+                    {group.links.map((link) => {
+                      const label = translatedLabel(navKey(group.name, link.name), link.name);
+                      if (link.target === "_blank") {
+                        return (
+                          <a
+                            key={link.href}
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
+                            title={label}
+                          >
+                            <i className={`bi ${link.icon}`}></i>
+                            <span className="flex-grow-1 text-truncate">{label}</span>
+                            <i className="bi bi-box-arrow-up-right link-arrow" style={{ fontSize: "10px", opacity: 0.5 }}></i>
+                          </a>
+                        );
+                      }
+                      return (
                         <Link
                           key={link.href}
                           href={link.href}
                           className={`sidebar-link ${isActive(link.href) ? "active" : ""}`}
                           onClick={closeSidebar}
-                          title={link.name}
+                          title={label}
                         >
                           <i className={`bi ${link.icon}`}></i>
-                          <span className="flex-grow-1 text-truncate">{(() => {
-                            const key = navKey(group.name, link.name);
-                            const label = t(key);
-                            return label !== key ? label : link.name;
-                          })()}</span>
+                          <span className="flex-grow-1 text-truncate">{label}</span>
                         </Link>
-                      )
-                    )}
-                </div>
-              )}
-            </div>
-          ))}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* Sidebar User */}
@@ -504,11 +520,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <i className={`bi ${theme === "light" ? "bi-moon-stars" : "bi-sun"} fs-5`}></i>
               </button>
 
-              {/* Notifications */}
-              <div className="d-none d-md-flex">
-                <button className="theme-toggle" title="Notifications">
+              {/* Help & notifications */}
+              <div className="d-none d-md-flex gap-1">
+                <Link href="/dashboard/guide" className="theme-toggle" title="User Guide" aria-label="Open user guide">
+                  <i className="bi bi-question-circle fs-5"></i>
+                </Link>
+                <Link href="/dashboard/notifications" className="theme-toggle" title="Notifications" aria-label="Open notifications">
                   <i className="bi bi-bell fs-5"></i>
-                </button>
+                </Link>
               </div>
 
               {/* User info */}

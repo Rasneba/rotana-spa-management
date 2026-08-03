@@ -77,12 +77,13 @@ const moduleDocs: Record<string, { name: string; icon: string; description: stri
     ],
   },
   membership: {
-    name: "Membership", icon: "bi-layers",
-    description: "Membership plans, member registration, and payment tracking",
+    name: "Spa Management", icon: "bi-flower1",
+    description: "Customer visits, appointments, treatments, inventory and draft service-order handoff",
     docs: [
-      { title: "Membership Plans", content: "Create and manage membership plans (gym, parking, club)." },
-      { title: "Member Management", content: "Register and manage members with plan assignments." },
-      { title: "Payment Recording", content: "Record membership payments with receipt tracking." },
+      { title: "Canonical Masters", content: "Create each person once in Customer & Member Master. Classify plans, services and packages in the single Offering Master. Pricing and payment remain in the separate POS." },
+      { title: "Visit & Treatment Workflow", content: "Check in customers, assign therapists, start treatment and record every service used." },
+      { title: "Service Order Draft", content: "Finish treatment and print an 80 mm price-free service order for the customer to take to the separate cashier." },
+      { title: "System Boundary", content: "The Spa system never calculates tax, accepts payment, creates invoices, or connects to the Sales/POS database." },
     ],
   },
   audit: {

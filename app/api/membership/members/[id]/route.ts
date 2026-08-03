@@ -8,11 +8,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   try {
     const result = await pool.query(
-      `SELECT mm.*, mp.name as plan_name, mp.type as plan_type,
-        mp.price as plan_price, mp.duration_days as plan_duration
+      `SELECT mm.*,
+              COALESCE(o.title,mp.name) AS plan_name,
+              COALESCE(o.details->>'classification',mp.type) AS plan_type,
+              COALESCE(NULLIF(o.details->>'validity_days','')::int,mp.duration_days) AS plan_duration,
+              o.details->>'offering_code' AS offering_code
        FROM membership_members mm
-       LEFT JOIN membership_plans mp ON mm.plan_id = mp.id
-       WHERE mm.id = $1`, [id]
+       LEFT JOIN spa_management_records o
+         ON o.id=mm.offering_id AND o.module_key='catalog/offerings' AND o.deleted_at IS NULL
+       LEFT JOIN membership_plans mp ON mm.plan_id=mp.id
+       WHERE mm.id=$1`, [id]
     );
     if (result.rows.length === 0) return NextResponse.json({ error: "Member not found" }, { status: 404 });
     return NextResponse.json(result.rows[0]);
@@ -27,7 +32,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const { id } = await params;
   try {
     const body = await req.json();
-    const allowed = ["customer_id","plan_id","full_name","phone","email","id_number","address","photo_url","qr_code","start_date","end_date","status","notes"];
+    const allowed = ["customer_id","offering_id","full_name","phone","email","id_number","address","photo_url","qr_code","classification","start_date","end_date","status","notes"];
     const sets: string[] = [];
     const vals: any[] = [];
     let idx = 1;

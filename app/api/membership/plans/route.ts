@@ -1,44 +1,40 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { withAuth, ok, created, err, badRequest } from "@/lib/api-utils";
+import { err, ok, withAuth } from "@/lib/api-utils";
 import { requirePermission } from "@/lib/permissions";
 
 export async function GET(req: Request) {
   return withAuth(req, async (user) => {
-    const { allowed } = await requirePermission(user, "view", "membership_plans");
+    const { allowed } = await requirePermission(user, "view", "catalog_offerings");
     if (!allowed) return NextResponse.json({ error: "Permission denied" }, { status: 403 });
     try {
       const result = await pool.query(
-        `SELECT mp.*,
-          (SELECT COUNT(*) FROM membership_members WHERE plan_id = mp.id) as member_count
-         FROM membership_plans mp
-         WHERE mp.company_id = $1
-         ORDER BY mp.type, mp.name`,
+        `SELECT id, title AS name,
+                details->>'offering_code' AS code,
+                details->>'category' AS type,
+                NULLIF(details->>'validity_days','')::int AS duration_days,
+                NULLIF(details->>'usage_limit','')::int AS max_members,
+                details->>'description' AS description,
+                status='active' AS is_active,
+                0::numeric AS price,
+                created_at, updated_at
+         FROM spa_management_records
+         WHERE company_id=$1 AND module_key='catalog/offerings'
+           AND details->>'classification'='membership_plan'
+           AND deleted_at IS NULL
+         ORDER BY title`,
         [user.company_id]
       );
       return ok(result.rows);
-    } catch (e: any) {
-      return err(e.message);
+    } catch (error) {
+      return err(error instanceof Error ? error.message : "Unable to load membership offerings");
     }
   });
 }
 
-export async function POST(req: Request) {
-  return withAuth(req, async (user) => {
-    const { allowed } = await requirePermission(user, "create", "membership_plans");
-    if (!allowed) return NextResponse.json({ error: "Permission denied" }, { status: 403 });
-    try {
-      const body = await req.json();
-      const { name, type, description, duration_days, price, max_members } = body;
-      if (!name) return badRequest("Plan name is required");
-      const result = await pool.query(
-        `INSERT INTO membership_plans (company_id, name, type, description, duration_days, price, max_members)
-         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-        [user.company_id, name, type || "general", description, duration_days || 30, price || 0, max_members || null]
-      );
-      return created(result.rows[0]);
-    } catch (e: any) {
-      return err(e.message);
-    }
-  });
+export async function POST() {
+  return NextResponse.json(
+    { error: "Membership plans are managed in the classified Offering Master. Use /api/spa/catalog/offerings." },
+    { status: 410 }
+  );
 }

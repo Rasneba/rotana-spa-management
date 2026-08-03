@@ -11,11 +11,10 @@ export async function GET(req: Request) {
       const filter = isSuper ? "" : cid ? `WHERE company_id = ${cid}` : "WHERE 1=0";
       const memberFilter = isSuper ? "" : cid ? `AND m.company_id = ${cid}` : "AND 1=0";
 
-      const [totalMembers, activeMembers, todayCheckIns, totalRevenue, recentMembers] = await Promise.all([
+      const [totalMembers, activeMembers, todayCheckIns, recentMembers] = await Promise.all([
         pool.query(`SELECT COUNT(*) FROM membership_members m ${filter.replace("WHERE", "WHERE m.")}`),
         pool.query(`SELECT COUNT(*) FROM membership_members m WHERE m.status = 'active' ${memberFilter}`),
         pool.query(`SELECT COUNT(*) FROM membership_attendance WHERE date = $1 AND check_out IS NULL`, [today]),
-        pool.query(`SELECT COALESCE(SUM(amount), 0) FROM membership_payments p ${filter.replace("WHERE", "WHERE p.")}`),
         pool.query(`SELECT m.*, mp.name as plan_name FROM membership_members m LEFT JOIN membership_plans mp ON m.plan_id = mp.id ${filter.replace("WHERE", "WHERE m.")} ORDER BY m.created_at DESC LIMIT 5`),
       ]);
 
@@ -23,7 +22,6 @@ export async function GET(req: Request) {
         totalMembers: parseInt(totalMembers.rows[0].count),
         activeMembers: parseInt(activeMembers.rows[0].count),
         todayCheckIns: parseInt(todayCheckIns.rows[0].count),
-        totalRevenue: parseFloat(totalRevenue.rows[0].coalesce),
         recentMembers: recentMembers.rows,
       });
     } catch (e: any) {

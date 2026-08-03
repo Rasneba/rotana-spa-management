@@ -108,9 +108,9 @@ export default function IdDefinitionsPage() {
       member: "{PREFIX}{SEP}{SEQ} → MEM-00001",
       employee: "{PREFIX}{SEP}{SEQ} → EMP-00001",
       voucher: "{PREFIX}{SEP}{SEQ}{SEP}{SUFFIX} → VCH-00001-HO",
-      parking_session: "{PREFIX}{SEP}{SEQ} → PK-000001",
-      qr_ticket: "{PREFIX}{SEP}{SEQ} → QR-000001",
-      invoice: "{PREFIX}{SEP}{SEQ} → INV-00001",
+      spa_visit: "{PREFIX}{SEP}{SEQ} → SPA-000001",
+      qr_pass: "{PREFIX}{SEP}{SEQ} → QR-000001",
+      service_order: "{PREFIX}{SEP}{SEQ} → SO-000001",
     };
     return hints[et] || "{PREFIX}{SEP}{SEQ} → PREFIX-00001";
   };

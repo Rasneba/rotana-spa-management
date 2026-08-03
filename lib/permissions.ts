@@ -3,40 +3,7 @@ import type { AuthUser } from "@/lib/api-utils";
 
 export type PermissionAction = "view" | "create" | "edit" | "delete" | "approve";
 
-export const RESOURCE_GROUPS: Record<string, { label: string; resources: string[] }> = {
-  "Membership": {
-    label: "Membership",
-    resources: [
-      "membership_plans", "membership_members", "membership_payments", "membership_attendance",
-      "membership_subscriptions", "membership_rate_cards", "membership_facilities",
-      "membership_gates", "membership_rfid_cards", "membership_qr_passes",
-      "membership_sessions", "membership_access_logs", "membership_day_tickets",
-      "membership_appointments",
-    ],
-  },
-
-  "System": {
-    label: "System",
-    resources: [
-      "users", "roles", "settings", "id_definitions", "notifications",
-      "documents", "reports", "audit_logs",
-      "companies", "modules", "demo_licenses",
-    ],
-  },
-};
-
-export function getAllResources(): string[] {
-  return Object.values(RESOURCE_GROUPS).flatMap((g) => g.resources);
-}
-
-export function getDefaultPermissions(): Record<string, boolean[]> {
-  const all: Record<string, boolean[]> = {};
-  const defaultActions = [false, false, false, false, false];
-  for (const res of getAllResources()) {
-    all[res] = [...defaultActions];
-  }
-  return all;
-}
+export { RESOURCE_GROUPS, getAllResources, getDefaultPermissions } from "@/lib/permission-defs";
 
 export function actionsToBits(actions: PermissionAction[]): boolean[] {
   const all: PermissionAction[] = ["view", "create", "edit", "delete", "approve"];
