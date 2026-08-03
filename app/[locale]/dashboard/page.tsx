@@ -11,7 +11,8 @@ const modules = [
 
 const quickActions = [
   { label: "New Visit", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits", color: "primary" },
-  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/operations/appointments", color: "success" },
+  { label: "New Booking", icon: "bi-calendar-plus", href: "/dashboard/spa/spa/bookings", color: "success" },
+  { label: "Website Requests", icon: "bi-globe2", href: "/dashboard/spa/operations/website-requests", color: "danger" },
   { label: "Customers", icon: "bi-people", href: "/dashboard/spa/customers/profiles", color: "info" },
   { label: "Service Orders", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders", color: "warning" },
 ];
@@ -95,6 +96,7 @@ export default function Dashboard() {
     { title: "Today's Visits", value: stats.todayVisits || 0, color: "text-success", icon: "bi-person-walking", href: "/dashboard/spa/operations/visits" },
     { title: "In Treatment", value: stats.inTreatment || 0, color: "text-warning", icon: "bi-flower1", href: "/dashboard/spa/operations/visits" },
     { title: "Draft Orders", value: stats.draftOrders || 0, color: "text-info", icon: "bi-receipt-cutoff", href: "/dashboard/spa/operations/service-orders" },
+    { title: "Web Requests", value: stats.websiteRequests || 0, color: "text-danger", icon: "bi-globe2", href: "/dashboard/spa/operations/website-requests" },
   ];
 
   return (

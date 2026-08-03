@@ -13,6 +13,8 @@ type BookingForm = {
   treatment: string;
   preferred_at: string;
   notes: string;
+  notification_channel: string;
+  notification_contact: string;
 };
 
 type NavItem = { label: string; id: string };
@@ -170,7 +172,7 @@ const reviews = [
 ];
 
 const rituals = ["Moroccan Bath", "Massage", "Facial", "Wax", "Hair Salon", "Manicure", "Pedicure"];
-const initialForm: BookingForm = { full_name: "", phone: "", email: "", branch: "", treatment: "", preferred_at: "", notes: "" };
+const initialForm: BookingForm = { full_name: "", phone: "", email: "", branch: "", treatment: "", preferred_at: "", notes: "", notification_channel: "whatsapp", notification_contact: "" };
 
 function handleTilt(event: React.MouseEvent<HTMLElement>) {
   const rect = event.currentTarget.getBoundingClientRect();
@@ -415,6 +417,8 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
           <label><span>{t.fields.full_name}</span><input required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></label>
           <label><span>{t.fields.phone}</span><input required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></label>
           <label><span>{t.fields.email}</span><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></label>
+          <label><span>{lang === "am" ? "ማረጋገጫ መቀበያ" : "Approval notification"}</span><select required value={form.notification_channel} onChange={(e) => setForm({ ...form, notification_channel: e.target.value })}><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option><option value="sms">SMS</option><option value="email">Email</option><option value="phone">Phone call</option></select></label>
+          <label><span>{lang === "am" ? "የማሳወቂያ አድራሻ" : "Notification contact"}</span><input required placeholder={form.notification_channel === "email" ? "you@example.com" : "+251..."} value={form.notification_contact} onChange={(e) => setForm({ ...form, notification_contact: e.target.value })} /></label>
           <label><span>{t.fields.branch}</span><select required value={form.branch} onChange={(e) => setForm({ ...form, branch: e.target.value })}><option value="">Select</option>{branchOptions.map((branch) => <option key={branch}>{branch}</option>)}</select></label>
           <label><span>{t.fields.treatment}</span><select required value={form.treatment} onChange={(e) => setForm({ ...form, treatment: e.target.value })}><option value="">Select</option>{treatmentOptions.map((treatment) => <option key={treatment}>{treatment}</option>)}</select></label>
           <label><span>{t.fields.preferred_at}</span><input required type="datetime-local" value={form.preferred_at} onChange={(e) => setForm({ ...form, preferred_at: e.target.value })} /></label>

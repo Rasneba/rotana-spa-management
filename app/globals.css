@@ -2637,3 +2637,6 @@ textarea.form-control {
   .dagi-site-v2 .dagi-section { scroll-margin-top:145px; }
   .dagi-map-card iframe { height:220px; }
 }
+
+.horizontal-booking-event.from-web { box-shadow:0 0 0 2px rgba(13,110,253,.22), 0 14px 32px rgba(13,110,253,.18); }
+.horizontal-booking-event.from-web::after { content:"WEB"; position:absolute; top:4px; right:6px; font-size:.58rem; font-weight:900; letter-spacing:.08em; background:rgba(255,255,255,.92); color:#0d6efd; border-radius:999px; padding:.12rem .32rem; }

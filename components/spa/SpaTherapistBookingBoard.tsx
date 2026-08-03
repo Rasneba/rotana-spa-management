@@ -36,6 +36,7 @@ type Booking = {
   duration_minutes?: number;
   status: string;
   notes?: string | null;
+  website_request_id?: number | null;
 };
 type Capabilities = { create: boolean; edit: boolean; delete: boolean };
 type FormState = {
@@ -336,7 +337,7 @@ export default function SpaTherapistBookingBoard() {
                         const end = minutesFor(booking.ends_at);
                         const left = ((start - DAY_START * 60) / SLOT_MINUTES) * SLOT_WIDTH;
                         const width = Math.max(SLOT_WIDTH, ((end - start) / SLOT_MINUTES) * SLOT_WIDTH - 5);
-                        return <button type="button" key={booking.id} className={`horizontal-booking-event ${statusClass(booking.status)}`} style={{ left: Math.max(0, left), width }} onClick={() => openEdit(booking)}><strong>{booking.member_name || booking.guest_name || "Guest"}</strong><span>{inputTime(booking.starts_at)}–{inputTime(booking.ends_at)}</span><em>{amharicTime(booking.starts_at)}–{amharicTime(booking.ends_at)}</em><small>{booking.offering_name || booking.service_name}</small></button>;
+                        return <button type="button" key={booking.id} className={`horizontal-booking-event ${statusClass(booking.status)} ${booking.website_request_id ? "from-web" : ""}`} style={{ left: Math.max(0, left), width }} onClick={() => openEdit(booking)}><strong>{booking.member_name || booking.guest_name || "Guest"}</strong><span>{inputTime(booking.starts_at)}–{inputTime(booking.ends_at)}</span><em>{amharicTime(booking.starts_at)}–{amharicTime(booking.ends_at)}</em><small>{booking.website_request_id ? "🌐 Web · " : ""}{booking.offering_name || booking.service_name}</small></button>;
                       })}
                     </div>
                   </div>

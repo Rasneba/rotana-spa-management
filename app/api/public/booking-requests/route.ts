@@ -36,6 +36,9 @@ export async function POST(req: Request) {
     const preferredAt = text(body.preferred_at, 80);
     const notes = text(body.notes, 2000);
     const locale = text(body.locale, 10) || "en";
+    const requestedChannel = text(body.notification_channel, 20) || "phone";
+    const notificationChannel = ["phone", "sms", "telegram", "whatsapp", "email"].includes(requestedChannel) ? requestedChannel : "phone";
+    const notificationContact = text(body.notification_contact, 200) || (notificationChannel === "email" ? email : phone);
 
     if (!fullName) return badRequest("Full name is required");
     if (!phone) return badRequest("Phone is required");
@@ -43,23 +46,31 @@ export async function POST(req: Request) {
     if (!treatment) return badRequest("Treatment is required");
     if (!preferredAt || Number.isNaN(Date.parse(preferredAt))) return badRequest("Preferred date/time is required");
     if (!validEmail(email)) return badRequest("Enter a valid email address");
+    if (notificationChannel === "email" && !validEmail(notificationContact)) return badRequest("Enter a valid notification email");
+    if (!notificationContact) return badRequest("Notification contact is required");
 
     const companyId = await getPublicCompanyId();
     if (!companyId) return err("No active company is configured for public bookings", 503);
 
     const result = await pool.query(
       `INSERT INTO website_booking_requests
-        (company_id, full_name, phone, email, branch, treatment, preferred_at, notes, locale, source, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7::timestamp,$8,$9,'public_website','new')
+        (company_id, full_name, phone, email, branch, treatment, preferred_at, notes, locale, source, status, notification_channel, notification_contact)
+       VALUES ($1,$2,$3,$4,$5,$6,$7::timestamp,$8,$9,'public_website','new',$10,$11)
        RETURNING id, status, created_at`,
-      [companyId, fullName, phone, email || null, branch, treatment, preferredAt, notes || null, locale]
+      [companyId, fullName, phone, email || null, branch, treatment, preferredAt, notes || null, locale, notificationChannel, notificationContact]
     );
+
+    await pool.query(
+      `INSERT INTO notifications (company_id, title, message, type)
+       VALUES ($1,'New website booking request',$2,'info')`,
+      [companyId, `${fullName} requested ${treatment} at ${branch}. Open Operations → Website Requests to approve and assign a therapist.`]
+    ).catch(() => undefined);
 
     return created({ request: result.rows[0] });
   } catch (error) {
     const code = typeof error === "object" && error && "code" in error ? String((error as { code?: unknown }).code) : "";
-    if (code === "42P01") {
-      return NextResponse.json({ error: "Apply db-migration-v38.sql before using public booking requests." }, { status: 503 });
+    if (code === "42P01" || code === "42703") {
+      return NextResponse.json({ error: "Apply db-migration-v38.sql and db-migration-v39.sql before using public booking requests." }, { status: 503 });
     }
     return err(error instanceof Error ? error.message : "Unable to create booking request");
   }
