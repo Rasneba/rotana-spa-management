@@ -2657,3 +2657,13 @@ textarea.form-control {
 .spa-sales-totals label, .spa-sales-payment label { display:grid; gap:.35rem; color:#475569; font-weight:800; }
 .spa-sales-totals strong { margin-left:auto; font-size:1.35rem; color:#143d2c; }
 @media (max-width:720px){ .spa-sales-line { grid-template-columns:1fr; } .spa-sales-line span { text-align:left; } .spa-sales-totals strong { margin-left:0; width:100%; } }
+
+.membership-action-row { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
+.membership-action-row button { border:1px solid rgba(15,23,42,.12); background:#fff; color:#143d2c; border-radius:.65rem; padding:.38rem .55rem; font-weight:800; display:inline-flex; align-items:center; gap:.25rem; }
+.membership-action-row button:hover { background:#eef7f1; }
+.membership-action-row button.danger { color:#b42318; }
+.membership-qr-modal { max-width:420px; }
+.membership-qr-body { display:grid; place-items:center; gap:.65rem; padding:1.5rem; text-align:center; }
+.membership-qr-body img { width:260px; max-width:100%; border-radius:1rem; box-shadow:0 18px 45px rgba(15,23,42,.12); }
+.membership-qr-body strong { color:#143d2c; font-size:1.1rem; }
+.membership-qr-body span { color:#647067; }
