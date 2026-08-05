@@ -8,6 +8,7 @@
         "start": "next start",
         "lint": "eslint",
         "relay": "node scripts/local-relay.mjs",
+        "access-relay": "node scripts/dagi-access-relay.mjs",
         "clean": "rmdir /s /q .next 2>nul & echo Cache cleared. Restart with: npm run dev",
         "clean:full": "rmdir /s /q .next 2>nul & rmdir /s /q node_modules 2>nul & npm install"
     },

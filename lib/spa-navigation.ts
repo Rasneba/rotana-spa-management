@@ -83,6 +83,7 @@ export const sidebarGroups: SidebarGroup[] = [
       { name: "Website Requests", href: "/dashboard/spa/operations/website-requests", icon: "bi-globe2", resource: "website_requests" },
       { name: "Towel Management", href: "/dashboard/spa/operations/towel-management", icon: "bi-layers", resource: "spa_towels" },
       { name: "Service Orders", href: "/dashboard/spa/operations/service-orders", icon: "bi-receipt-cutoff", resource: "spa_service_orders" },
+      { name: "Spa Sales / POS", href: "/dashboard/spa/sales", icon: "bi-shop", resource: "spa_sales" },
     ],
   },
   {
