@@ -103,11 +103,11 @@ export default function ServiceOrdersWorkspace() {
   return (
     <div className="spa-workspace-page service-orders-page">
       <header className="spa-workspace-header">
-        <div className="spa-workspace-heading"><span className="spa-workspace-icon"><i className="bi bi-receipt-cutoff" /></span><div><p>Operational Handoff</p><h1>Service Orders</h1><span>Draft treatment slips for the separate Sales/POS cashier. No prices, payment, tax or invoices are created here.</span></div></div>
-        <Link href="/dashboard/spa/operations/visits" className="spa-primary-button"><i className="bi bi-person-walking" /> Open Visits</Link>
+        <div className="spa-workspace-heading"><span className="spa-workspace-icon"><i className="bi bi-receipt-cutoff" /></span><div><p>Operational Handoff</p><h1>Service Orders</h1><span>Draft treatment slips for Spa Sales / POS. Cashier converts handed-off orders, prices services, and collects payment.</span></div></div>
+        <div className="spa-workspace-actions"><Link href="/dashboard/spa/sales" className="spa-secondary-button"><i className="bi bi-shop" /> Spa Sales / POS</Link><Link href="/dashboard/spa/operations/visits" className="spa-primary-button"><i className="bi bi-person-walking" /> Open Visits</Link></div>
       </header>
 
-      <div className="pos-boundary-banner"><i className="bi bi-shield-check" /><div><strong>Separate-system boundary</strong><span>These drafts are operational references only. The cashier enters services, calculates prices and collects payment in the separate POS application.</span></div></div>
+      <div className="pos-boundary-banner"><i className="bi bi-shield-check" /><div><strong>Spa Sales handoff</strong><span>Print and hand off the draft, then open Spa Sales / POS to convert it into an invoice and collect cash or AddisPay payment.</span></div></div>
       {error && <div className="spa-workspace-alert danger" role="alert"><i className="bi bi-exclamation-circle" />{error}</div>}
 
       <section className="spa-workspace-summary spa-service-order-summary">

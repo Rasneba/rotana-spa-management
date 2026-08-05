@@ -2642,3 +2642,18 @@ textarea.form-control {
 .horizontal-booking-event.from-web::after { content:"WEB"; position:absolute; top:4px; right:6px; font-size:.58rem; font-weight:900; letter-spacing:.08em; background:rgba(255,255,255,.92); color:#0d6efd; border-radius:999px; padding:.12rem .32rem; }
 
 .dagi-field-help { color:#6c776f; font-size:.78rem; line-height:1.35; font-weight:700; }
+
+.spa-ready-order-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; padding:1rem; }
+.spa-ready-order-grid article { border:1px solid rgba(15,23,42,.1); border-radius:1.2rem; padding:1rem; background:linear-gradient(135deg, rgba(255,255,255,.96), rgba(245,250,247,.92)); box-shadow:0 18px 45px rgba(15,23,42,.08); }
+.spa-ready-order-grid article span { color:#8a6a2a; font-weight:900; font-size:.78rem; letter-spacing:.08em; }
+.spa-ready-order-grid article h3 { margin:.25rem 0; color:#143d2c; font-size:1.15rem; font-weight:900; }
+.spa-ready-order-grid article p { color:#647067; margin-bottom:1rem; }
+.spa-sales-modal { max-width:980px; }
+.spa-sales-lines { display:grid; gap:.65rem; padding:1rem 1.25rem; }
+.spa-sales-line { display:grid; grid-template-columns:minmax(180px,1fr) 90px 130px 130px; gap:.65rem; align-items:center; padding:.7rem; border:1px solid rgba(15,23,42,.08); border-radius:1rem; background:#fff; }
+.spa-sales-line input, .spa-sales-totals input, .spa-sales-payment input { border:1px solid rgba(15,23,42,.16); border-radius:.8rem; padding:.65rem .75rem; }
+.spa-sales-line span { text-align:right; font-weight:900; color:#143d2c; }
+.spa-sales-totals, .spa-sales-payment { display:flex; flex-wrap:wrap; gap:1rem; align-items:end; padding:0 1.25rem 1rem; }
+.spa-sales-totals label, .spa-sales-payment label { display:grid; gap:.35rem; color:#475569; font-weight:800; }
+.spa-sales-totals strong { margin-left:auto; font-size:1.35rem; color:#143d2c; }
+@media (max-width:720px){ .spa-sales-line { grid-template-columns:1fr; } .spa-sales-line span { text-align:left; } .spa-sales-totals strong { margin-left:0; width:100%; } }
