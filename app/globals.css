@@ -2667,3 +2667,38 @@ textarea.form-control {
 .membership-qr-body img { width:260px; max-width:100%; border-radius:1rem; box-shadow:0 18px 45px rgba(15,23,42,.12); }
 .membership-qr-body strong { color:#143d2c; font-size:1.1rem; }
 .membership-qr-body span { color:#647067; }
+
+/* Comfortable 100% browser scale: larger UI without overlap/cropping */
+html { font-size: 15px; }
+:root { --sidebar-width: 252px; --header-height: 48px; }
+.page-wrapper { overflow-x: auto; }
+.page-body { padding: 1rem; }
+.page-header .container-fluid { padding-left: 1rem; padding-right: 1rem; }
+.page-sidebar .sidebar-link { font-size: 0.76rem; line-height: 1.25; }
+.page-sidebar .sidebar-direct-link { font-size: 0.78rem; line-height: 1.25; }
+.page-sidebar .sidebar-group-label { font-size: 0.72rem; }
+.page-sidebar .sidebar-section-label { font-size: 0.62rem; }
+.spa-workspace-toolbar { flex-wrap: wrap; }
+.spa-workspace-summary { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.spa-workspace-table { min-width: max-content; font-size: 0.76rem; }
+.spa-workspace-table th { font-size: 0.62rem; }
+.spa-workspace-table td { max-width: 24rem; }
+.spa-workspace-search input,
+.spa-workspace-filter select { font-size: 0.78rem; }
+.spa-record-code { font-size: 0.68rem; }
+.spa-status-pill { font-size: 0.64rem; }
+.card, .btn, .form-control, .form-select, .dropdown-menu { font-size: 0.95rem; }
+.table { font-size: 0.88rem; }
+@media (max-width: 768px) {
+  html { font-size: 14px; }
+  .page-body { padding: 0.75rem; }
+  .spa-workspace-table { min-width: 720px; }
+}
+@media (min-width: 769px) and (max-width: 1200px) {
+  html { font-size: 14px; }
+  :root { --sidebar-width: 240px; --header-height: 46px; }
+}
+@media (min-width: 1600px) {
+  html { font-size: 16px; }
+  :root { --sidebar-width: 272px; --header-height: 52px; }
+}
