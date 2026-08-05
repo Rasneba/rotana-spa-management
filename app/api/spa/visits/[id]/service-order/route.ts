@@ -15,7 +15,7 @@ function isObject(value: unknown): value is JsonObject {
 function apiError(error: unknown) {
   const code = isObject(error) && typeof error.code === "string" ? error.code : "";
   if (code === "42P01") {
-    return NextResponse.json({ error: "Apply db-migration-v34.sql before generating service orders." }, { status: 503 });
+    return NextResponse.json({ error: "Apply db-migration-v34.sql and db-migration-v40.sql before generating service orders." }, { status: 503 });
   }
   return err(error instanceof Error ? error.message : "Unable to generate service order");
 }
@@ -88,7 +88,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       }
 
       const servicesResult = await client.query(
-        `SELECT service_code, service_name, quantity
+        `SELECT service_code, service_name, quantity, unit_price
          FROM spa_visit_services WHERE visit_id=$1 ORDER BY created_at, id`,
         [visitId]
       );
@@ -98,19 +98,27 @@ export async function POST(req: Request, { params }: RouteParams) {
       }
 
       const now = new Date().toISOString();
+      const serviceLines = servicesResult.rows.map((service) => {
+        const unitPrice = service.unit_price === null || service.unit_price === undefined ? null : Number(service.unit_price);
+        return {
+          code: service.service_code || null,
+          name: service.service_name,
+          quantity: Number(service.quantity),
+          unit_price: unitPrice,
+          line_total: unitPrice === null ? null : Number((unitPrice * Number(service.quantity)).toFixed(2)),
+        };
+      });
+      const totalItems = serviceLines.reduce((total, service) => total + service.quantity, 0);
+      const totalAmount = serviceLines.reduce((total, service) => total + (service.line_total || 0), 0);
       const snapshot: ServiceOrderSnapshot = {
         visit_no: visit.visit_no,
         customer_name: visit.customer_name,
         therapist_name: visit.therapist_name,
         generated_at: now,
         notes: visit.notes || "",
-        services: servicesResult.rows.map((service) => ({
-          code: service.service_code || null,
-          name: service.service_name,
-          quantity: Number(service.quantity),
-        })),
+        total_amount: Number(totalAmount.toFixed(2)),
+        services: serviceLines,
       };
-      const totalItems = snapshot.services.reduce((total, service) => total + service.quantity, 0);
 
       const existingOrder = await client.query(
         `SELECT * FROM spa_service_orders WHERE visit_id=$1 FOR UPDATE`,

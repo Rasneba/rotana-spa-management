@@ -10,11 +10,13 @@ type OfferingRecord = {
   id: number | string;
   title: string;
   status: string;
+  amount?: number | string | null;
   details: {
     offering_code?: string | null;
     classification?: string | null;
     category?: string | null;
     duration_minutes?: string | number | null;
+    price?: number | string | null;
   };
 };
 
@@ -43,6 +45,18 @@ function offeringIcon(classification?: string | null): string {
   if (classification === "gym_service") return "bi-heart-pulse";
   if (classification === "package") return "bi-gift";
   return "bi-flower2";
+}
+
+function offeringPrice(offering: OfferingRecord): number | null {
+  const value = offering.amount ?? offering.details?.price;
+  if (value === null || value === undefined || value === "") return null;
+  const price = Number(value);
+  return Number.isFinite(price) ? price : null;
+}
+
+function formatPrice(value: number | null): string {
+  if (value === null || value === undefined) return "";
+  return new Intl.NumberFormat("en-ET", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 }
 
 export default function TherapistVisitWorkspace({ visitId }: { visitId: string }) {
@@ -313,7 +327,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
                   disabled={visit.status !== "in_treatment" || Boolean(busy)}
                 >
                   <span className="touch-service-icon"><i className={`bi ${offeringIcon(offering.details.classification)}`} /></span>
-                  <div><h3>{offering.title}</h3><p>{offering.details.category || offering.details.classification?.replace("_", " ")}</p>{offering.details.duration_minutes && <small><i className="bi bi-clock" /> {offering.details.duration_minutes} min</small>}</div>
+                  <div><h3>{offering.title}</h3><p>{offering.details.category || offering.details.classification?.replace("_", " ")}</p><small><i className="bi bi-clock" /> {offering.details.duration_minutes ? `${offering.details.duration_minutes} min` : ""}{offeringPrice(offering) !== null ? ` · ${formatPrice(offeringPrice(offering))} ETB` : ""}</small></div>
                   {offering.details.offering_code && <code>{offering.details.offering_code}</code>}
                   {cartLine && <b className="touch-tile-quantity">{cartLine.quantity}</b>}
                   {busy === `offering-${offering.id}` && <span className="touch-tile-loading"><span className="spinner-border spinner-border-sm" /></span>}
@@ -331,7 +345,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
               <div className="touch-cart-empty"><i className="bi bi-basket2" /><h3>No services yet</h3><p>Tap a service tile to add it.</p></div>
             ) : services.map((service) => (
               <article key={service.id} className="touch-cart-line">
-                <div className="touch-line-name"><strong>{service.service_name}</strong><small>{service.service_code || "Service"}</small></div>
+                <div className="touch-line-name"><strong>{service.service_name}</strong><small>{service.service_code || "Service"}{service.unit_price !== null && service.unit_price !== undefined ? ` · ${formatPrice(Number(service.unit_price))} ETB` : ""}</small></div>
                 <div className="touch-quantity-control">
                   <button type="button" onClick={() => void changeQuantity(service, Number(service.quantity) - 1)} disabled={treatmentClosed || Boolean(busy)} aria-label={`Decrease ${service.service_name}`}><i className="bi bi-dash" /></button>
                   <b>{service.quantity}</b>
@@ -355,7 +369,7 @@ export default function TherapistVisitWorkspace({ visitId }: { visitId: string }
             {visit.finished_at && capabilities.orders && <button type="button" className="print" onClick={() => void printDraft()} disabled={Boolean(busy)}><i className="bi bi-printer" /> Print Draft</button>}
             {order && order.print_count > 0 && order.status !== "handed_to_cashier" && capabilities.orders && <button type="button" className="handoff" onClick={() => void serviceOrderAction("handoff")} disabled={Boolean(busy)}><i className="bi bi-box-arrow-right" /> Handed to Cashier</button>}
           </div>
-          <div className="touch-pos-note"><i className="bi bi-shield-check" /><span>Draft only · No prices · Payment at separate cashier</span></div>
+          <div className="touch-pos-note"><i className="bi bi-shield-check" /><span>Draft only · For cashier · Payment collected at separate cashier</span></div>
         </aside>
       </div>
 

@@ -1787,7 +1787,7 @@ textarea.form-control {
 .service-order-actions a:hover, .service-order-actions button:hover { border-color: #9db4a4; color: #315e49; background: rgba(85,116,99,0.08); }
 .service-order-print-only { position: fixed; left: -9999px; top: 0; }
 
-/* 80 mm thermal draft. Prices are intentionally absent. */
+/* 80 mm thermal draft. Prices are printed only when the offering has a price. */
 .service-order-slip {
   width: 72mm;
   margin: 0 auto;
@@ -1804,8 +1804,9 @@ textarea.form-control {
 .service-order-slip dl div { display: grid; grid-template-columns: 19mm 1fr; }
 .service-order-slip dt, .service-order-slip dd { margin: 0; }
 .service-order-slip .slip-services { margin: 2.5mm 0; padding: 0; list-style: none; }
-.service-order-slip .slip-services li { display: grid; grid-template-columns: 5mm 1fr; gap: 1mm; margin: 1.2mm 0; }
+.service-order-slip .slip-services li { display: grid; grid-template-columns: 5mm minmax(0,1fr) auto auto; gap: 1mm; margin: 1.2mm 0; }
 .service-order-slip .slip-services strong { font-weight: 400; overflow-wrap: anywhere; }
+.service-order-slip .slip-line-price, .service-order-slip .slip-line-total { text-align: right; white-space: nowrap; }
 .service-order-slip .slip-total { margin: 2mm 0; }
 .service-order-slip .slip-warning { margin: 1mm 0; font-weight: 900; text-align: center; }
 

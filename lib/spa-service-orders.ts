@@ -18,6 +18,7 @@ export type VisitService = {
   service_code: string | null;
   service_name: string;
   quantity: number;
+  unit_price?: number | string | null;
   notes: string | null;
   created_at: string;
 };
@@ -52,6 +53,8 @@ export type ServiceOrderItem = {
   code: string | null;
   name: string;
   quantity: number;
+  unit_price?: number | null;
+  line_total?: number | null;
 };
 
 export type ServiceOrderSnapshot = {
@@ -60,6 +63,7 @@ export type ServiceOrderSnapshot = {
   therapist_name: string;
   generated_at: string;
   notes: string;
+  total_amount?: number;
   services: ServiceOrderItem[];
 };
 

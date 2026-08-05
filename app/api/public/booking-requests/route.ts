@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { badRequest, created, err } from "@/lib/api-utils";
+import { dispatchCustomerNotification, dispatchStaffNotification, type NotificationChannel } from "@/lib/notification-dispatch";
 
 type JsonObject = Record<string, unknown>;
 
@@ -14,6 +15,11 @@ function text(value: unknown, max = 500): string {
 
 function validEmail(value: string): boolean {
   return value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function prettyWhen(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 }
 
 async function getPublicCompanyId(): Promise<number | null> {
@@ -59,6 +65,38 @@ export async function POST(req: Request) {
        RETURNING id, status, created_at`,
       [companyId, fullName, phone, email || null, branch, treatment, preferredAt, notes || null, locale, notificationChannel, notificationContact]
     );
+    const request = result.rows[0];
+
+    const when = prettyWhen(preferredAt);
+    const ackMessage = `Thank you, ${fullName}! We received your booking request for ${treatment} at ${branch} on ${when}. Our team will confirm your appointment shortly.`;
+    const ackDelivery = await dispatchCustomerNotification({
+      channel: notificationChannel as NotificationChannel,
+      recipient: notificationContact,
+      subject: "Dagi Spa booking received",
+      message: ackMessage,
+    });
+    await pool.query(
+      `INSERT INTO notification_outbox (company_id, website_request_id, channel, recipient, subject, message, status, provider_response, sent_at)
+       VALUES ($1,$2,$3,$4,'Dagi Spa booking received',$5,$6,$7,CASE WHEN $6='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+      [companyId, request.id, notificationChannel, notificationContact, ackMessage, ackDelivery.status, ackDelivery.providerResponse || null]
+    ).catch(() => undefined);
+
+    const staffMessage = [
+      `New web booking #${request.id}`,
+      `Customer: ${fullName}`,
+      `Phone: ${phone}${email ? `\nEmail: ${email}` : ""}`,
+      `Treatment: ${treatment} at ${branch}`,
+      `When: ${when}`,
+      notes ? `Notes: ${notes}` : "",
+      `Notify: ${notificationChannel} ${notificationContact}`,
+      `Approve from Telegram: /approve ${request.id}`,
+    ].filter(Boolean).join("\n");
+    const staffDelivery = await dispatchStaffNotification(staffMessage);
+    await pool.query(
+      `INSERT INTO notification_outbox (company_id, website_request_id, channel, recipient, subject, message, status, provider_response, sent_at)
+       VALUES ($1,$2,'telegram',$3,'New website booking request',$4,$5,$6,CASE WHEN $5='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+      [companyId, request.id, process.env.TELEGRAM_STAFF_CHAT_ID || "staff", staffMessage, staffDelivery.status, staffDelivery.providerResponse || null]
+    ).catch(() => undefined);
 
     await pool.query(
       `INSERT INTO notifications (company_id, title, message, type)
