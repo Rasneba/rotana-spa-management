@@ -93,7 +93,7 @@ export async function GET(req: Request) {
         if (result.rows.length === 0) return NextResponse.json({ error: "Visit not found" }, { status: 404 });
         const services = await pool.query(
           `SELECT id, visit_id, service_record_id, service_code, service_name,
-                  quantity, notes, created_at, updated_at
+                  quantity, unit_price, notes, created_at, updated_at
            FROM spa_visit_services
            WHERE visit_id = $1
            ORDER BY created_at, id`,

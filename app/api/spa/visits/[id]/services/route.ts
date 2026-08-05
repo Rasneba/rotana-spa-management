@@ -14,7 +14,7 @@ function isObject(value: unknown): value is JsonObject {
 function apiError(error: unknown) {
   const code = isObject(error) && typeof error.code === "string" ? error.code : "";
   if (code === "42P01") {
-    return NextResponse.json({ error: "Apply db-migration-v34.sql before managing visit services." }, { status: 503 });
+    return NextResponse.json({ error: "Apply db-migration-v34.sql and db-migration-v40.sql before managing visit services." }, { status: 503 });
   }
   return err(error instanceof Error ? error.message : "Unable to update visit services");
 }
@@ -72,7 +72,7 @@ export async function POST(req: Request, { params }: RouteParams) {
       }
 
       const serviceResult = await pool.query(
-        `SELECT id, title, details->>'offering_code' AS service_code
+        `SELECT id, title, amount AS unit_price, details->>'offering_code' AS service_code
          FROM spa_management_records
          WHERE id=$1 AND company_id=$2 AND module_key='catalog/offerings'
            AND details->>'classification' IN ('spa_service','gym_service','package')
@@ -85,11 +85,12 @@ export async function POST(req: Request, { params }: RouteParams) {
       const result = await pool.query(
         `INSERT INTO spa_visit_services
           (visit_id, company_id, service_record_id, offering_id, service_code,
-           service_name, quantity, notes, added_by)
-         VALUES ($1,$2,$3,$3,$4,$5,$6,$7,$8)
+           service_name, quantity, unit_price, notes, added_by)
+         VALUES ($1,$2,$3,$3,$4,$5,$6,$7,$8,$9)
          ON CONFLICT (visit_id, service_record_id)
          DO UPDATE SET quantity=EXCLUDED.quantity,
                        offering_id=EXCLUDED.offering_id,
+                       unit_price=EXCLUDED.unit_price,
                        notes=EXCLUDED.notes,
                        service_code=EXCLUDED.service_code,
                        service_name=EXCLUDED.service_name,
@@ -102,6 +103,7 @@ export async function POST(req: Request, { params }: RouteParams) {
           service.service_code || null,
           service.title,
           quantity,
+          service.unit_price === null || service.unit_price === undefined ? null : Number(service.unit_price),
           typeof rawBody.notes === "string" ? rawBody.notes.slice(0, 2_000) : null,
           user.id,
         ]
