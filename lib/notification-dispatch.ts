@@ -1,11 +1,20 @@
 export type NotificationChannel = "sms" | "telegram" | "whatsapp" | "email" | "phone";
 
-type DispatchResult = {
+export type DispatchResult = {
   status: "sent" | "queued" | "failed" | "manual_required";
   providerResponse?: string;
 };
 
 export type TelegramInlineKeyboard = { text: string; callback_data: string }[][];
+
+export type CustomerNotificationTargets = {
+  telegram?: string;
+  sms?: string;
+  email?: string;
+  whatsapp?: string;
+};
+
+export type CustomerDispatch = { channel: NotificationChannel; recipient: string; delivery: DispatchResult };
 
 async function telegramApi(method: string, payload: Record<string, unknown>): Promise<Response> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -72,6 +81,44 @@ export async function dispatchCustomerNotification(params: {
   }
 
   return { status: params.channel === "phone" ? "manual_required" : "queued", providerResponse: "No provider credentials configured; notification queued for external/manual delivery." };
+}
+
+// Dispatches one message to every channel for which a recipient was provided.
+// Providers without credentials are recorded as "queued" so nothing is lost
+// when SMS/email/whatsapp integrations are added later.
+export async function dispatchCustomerNotifications(params: {
+  subject: string;
+  message: string;
+  targets: CustomerNotificationTargets;
+}): Promise<CustomerDispatch[]> {
+  const results: CustomerDispatch[] = [];
+  const { subject, message, targets } = params;
+
+  if (targets.telegram) {
+    results.push({ channel: "telegram", recipient: targets.telegram, delivery: await sendTelegram(targets.telegram, message) });
+  }
+  if (targets.sms) {
+    results.push({
+      channel: "sms",
+      recipient: targets.sms,
+      delivery: await dispatchCustomerNotification({ channel: "sms", recipient: targets.sms, subject, message }),
+    });
+  }
+  if (targets.email) {
+    results.push({
+      channel: "email",
+      recipient: targets.email,
+      delivery: await dispatchCustomerNotification({ channel: "email", recipient: targets.email, subject, message }),
+    });
+  }
+  if (targets.whatsapp) {
+    results.push({
+      channel: "whatsapp",
+      recipient: targets.whatsapp,
+      delivery: await dispatchCustomerNotification({ channel: "whatsapp", recipient: targets.whatsapp, subject, message }),
+    });
+  }
+  return results;
 }
 
 export async function dispatchStaffNotification(message: string, keyboard?: TelegramInlineKeyboard): Promise<DispatchResult> {

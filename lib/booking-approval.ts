@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { dispatchCustomerNotification, type NotificationChannel } from "@/lib/notification-dispatch";
+import { dispatchCustomerNotifications } from "@/lib/notification-dispatch";
 
 export const ACTIVE_BOOKING_STATUSES = ["confirmed", "checked_in"];
 
@@ -15,7 +15,24 @@ function text(value: unknown, max = 1000): string {
 
 export function buildConfirmationMessage(request: JsonObject, startsAt: string, therapistName: string, serviceName: string) {
   const when = new Date(startsAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-  return `Dagi Spa booking approved: ${serviceName} at ${request.branch} on ${when}. Therapist: ${therapistName}. Thank you, ${request.full_name}.`;
+  return `We received your booking and the booking is confirmed. Please be there at ${when}. Service: ${serviceName} at ${request.branch}. Therapist: ${therapistName}. Thank you, ${request.full_name}.`;
+}
+
+// Picks the recipients to notify for a booking across every channel it provides:
+//  - Telegram: the request's notification contact when it is a @handle or the
+//    chosen channel is telegram.
+//  - SMS / WhatsApp: the customer phone.
+//  - Email: the customer email.
+export function customerNotificationTargets(request: JsonObject) {
+  const contact = text(request.notification_contact, 200).trim();
+  const channel = text(request.notification_channel, 20);
+  const phone = text(request.phone, 40);
+  const email = text(request.email, 200);
+  const targets: { telegram?: string; sms?: string; email?: string; whatsapp?: string } = {};
+  if (phone) targets.sms = phone;
+  if (email) targets.email = email;
+  if (contact && (channel === "telegram" || contact.startsWith("@"))) targets.telegram = contact;
+  return targets;
 }
 
 export async function validateResources(companyId: number, therapistId: number, offeringId: number) {
@@ -181,20 +198,34 @@ export async function approveBookingRequest(
         );
     const appointment = appointmentResult.rows[0];
     const notificationMessage = buildConfirmationMessage(request, startsAt, resources.therapist.title, resources.offering.title);
-    const channel = (request.notification_channel || "phone") as NotificationChannel;
-    const recipient = request.notification_contact || (channel === "email" ? request.email : request.phone);
-    const delivery = await dispatchCustomerNotification({ channel, recipient, subject: "Dagi Spa booking approved", message: notificationMessage });
-    await client.query(
-      `INSERT INTO notification_outbox (company_id, website_request_id, appointment_id, channel, recipient, subject, message, status, provider_response, sent_at)
-       VALUES ($1,$2,$3,$4,$5,'Dagi Spa booking approved',$6,$7::text,$8,CASE WHEN $7::text='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
-      [input.companyId, input.requestId, appointment.id, channel, recipient, notificationMessage, delivery.status, delivery.providerResponse || null]
-    );
+    const deliveries = await dispatchCustomerNotifications({
+      subject: "Dagi Spa booking approved",
+      message: notificationMessage,
+      targets: customerNotificationTargets(request),
+    });
+    let primaryStatus = "queued";
+    let primaryRecipient = "";
+    for (const delivery of deliveries) {
+      if (delivery.channel === "telegram") {
+        primaryStatus = delivery.delivery.status;
+        primaryRecipient = delivery.recipient;
+      }
+      await client.query(
+        `INSERT INTO notification_outbox (company_id, website_request_id, appointment_id, channel, recipient, subject, message, status, provider_response, sent_at)
+         VALUES ($1,$2,$3,$4,$5,'Dagi Spa booking approved',$6,$7::text,$8,CASE WHEN $7::text='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+        [input.companyId, input.requestId, appointment.id, delivery.channel, delivery.recipient, notificationMessage, delivery.delivery.status, delivery.delivery.providerResponse || null]
+      );
+    }
+    if (deliveries.length > 0 && !primaryRecipient) {
+      primaryRecipient = deliveries[0].recipient;
+      primaryStatus = deliveries[0].delivery.status;
+    }
     const updated = await client.query(
       `UPDATE website_booking_requests SET status='confirmed', staff_notes=$1, confirmed_by=$2, confirmed_at=CURRENT_TIMESTAMP,
          assigned_therapist_record_id=$3, assigned_offering_id=$4, assigned_facility_id=$5, appointment_id=$6,
          notification_status=$7, notification_message=$8, updated_at=CURRENT_TIMESTAMP
        WHERE id=$9 RETURNING *`,
-      [staffNotes || null, input.requestedBy || null, input.therapistRecordId, input.offeringId, input.facilityId || null, appointment.id, delivery.status, notificationMessage, input.requestId]
+      [staffNotes || null, input.requestedBy || null, input.therapistRecordId, input.offeringId, input.facilityId || null, appointment.id, primaryStatus, notificationMessage, input.requestId]
     );
     await client.query(
       `INSERT INTO notifications (company_id, title, message, type)
