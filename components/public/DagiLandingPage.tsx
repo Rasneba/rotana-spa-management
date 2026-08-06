@@ -127,7 +127,7 @@ const detailedTreatments = [
     title: "Facial & Beauty Care",
     am: "ፊያሻል እና የውበት እንክብካቤ",
     duration: "45–75 min",
-    image: "/dagi/logo.jpg",
+    image: "/dagi/face.jpg",
     details: ["Skin cleansing", "Hydrating mask", "Wax service", "Manicure & pedicure"],
   },
   {

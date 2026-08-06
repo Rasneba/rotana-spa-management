@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     });
     await pool.query(
       `INSERT INTO notification_outbox (company_id, website_request_id, channel, recipient, subject, message, status, provider_response, sent_at)
-       VALUES ($1,$2,$3,$4,'Dagi Spa booking received',$5,$6,$7,CASE WHEN $6='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+       VALUES ($1,$2,$3,$4,'Dagi Spa booking received',$5,$6::text,$7,CASE WHEN $6::text='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
       [companyId, request.id, notificationChannel, notificationContact, ackMessage, ackDelivery.status, ackDelivery.providerResponse || null]
     ).catch(() => undefined);
 
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
     const staffDelivery = await dispatchStaffNotification(staffMessage, staffKeyboard);
     await pool.query(
       `INSERT INTO notification_outbox (company_id, website_request_id, channel, recipient, subject, message, status, provider_response, sent_at)
-       VALUES ($1,$2,'telegram',$3,'New website booking request',$4,$5,$6,CASE WHEN $5='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+       VALUES ($1,$2,'telegram',$3,'New website booking request',$4,$5::text,$6,CASE WHEN $5::text='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
       [companyId, request.id, process.env.TELEGRAM_STAFF_CHAT_ID || "staff", staffMessage, staffDelivery.status, staffDelivery.providerResponse || null]
     ).catch(() => undefined);
 

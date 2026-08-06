@@ -186,7 +186,7 @@ export async function approveBookingRequest(
     const delivery = await dispatchCustomerNotification({ channel, recipient, subject: "Dagi Spa booking approved", message: notificationMessage });
     await client.query(
       `INSERT INTO notification_outbox (company_id, website_request_id, appointment_id, channel, recipient, subject, message, status, provider_response, sent_at)
-       VALUES ($1,$2,$3,$4,$5,'Dagi Spa booking approved',$6,$7,$8,CASE WHEN $7='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+       VALUES ($1,$2,$3,$4,$5,'Dagi Spa booking approved',$6,$7::text,$8,CASE WHEN $7::text='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
       [input.companyId, input.requestId, appointment.id, channel, recipient, notificationMessage, delivery.status, delivery.providerResponse || null]
     );
     const updated = await client.query(
