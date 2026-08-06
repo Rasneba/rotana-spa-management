@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { approveBookingRequest, declineBookingRequest, resolveSpaRecord } from "@/lib/booking-approval";
-import { sendTelegramMessage } from "@/lib/notification-dispatch";
+import {
+  approveBookingRequest,
+  declineBookingRequest,
+  resolveSpaRecord,
+  listActiveTherapists,
+  listActiveOfferings,
+  getActiveTherapist,
+  getActiveOffering,
+  hasConflict,
+  type SpaListRecord,
+} from "@/lib/booking-approval";
+import { sendTelegramMessage, answerTelegramCallback, editTelegramMessage, type TelegramInlineKeyboard } from "@/lib/notification-dispatch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,9 +27,20 @@ const STAFF_CHAT_IDS = (process.env.TELEGRAM_STAFF_CHAT_ID || "")
   .map((id) => id.trim().replace(/^@/, "").toLowerCase())
   .filter(Boolean);
 
-function isStaff(chatId: unknown): boolean {
+const STAFF_USERNAMES = (process.env.TELEGRAM_STAFF_USERNAMES || "")
+  .split(",")
+  .map((name) => name.trim().replace(/^@/, "").toLowerCase())
+  .filter(Boolean);
+
+function isStaffChat(chatId: unknown): boolean {
   const key = String(chatId ?? "").replace(/^@/, "").toLowerCase();
   return STAFF_CHAT_IDS.length > 0 && STAFF_CHAT_IDS.includes(key);
+}
+
+function isStaffUser(from: JsonObject | null): boolean {
+  if (STAFF_USERNAMES.length === 0) return false;
+  const username = typeof from?.username === "string" ? from.username.replace(/^@/, "").toLowerCase() : "";
+  return username !== "" && STAFF_USERNAMES.includes(username);
 }
 
 function commandBody(text: string, command: string): string {
@@ -53,7 +74,7 @@ async function getCompanyStaffUser(companyId: number): Promise<number | null> {
 function formatWhen(value: string | null | undefined): string {
   if (!value) return "";
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 }
 
 const HELP_TEXT = [
@@ -62,11 +83,270 @@ const HELP_TEXT = [
   "Commands:",
   "/status <id> - check a web booking",
   "/approve <id> - approve (uses assigned or unique therapist/service)",
-  "/approve <id> t:<therapist> s:<service> - approve with specific therapist & service (use record ID or code)",
+  "/approve <id> t:<therapist> s:<service> - approve with specific therapist & service (record ID or code)",
   "/decline <id> - decline a web booking",
   "",
-  "New web bookings are announced here automatically.",
+  "New web bookings are announced here with Approve / Status / Decline buttons.",
 ].join("\n");
+
+async function fetchRequest(id: number): Promise<JsonObject | null> {
+  const result = await pool.query(`SELECT * FROM website_booking_requests WHERE id=$1`, [id]);
+  return result.rows[0] || null;
+}
+
+function requestLines(request: JsonObject): string[] {
+  return [
+    `Request #${request.id}`,
+    `Status: ${request.status}`,
+    `Customer: ${request.full_name}`,
+    `Phone: ${request.phone}${request.email ? `\nEmail: ${request.email}` : ""}`,
+    `Treatment: ${request.treatment} at ${request.branch}`,
+    `When: ${formatWhen(String(request.preferred_at || ""))}`,
+  ].filter(Boolean);
+}
+
+function menuKeyboard(id: number): TelegramInlineKeyboard {
+  return [
+    [{ text: "✅ Approve", callback_data: `approve:${id}` }, { text: "📋 Status", callback_data: `status:${id}` }],
+    [{ text: "❌ Decline", callback_data: `decline:${id}` }],
+  ];
+}
+
+async function out(chatId: number, messageId: number | null, text: string, keyboard?: TelegramInlineKeyboard | null): Promise<void> {
+  if (messageId === null || messageId === undefined) {
+    await sendTelegramMessage(String(chatId), text, keyboard ?? undefined);
+  } else {
+    await editTelegramMessage(String(chatId), messageId, text, keyboard ?? null);
+  }
+}
+
+function toIso(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toISOString();
+}
+
+async function therapistAvailability(companyId: number, preferredAt: string, facilityId: number | null, therapists: SpaListRecord[]): Promise<{ therapist: SpaListRecord; free: boolean }[]> {
+  const startsAt = toIso(preferredAt);
+  const endsAt = new Date(new Date(preferredAt).getTime() + 60 * 60 * 1000).toISOString();
+  return Promise.all(
+    therapists.map(async (therapist) => {
+      const conflict = await hasConflict({ companyId, therapistId: therapist.id, facilityId: facilityId || null, startsAt, endsAt });
+      return { therapist, free: conflict === null };
+    })
+  );
+}
+
+async function showTherapistPicker(chatId: number, messageId: number | null, request: JsonObject, therapists: SpaListRecord[]): Promise<void> {
+  const rows = await therapistAvailability(request.company_id as number, String(request.preferred_at || ""), request.assigned_facility_id as number | null, therapists);
+  const keyboard: TelegramInlineKeyboard = rows.map(({ therapist, free }) => [
+    { text: `${free ? "✅" : "⛔"} ${therapist.title}`, callback_data: `t:${request.id}:${therapist.id}` },
+  ]);
+  keyboard.push([{ text: "↩ Menu", callback_data: `menu:${request.id}` }]);
+  const text = `Request #${request.id} — choose therapist for ${formatWhen(String(request.preferred_at || ""))}:\n✅ free · ⛔ already booked at that time`;
+  await out(chatId, messageId, text, keyboard);
+}
+
+async function showOfferingPicker(chatId: number, messageId: number | null, request: JsonObject, therapistId: number, offerings: SpaListRecord[]): Promise<void> {
+  const keyboard: TelegramInlineKeyboard = offerings.map((offering) => [
+    { text: offering.title, callback_data: `o:${request.id}:${therapistId}:${offering.id}` },
+  ]);
+  keyboard.push([{ text: "↩ Menu", callback_data: `menu:${request.id}` }]);
+  const text = `Request #${request.id} — choose service for ${request.treatment}:`;
+  await out(chatId, messageId, text, keyboard);
+}
+
+async function approveFlow(chatId: number, messageId: number | null, requestId: number, therapistId?: number, offeringId?: number): Promise<void> {
+  const request = await fetchRequest(requestId);
+  if (!request) return out(chatId, messageId, `Request #${requestId} not found.`);
+  if (request.status === "confirmed") return out(chatId, messageId, `Request #${requestId} is already confirmed.`);
+
+  let therapist: SpaListRecord | null = null;
+  if (therapistId) {
+    therapist = await getActiveTherapist(request.company_id as number, therapistId);
+    if (!therapist) return out(chatId, messageId, "Therapist not found or not active.");
+  } else if (request.assigned_therapist_record_id) {
+    therapist = await getActiveTherapist(request.company_id as number, Number(request.assigned_therapist_record_id));
+  } else {
+    const therapists = await listActiveTherapists(request.company_id as number);
+    if (therapists.length === 0) return out(chatId, messageId, "No active therapist found. Add one in the Offering Master first.");
+    if (therapists.length === 1) therapist = therapists[0];
+    else return showTherapistPicker(chatId, messageId, request, therapists);
+  }
+  if (!therapist) return out(chatId, messageId, "No active therapist resolved.");
+
+  let offering: SpaListRecord | null = null;
+  if (offeringId) {
+    offering = await getActiveOffering(request.company_id as number, offeringId);
+    if (!offering) return out(chatId, messageId, "Service not found or not active.");
+  } else if (request.assigned_offering_id) {
+    offering = await getActiveOffering(request.company_id as number, Number(request.assigned_offering_id));
+  } else {
+    let candidates = await listActiveOfferings(request.company_id as number, String(request.treatment || ""));
+    if (candidates.length === 0) candidates = await listActiveOfferings(request.company_id as number);
+    if (candidates.length === 1) offering = candidates[0];
+    else return showOfferingPicker(chatId, messageId, request, therapist.id, candidates);
+  }
+  if (!offering) return out(chatId, messageId, "No active service resolved.");
+
+  const requestedBy = await getCompanyStaffUser(request.company_id as number);
+  const approval = await approveBookingRequest({
+    requestId: request.id as number,
+    companyId: request.company_id as number,
+    therapistRecordId: therapist.id,
+    offeringId: offering.id,
+    facilityId: request.assigned_facility_id as number | null,
+    requestedBy,
+  });
+
+  if (approval.ok) {
+    const when = formatWhen(String(approval.request.preferred_at || ""));
+    const contact = request.notification_contact ? String(request.notification_contact) : "";
+    const text = `✅ Request #${request.id} approved!\n${request.full_name} → ${therapist.title} | ${offering.title}\nWhen: ${when}${contact ? `\nClient notification: ${request.notification_channel} ${contact}` : ""}`;
+    return out(chatId, messageId, text, null);
+  }
+
+  const retry: TelegramInlineKeyboard = [[{ text: "↩ Try another therapist", callback_data: `approve:${request.id}` }]];
+  return out(chatId, messageId, `⚠️ Could not approve #${request.id}: ${approval.error}`, retry);
+}
+
+async function statusFlow(chatId: number, messageId: number | null, requestId: number): Promise<void> {
+  const request = await fetchRequest(requestId);
+  if (!request) return out(chatId, messageId, `Request #${requestId} not found.`);
+  return out(chatId, messageId, requestLines(request).join("\n"));
+}
+
+async function declineFlow(chatId: number, messageId: number | null, requestId: number): Promise<void> {
+  const request = await fetchRequest(requestId);
+  if (!request) return out(chatId, messageId, `Request #${requestId} not found.`);
+  const requestedBy = await getCompanyStaffUser(request.company_id as number);
+  const outcome = await declineBookingRequest(requestId, request.company_id as number, "Declined from Telegram", requestedBy);
+  if (outcome.ok) return out(chatId, messageId, `Request #${requestId} declined.`);
+  return out(chatId, messageId, `Could not decline #${requestId}: ${outcome.error}`);
+}
+
+async function menuFlow(chatId: number, messageId: number | null, requestId: number): Promise<void> {
+  const request = await fetchRequest(requestId);
+  if (!request) return out(chatId, messageId, `Request #${requestId} not found.`);
+  return out(chatId, messageId, requestLines(request).join("\n"), menuKeyboard(requestId));
+}
+
+async function handleCallback(callback: JsonObject): Promise<void> {
+  const data = typeof callback.data === "string" ? callback.data : "";
+  const message = isObject(callback.message) ? callback.message : null;
+  const chat = message && isObject(message.chat) ? message.chat : null;
+  const chatId = chat && typeof chat.id === "number" ? chat.id : undefined;
+  const messageId = message && typeof message.message_id === "number" ? message.message_id : undefined;
+  const callbackId = typeof callback.id === "string" ? callback.id : "";
+  const from = isObject(callback.from) ? callback.from : null;
+
+  if (chatId === undefined) return;
+  if (!isStaffChat(chatId) && !isStaffUser(from)) return;
+  await answerTelegramCallback(callbackId);
+  if (messageId === undefined) return;
+
+  const parts = data.split(":");
+  const action = parts[0];
+  const requestId = Number(parts[1]);
+  const argA = parts[2] ? Number(parts[2]) : undefined;
+  const argB = parts[3] ? Number(parts[3]) : undefined;
+  if (!Number.isInteger(requestId) || requestId < 1) return;
+
+  switch (action) {
+    case "menu":
+      return menuFlow(chatId, messageId, requestId);
+    case "status":
+      return statusFlow(chatId, messageId, requestId);
+    case "decline":
+      return declineFlow(chatId, messageId, requestId);
+    case "approve":
+      return approveFlow(chatId, messageId, requestId);
+    case "t":
+      return approveFlow(chatId, messageId, requestId, argA, undefined);
+    case "o":
+      return approveFlow(chatId, messageId, requestId, argA, argB);
+  }
+}
+
+async function handleTextMessage(chatId: number, from: JsonObject | null, text: string): Promise<void> {
+  const lower = text.toLowerCase();
+  const staff = isStaffChat(chatId) || isStaffUser(from);
+
+  if (lower.startsWith("/start") || lower.startsWith("/help")) {
+    await sendTelegramMessage(String(chatId), HELP_TEXT);
+    return;
+  }
+
+  if (lower.startsWith("/status")) {
+    if (!staff) return;
+    const id = Number(commandBody(text, "status").split(/\s+/)[0]);
+    if (!Number.isInteger(id) || id < 1) {
+      await sendTelegramMessage(String(chatId), "Usage: /status <request id>");
+      return;
+    }
+    return statusFlow(chatId, null, id);
+  }
+
+  if (lower.startsWith("/decline")) {
+    if (!staff) return;
+    const id = Number(commandBody(text, "decline").split(/\s+/)[0]);
+    if (!Number.isInteger(id) || id < 1) {
+      await sendTelegramMessage(String(chatId), "Usage: /decline <request id>");
+      return;
+    }
+    return declineFlow(chatId, null, id);
+  }
+
+  if (lower.startsWith("/approve")) {
+    if (!staff) return;
+    const args = parseApproveArgs(text);
+    if ("error" in args) {
+      await sendTelegramMessage(String(chatId), args.error);
+      return;
+    }
+    const request = await fetchRequest(args.id);
+    if (!request) {
+      await sendTelegramMessage(String(chatId), `Request #${args.id} not found.`);
+      return;
+    }
+    let therapistId: number | undefined;
+    if (args.therapistRef) {
+      if (/^\d+$/.test(args.therapistRef)) {
+        const therapist = await getActiveTherapist(request.company_id as number, Number(args.therapistRef));
+        if (!therapist) {
+          await sendTelegramMessage(String(chatId), `Therapist #${args.therapistRef} not found.`);
+          return;
+        }
+        therapistId = therapist.id;
+      } else {
+        const resolved = await resolveSpaRecord(request.company_id as number, "spa/therapists", args.therapistRef);
+        if ("error" in resolved) {
+          await sendTelegramMessage(String(chatId), resolved.error);
+          return;
+        }
+        therapistId = resolved.id;
+      }
+    }
+    let offeringId: number | undefined;
+    if (args.offeringRef) {
+      if (/^\d+$/.test(args.offeringRef)) {
+        const offering = await getActiveOffering(request.company_id as number, Number(args.offeringRef));
+        if (!offering) {
+          await sendTelegramMessage(String(chatId), `Service #${args.offeringRef} not found.`);
+          return;
+        }
+        offeringId = offering.id;
+      } else {
+        const resolved = await resolveSpaRecord(request.company_id as number, "catalog/offerings", args.offeringRef);
+        if ("error" in resolved) {
+          await sendTelegramMessage(String(chatId), resolved.error);
+          return;
+        }
+        offeringId = resolved.id;
+      }
+    }
+    return approveFlow(chatId, null, args.id, therapistId, offeringId);
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -80,176 +360,21 @@ export async function POST(req: Request) {
     const raw: unknown = await req.json();
     if (!isObject(raw)) return NextResponse.json({ ok: true });
 
+    if (isObject(raw.callback_query)) {
+      await handleCallback(raw.callback_query).catch(() => undefined);
+      return NextResponse.json({ ok: true });
+    }
+
     const message = isObject(raw.message) ? raw.message : null;
     if (!message) return NextResponse.json({ ok: true });
 
-    const chatId = message.chat && isObject(message.chat) ? message.chat.id : undefined;
+    const chat = isObject(message.chat) ? message.chat : null;
+    const chatId = chat && typeof chat.id === "number" ? chat.id : undefined;
     const text = typeof message.text === "string" ? message.text.trim() : "";
+    const from = isObject(message.from) ? message.from : null;
     if (chatId === undefined || !text) return NextResponse.json({ ok: true });
 
-    const lower = text.toLowerCase();
-
-    if (lower.startsWith("/start") || lower.startsWith("/help")) {
-      await sendTelegramMessage(String(chatId), HELP_TEXT);
-      return NextResponse.json({ ok: true });
-    }
-
-    if (lower.startsWith("/status")) {
-      if (!isStaff(chatId)) return NextResponse.json({ ok: true });
-      const id = Number(commandBody(text, "status").split(/\s+/)[0]);
-      if (!Number.isInteger(id) || id < 1) {
-        await sendTelegramMessage(String(chatId), "Usage: /status <request id>");
-        return NextResponse.json({ ok: true });
-      }
-      const result = await pool.query(`SELECT * FROM website_booking_requests WHERE id=$1`, [id]);
-      const request = result.rows[0];
-      if (!request) {
-        await sendTelegramMessage(String(chatId), `Request #${id} not found.`);
-        return NextResponse.json({ ok: true });
-      }
-      const lines = [
-        `Request #${request.id}`,
-        `Status: ${request.status}`,
-        `Customer: ${request.full_name}`,
-        `Phone: ${request.phone}`,
-        `Treatment: ${request.treatment} at ${request.branch}`,
-        `When: ${formatWhen(request.preferred_at)}`,
-      ];
-      await sendTelegramMessage(String(chatId), lines.join("\n"));
-      return NextResponse.json({ ok: true });
-    }
-
-    if (lower.startsWith("/decline")) {
-      if (!isStaff(chatId)) return NextResponse.json({ ok: true });
-      const id = Number(commandBody(text, "decline").split(/\s+/)[0]);
-      if (!Number.isInteger(id) || id < 1) {
-        await sendTelegramMessage(String(chatId), "Usage: /decline <request id>");
-        return NextResponse.json({ ok: true });
-      }
-      const existing = await pool.query(`SELECT id, company_id FROM website_booking_requests WHERE id=$1`, [id]);
-      if (!existing.rows[0]) {
-        await sendTelegramMessage(String(chatId), `Request #${id} not found.`);
-        return NextResponse.json({ ok: true });
-      }
-      const requestedBy = await getCompanyStaffUser(existing.rows[0].company_id);
-      const outcome = await declineBookingRequest(id, existing.rows[0].company_id, "Declined from Telegram", requestedBy);
-      if (outcome.ok) {
-        await sendTelegramMessage(String(chatId), `Request #${id} declined.`);
-      } else {
-        await sendTelegramMessage(String(chatId), `Could not decline #${id}: ${outcome.error}`);
-      }
-      return NextResponse.json({ ok: true });
-    }
-
-    if (lower.startsWith("/approve")) {
-      if (!isStaff(chatId)) return NextResponse.json({ ok: true });
-      const args = parseApproveArgs(text);
-      if ("error" in args) {
-        await sendTelegramMessage(String(chatId), args.error);
-        return NextResponse.json({ ok: true });
-      }
-      const existing = await pool.query(
-        `SELECT id, company_id, status, treatment, assigned_therapist_record_id, assigned_offering_id, assigned_facility_id, full_name, notification_channel, notification_contact FROM website_booking_requests WHERE id=$1`,
-        [args.id]
-      );
-      const request = existing.rows[0];
-      if (!request) {
-        await sendTelegramMessage(String(chatId), `Request #${args.id} not found.`);
-        return NextResponse.json({ ok: true });
-      }
-      if (request.status === "confirmed") {
-        await sendTelegramMessage(String(chatId), `Request #${args.id} is already confirmed.`);
-        return NextResponse.json({ ok: true });
-      }
-
-      const therapistResult = args.therapistRef
-        ? await resolveSpaRecord(request.company_id, "spa/therapists", args.therapistRef)
-        : request.assigned_therapist_record_id
-          ? await resolveSpaRecord(request.company_id, "spa/therapists", String(request.assigned_therapist_record_id))
-          : null;
-      let therapist: { id: number; title: string } | null = null;
-      if (therapistResult === null) {
-        const unique = await pool.query(
-          `SELECT id, title FROM spa_management_records
-           WHERE company_id=$1 AND module_key='spa/therapists' AND status='active' AND deleted_at IS NULL`,
-          [request.company_id]
-        );
-        if (unique.rows.length === 1) {
-          therapist = unique.rows[0];
-        } else if (unique.rows.length === 0) {
-          await sendTelegramMessage(String(chatId), "No active therapist found. Add one in the Offering Master first.");
-          return NextResponse.json({ ok: true });
-        } else {
-          await sendTelegramMessage(String(chatId), `Multiple therapists available. Specify one: /approve ${args.id} t:<therapist id or code>`);
-          return NextResponse.json({ ok: true });
-        }
-      } else if ("error" in therapistResult) {
-        await sendTelegramMessage(String(chatId), therapistResult.error);
-        return NextResponse.json({ ok: true });
-      } else {
-        therapist = therapistResult;
-      }
-
-      const offeringResult = args.offeringRef
-        ? await resolveSpaRecord(request.company_id, "catalog/offerings", args.offeringRef)
-        : request.assigned_offering_id
-          ? await resolveSpaRecord(request.company_id, "catalog/offerings", String(request.assigned_offering_id))
-          : null;
-      let offering: { id: number; title: string } | null = null;
-      if (offeringResult === null) {
-        const treatment = String(request.treatment || "").trim();
-        const matches = treatment
-          ? await pool.query(
-              `SELECT id, title FROM spa_management_records
-               WHERE company_id=$1 AND module_key='catalog/offerings' AND status='active' AND deleted_at IS NULL
-                 AND details->>'classification' IN ('spa_service','package')
-                 AND (LOWER(title)=LOWER($2) OR LOWER(details->>'offering_code')=LOWER($2) OR title ILIKE $3)`,
-              [request.company_id, treatment, `%${treatment}%`]
-            )
-          : { rows: [] };
-        if (matches.rows.length === 1) {
-          offering = matches.rows[0];
-        } else if (matches.rows.length === 0) {
-          await sendTelegramMessage(String(chatId), `No active service matches "${treatment}". Specify one: /approve ${args.id} s:<service id or code>`);
-          return NextResponse.json({ ok: true });
-        } else {
-          await sendTelegramMessage(String(chatId), `Multiple services match "${treatment}". Specify one: /approve ${args.id} s:<service id or code>`);
-          return NextResponse.json({ ok: true });
-        }
-      } else if ("error" in offeringResult) {
-        await sendTelegramMessage(String(chatId), offeringResult.error);
-        return NextResponse.json({ ok: true });
-      } else {
-        offering = offeringResult;
-      }
-
-      const requestedBy = await getCompanyStaffUser(request.company_id);
-      if (!therapist || !offering) {
-        await sendTelegramMessage(String(chatId), "Could not resolve therapist or service for this request.");
-        return NextResponse.json({ ok: true });
-      }
-      const approval = await approveBookingRequest({
-        requestId: args.id,
-        companyId: request.company_id,
-        therapistRecordId: therapist.id,
-        offeringId: offering.id,
-        facilityId: request.assigned_facility_id || null,
-        requestedBy,
-      });
-      if (approval.ok) {
-        const updated = approval.request;
-        const when = formatWhen(String(updated.preferred_at));
-        const contact = request.notification_contact || "";
-        await sendTelegramMessage(
-          String(chatId),
-          `Request #${args.id} approved!\n${request.full_name} → ${therapist.title} | ${offering.title}\nWhen: ${when}${contact ? `\nClient confirmation: ${request.notification_channel} ${contact}` : ""}`
-        );
-      } else {
-        await sendTelegramMessage(String(chatId), `Could not approve #${args.id}: ${approval.error}`);
-      }
-      return NextResponse.json({ ok: true });
-    }
-
+    await handleTextMessage(chatId, from, text).catch(() => undefined);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: true });

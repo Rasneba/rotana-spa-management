@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { badRequest, created, err } from "@/lib/api-utils";
-import { dispatchCustomerNotification, dispatchStaffNotification, type NotificationChannel } from "@/lib/notification-dispatch";
+import { dispatchCustomerNotification, dispatchStaffNotification, type NotificationChannel, type TelegramInlineKeyboard } from "@/lib/notification-dispatch";
 
 type JsonObject = Record<string, unknown>;
 
@@ -91,7 +91,14 @@ export async function POST(req: Request) {
       `Notify: ${notificationChannel} ${notificationContact}`,
       `Approve from Telegram: /approve ${request.id}`,
     ].filter(Boolean).join("\n");
-    const staffDelivery = await dispatchStaffNotification(staffMessage);
+    const staffKeyboard: TelegramInlineKeyboard = [
+      [
+        { text: `✅ Approve #${request.id}`, callback_data: `approve:${request.id}` },
+        { text: `📋 Status`, callback_data: `status:${request.id}` },
+      ],
+      [{ text: `❌ Decline #${request.id}`, callback_data: `decline:${request.id}` }],
+    ];
+    const staffDelivery = await dispatchStaffNotification(staffMessage, staffKeyboard);
     await pool.query(
       `INSERT INTO notification_outbox (company_id, website_request_id, channel, recipient, subject, message, status, provider_response, sent_at)
        VALUES ($1,$2,'telegram',$3,'New website booking request',$4,$5,$6,CASE WHEN $5='sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,

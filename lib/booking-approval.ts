@@ -39,6 +39,58 @@ export async function validateResources(companyId: number, therapistId: number, 
   return { therapist: therapistResult.rows[0], offering: offeringResult.rows[0] };
 }
 
+export type SpaListRecord = { id: number; title: string; duration_minutes?: number };
+
+export async function listActiveTherapists(companyId: number): Promise<SpaListRecord[]> {
+  const result = await pool.query(
+    `SELECT id, title FROM spa_management_records
+     WHERE company_id=$1 AND module_key='spa/therapists' AND status='active' AND deleted_at IS NULL
+     ORDER BY title`,
+    [companyId]
+  );
+  return result.rows;
+}
+
+export async function listActiveOfferings(companyId: number, treatment?: string): Promise<SpaListRecord[]> {
+  const result = await pool.query(
+    `SELECT id, title, COALESCE(NULLIF(details->>'duration_minutes','')::int,60) AS duration_minutes
+     FROM spa_management_records
+     WHERE company_id=$1 AND module_key='catalog/offerings' AND status='active' AND deleted_at IS NULL
+       AND details->>'classification' IN ('spa_service','package')
+     ORDER BY title`,
+    [companyId]
+  );
+  const rows: SpaListRecord[] = result.rows;
+  if (!treatment) return rows;
+  const needle = treatment.trim().toLowerCase();
+  if (!needle) return rows;
+  const exact = rows.filter((row) => row.title.trim().toLowerCase() === needle);
+  if (exact.length > 0) return exact;
+  const partial = rows.filter((row) => row.title.toLowerCase().includes(needle));
+  return partial.length > 0 ? partial : rows;
+}
+
+export async function getActiveTherapist(companyId: number, recordId: number): Promise<SpaListRecord | null> {
+  const result = await pool.query(
+    `SELECT id, title FROM spa_management_records
+     WHERE id=$1 AND company_id=$2 AND module_key='spa/therapists' AND status='active' AND deleted_at IS NULL`,
+    [recordId, companyId]
+  );
+  return result.rows[0] || null;
+}
+
+export async function getActiveOffering(companyId: number, recordId: number): Promise<SpaListRecord | null> {
+  const result = await pool.query(
+    `SELECT id, title, COALESCE(NULLIF(details->>'duration_minutes','')::int,60) AS duration_minutes
+     FROM spa_management_records
+     WHERE id=$1 AND company_id=$2 AND module_key='catalog/offerings'
+       AND details->>'classification' IN ('spa_service','package')
+       AND status='active' AND deleted_at IS NULL`,
+    [recordId, companyId]
+  );
+  return result.rows[0] || null;
+}
+
 export async function hasConflict(params: { companyId: number; therapistId: number; facilityId: number | null; startsAt: string; endsAt: string; excludeId?: number | null }) {
   const therapistConflict = await pool.query(
     `SELECT id FROM spa_appointments

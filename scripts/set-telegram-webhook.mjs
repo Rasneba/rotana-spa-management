@@ -5,7 +5,7 @@
 //   node scripts/set-telegram-webhook.mjs https://your-domain.com/api/telegram/webhook
 //   node scripts/set-telegram-webhook.mjs "https://your-domain.com/api/telegram/webhook <secret>"
 
-const fs = require("fs");
+import fs from "node:fs";
 
 function readEnv(key) {
   const raw = fs.existsSync(".env") ? fs.readFileSync(".env", "utf8") : "";
@@ -25,7 +25,7 @@ function readEnv(key) {
     console.error("TELEGRAM_BOT_TOKEN not found in .env");
     process.exit(1);
   }
-  const body = { url, allowed_updates: ["message"] };
+  const body = { url, allowed_updates: ["message", "callback_query"] };
   if (secret) body.secret_token = secret;
   const response = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
     method: "POST",
