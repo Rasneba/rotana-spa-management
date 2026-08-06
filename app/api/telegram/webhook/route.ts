@@ -81,6 +81,7 @@ const HELP_TEXT = [
   "Dagi Spa booking bot.",
   "",
   "Commands:",
+  "/menu - list pending bookings with action buttons",
   "/status <id> - check a web booking",
   "/approve <id> - approve (uses assigned or unique therapist/service)",
   "/approve <id> t:<therapist> s:<service> - approve with specific therapist & service (record ID or code)",
@@ -230,6 +231,26 @@ async function menuFlow(chatId: number, messageId: number | null, requestId: num
   return out(chatId, messageId, requestLines(request).join("\n"), menuKeyboard(requestId));
 }
 
+async function pendingListFlow(chatId: number, messageId: number | null): Promise<void> {
+  const result = await pool.query(
+    `SELECT id, full_name, treatment, branch, preferred_at, status
+     FROM website_booking_requests
+     WHERE status IN ('new','contacted')
+     ORDER BY created_at DESC
+     LIMIT 5`
+  );
+  if (result.rows.length === 0) return out(chatId, messageId, "No pending web bookings.");
+  const header = result.rows
+    .map((row, index) => `${index + 1}. #${row.id} ${row.full_name} — ${row.treatment} (${row.status})`)
+    .join("\n");
+  const keyboard: TelegramInlineKeyboard = result.rows.map((row) => [
+    { text: `✅ Approve #${row.id}`, callback_data: `approve:${row.id}` },
+    { text: `📋 Status #${row.id}`, callback_data: `status:${row.id}` },
+    { text: `❌ Decline #${row.id}`, callback_data: `decline:${row.id}` },
+  ]);
+  return out(chatId, messageId, `Pending bookings:\n${header}`, keyboard);
+}
+
 async function handleCallback(callback: JsonObject): Promise<void> {
   const data = typeof callback.data === "string" ? callback.data : "";
   const message = isObject(callback.message) ? callback.message : null;
@@ -274,6 +295,11 @@ async function handleTextMessage(chatId: number, from: JsonObject | null, text: 
   if (lower.startsWith("/start") || lower.startsWith("/help")) {
     await sendTelegramMessage(String(chatId), HELP_TEXT);
     return;
+  }
+
+  if (lower.startsWith("/menu")) {
+    if (!staff) return;
+    return pendingListFlow(chatId, null);
   }
 
   if (lower.startsWith("/status")) {
