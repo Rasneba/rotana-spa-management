@@ -4,6 +4,13 @@ function getApiKey() {
   return process.env.ADDISPAY_SECRET_KEY || "";
 }
 
+function missingKeyResponse(): { status: "failed"; message: string } {
+  return {
+    status: "failed",
+    message: "AddisPay API key not configured. Set ADDISPAY_SECRET_KEY (and ADDISPAY_API_URL for the correct environment).",
+  };
+}
+
 export interface AddisPayInitializeParams {
   amount: number;
   currency?: string;
@@ -28,6 +35,8 @@ export interface AddisPayResponse {
 }
 
 export async function createOrder(params: AddisPayInitializeParams): Promise<AddisPayResponse> {
+  const apiKey = getApiKey();
+  if (!apiKey) return missingKeyResponse();
   try {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const body = {
@@ -52,7 +61,7 @@ export async function createOrder(params: AddisPayInitializeParams): Promise<Add
 
     const res = await fetch(`${ADDISPAY_API}/checkout-api/v1/create-order`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json", Auth: getApiKey() },
+      headers: { "Content-Type": "application/json", Accept: "application/json", Auth: apiKey },
       body: JSON.stringify(body),
     });
     const text = await res.text();
@@ -70,10 +79,12 @@ export async function createOrder(params: AddisPayInitializeParams): Promise<Add
 }
 
 export async function checkStatus(uuid: string): Promise<{ status: string; data?: unknown; message: string }> {
+  const apiKey = getApiKey();
+  if (!apiKey) return { status: "failed", message: missingKeyResponse().message };
   try {
     const res = await fetch(`${ADDISPAY_API}/checkout-api/v1/transaction/check-status?uuid=${encodeURIComponent(uuid)}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json", Accept: "application/json", Auth: getApiKey() },
+      headers: { "Content-Type": "application/json", Accept: "application/json", Auth: apiKey },
     });
     const text = await res.text();
     let json: Record<string, unknown>;
