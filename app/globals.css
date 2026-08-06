@@ -1096,7 +1096,7 @@ textarea.form-control {
 .spa-schedule-page { min-height: 100%; max-width: 1600px; margin: 0 auto; padding: clamp(1.2rem, 2.5vw, 2.15rem); color: var(--spa-ink); }
 .spa-schedule-hero { display: flex; gap: 1.5rem; justify-content: space-between; align-items: flex-end; margin-bottom: 1.65rem; }
 .spa-eyebrow { display: inline-flex; align-items: center; gap: 0.38rem; color: #6d8674; font-size: 0.64rem; font-weight: 800; letter-spacing: 0.14em; }
-.spa-schedule-hero h1 { margin: 0.32rem 0 0.25rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.15rem, 3vw, 3.1rem); line-height: 1; font-weight: 400; letter-spacing: -0.06em; color: #243f34; }
+.spa-schedule-hero h3 { margin: 0.32rem 0 0.25rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.15rem, 3vw, 3.1rem); line-height: 1; font-weight: 400; letter-spacing: -0.06em; color: #243f34; }
 .spa-schedule-hero p { margin: 0; color: #738278; font-size: 0.78rem; }
 .spa-hero-actions { display: flex; gap: 0.65rem; align-items: center; }
 .schedule-primary-button, .schedule-today-button { min-height: 2.7rem; display: inline-flex; justify-content: center; align-items: center; gap: 0.45rem; border-radius: 0.7rem; padding: 0 1rem; font-size: 0.74rem; font-weight: 750; }

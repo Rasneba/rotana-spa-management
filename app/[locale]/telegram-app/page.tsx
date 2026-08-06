@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type TgWebApp = {
@@ -91,7 +92,7 @@ export default function TelegramAppPage() {
       webApp?.ready();
       webApp?.expand();
       let initData = "";
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 60; i++) {
         const current = window.Telegram?.WebApp?.initData ?? "";
         if (current) {
           initData = current;
@@ -232,6 +233,14 @@ export default function TelegramAppPage() {
 
   return (
     <>
+      <Script
+        src="https://telegram.org/js/telegram-web-app.js"
+        strategy="afterInteractive"
+        onReady={() => {
+          window.Telegram?.WebApp?.ready();
+          window.Telegram?.WebApp?.expand();
+        }}
+      />
       <div className="tg-app">
         <header className="tg-app__header">
           <div>
