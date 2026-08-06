@@ -89,3 +89,25 @@ export function verifyTelegramInitData(initData: string): InitDataResult {
     return { ok: false, reason: "missing_user" };
   }
 }
+
+// Temporary diagnostics to pin down a hash mismatch on the live bot.
+// Returns the parsed data_check_string for each strategy plus computed vs
+// received hash, so we can see exactly how they diverge.
+export function debugInitData(
+  initData: string
+): { manualCheck: string; urlsCheck: string; manualComputed: string; urlsComputed: string; receivedHash: string } | null {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return null;
+  const manual = buildCheckManual(initData);
+  const urls = buildCheckUrlSearch(initData);
+  if (!manual || !urls) return null;
+  const compute = (data: string) =>
+    crypto.createHmac("sha256", crypto.createHash("sha256").update(token).digest()).update(data).digest("hex");
+  return {
+    manualCheck: manual.dataCheckString,
+    urlsCheck: urls.dataCheckString,
+    manualComputed: compute(manual.dataCheckString),
+    urlsComputed: compute(urls.dataCheckString),
+    receivedHash: manual.hash,
+  };
+}

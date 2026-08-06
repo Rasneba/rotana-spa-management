@@ -52,6 +52,7 @@ const statusColors: Record<string, string> = {
 export default function TelegramAppPage() {
   const [phase, setPhase] = useState<Phase>("boot");
   const [error, setError] = useState("");
+  const [debugJson, setDebugJson] = useState("");
   const [token, setToken] = useState("");
   const [requests, setRequests] = useState<BookingRequest[]>([]);
   const [therapists, setTherapists] = useState<Therapist[]>([]);
@@ -111,6 +112,7 @@ export default function TelegramAppPage() {
         if (!res.ok) {
           setPhase(data.error === "Not authorized as staff" ? "denied" : "error");
           setError(data.error || "Unable to open session");
+          if (data.debug) setDebugJson(JSON.stringify(data.debug));
           return;
         }
         setToken(data.token);
@@ -278,6 +280,11 @@ export default function TelegramAppPage() {
                 ? `${window.Telegram.WebApp.initData.length} chars`
                 : "empty"}
             </p>
+            {debugJson && (
+              <pre className="tg-app__debug" style={{ textAlign: "left", fontSize: 10, whiteSpace: "pre-wrap", wordBreak: "break-all", maxWidth: "100%" }}>
+                {debugJson}
+              </pre>
+            )}
             <button className="tg-app__btn" onClick={() => location.reload()}>
               Retry
             </button>

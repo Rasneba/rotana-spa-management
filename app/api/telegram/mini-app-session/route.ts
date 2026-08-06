@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { verifyTelegramInitData } from "@/lib/telegram-auth";
+import { verifyTelegramInitData, debugInitData } from "@/lib/telegram-auth";
 import { createToken } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -42,7 +42,11 @@ export async function POST(req: Request) {
             : verified.reason === "expired"
               ? "Telegram session expired. Reopen the Mini App."
               : "Invalid Telegram session.";
-      return NextResponse.json({ error: message }, { status: 401 });
+      const extra =
+        verified.reason === "bad_hash"
+          ? { debug: debugInitData(initData) }
+          : {};
+      return NextResponse.json({ error: message, ...extra }, { status: 401 });
     }
     const tgUser = verified.user;
 
