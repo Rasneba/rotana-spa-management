@@ -263,6 +263,12 @@ export default function TelegramAppPage() {
             <strong>Error</strong>
             <p>{error}</p>
             <p className="tg-app__hint">Make sure you open this from the Telegram bot.</p>
+            <p className="tg-app__diag">
+              Telegram SDK: {typeof window !== "undefined" && window.Telegram ? "present" : "missing"} · initData:{" "}
+              {typeof window !== "undefined" && window.Telegram?.WebApp?.initData
+                ? `${window.Telegram.WebApp.initData.length} chars`
+                : "empty"}
+            </p>
             <button className="tg-app__btn" onClick={() => location.reload()}>
               Retry
             </button>
@@ -380,6 +386,7 @@ export default function TelegramAppPage() {
         .tg-app__state { text-align: center; padding: 48px 16px; }
         .tg-app__state strong { font-size: 16px; }
         .tg-app__state p { color: var(--tg-hint); font-size: 13px; }
+        .tg-app__diag { font-size: 11px; word-break: break-all; color: var(--tg-hint); }
         .tg-app__sheet { position: fixed; left: 0; right: 0; bottom: 0; background: var(--tg-bg); border-top: 1px solid var(--tg-sec); padding: 14px; border-radius: 16px 16px 0 0; max-height: 70vh; overflow: auto; box-shadow: 0 -4px 20px rgba(0,0,0,.12); }
         .tg-app__sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .tg-app__row { display: flex; justify-content: space-between; align-items: center; width: 100%; background: var(--tg-sec); border: 0; color: var(--tg-text); border-radius: 10px; padding: 12px; margin-bottom: 8px; font-size: 14px; cursor: pointer; }
