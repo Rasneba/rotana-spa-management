@@ -22,14 +22,13 @@ type NavItem = { label: string; id: string };
 const content = {
   en: {
     nav: [
-      { label: "About", id: "about" },
+      
       { label: "Treatments", id: "treatments" },
       { label: "Gallery", id: "gallery" },
-      { label: "Branches", id: "branches" },
       { label: "Map", id: "map" },
-      { label: "Reviews", id: "reviews" },
       { label: "Gift Cards", id: "gift-cards" },
       { label: "Booking", id: "booking" },
+      { label: "About", id: "about" },
     ] satisfies NavItem[],
     staff: "Staff Portal",
     heroKicker: "Discover Peace. Discover Dagi Spa.",
@@ -134,7 +133,7 @@ const detailedTreatments = [
     title: "Reflexology",
     am: "ሪፍሌክሶሎጂ",
     duration: "30–60 min",
-    image: "/dagi/yoly.png",
+    image: "/dagi/foot.jpg",
     details: ["Foot pressure points", "Circulation support", "Stress release", "Balance restoration"],
   },
 ];
@@ -258,7 +257,7 @@ export default function DagiLandingPage({ locale }: { locale: string }) {
           <div className="dagi-orbit" aria-hidden="true"><span /><span /><span /></div>
           <article className="dagi-hero-card" onMouseMove={handleTilt} onMouseLeave={resetTilt}>
             <div className="dagi-hero-card-glow" />
-            <img src="/dagi/massage.jpg" alt="Dagi Spa massage treatment" />
+            <img src="/dagi/hero.jpg" alt="Dagi Spa massage treatment" />
             <div className="dagi-card-caption">
               <small>Signature ritual</small>
               <strong>Massage • Moroccan Bath • Facial</strong>

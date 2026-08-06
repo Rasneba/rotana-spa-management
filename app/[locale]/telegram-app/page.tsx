@@ -1,6 +1,5 @@
 "use client";
 
-import Script from "next/script";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type TgWebApp = {
@@ -87,10 +86,20 @@ export default function TelegramAppPage() {
   );
 
   useEffect(() => {
-    webApp?.ready();
-    webApp?.expand();
-    const initData = webApp?.initData ?? "";
-    (async () => {
+    let cancelled = false;
+    const boot = async () => {
+      webApp?.ready();
+      webApp?.expand();
+      let initData = "";
+      for (let i = 0; i < 30; i++) {
+        const current = window.Telegram?.WebApp?.initData ?? "";
+        if (current) {
+          initData = current;
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      if (cancelled) return;
       try {
         const res = await fetch("/api/telegram/mini-app-session", {
           method: "POST",
@@ -107,10 +116,16 @@ export default function TelegramAppPage() {
         setPhase("ready");
         await loadData(data.token);
       } catch {
-        setPhase("error");
-        setError("Network error");
+        if (!cancelled) {
+          setPhase("error");
+          setError("Network error");
+        }
       }
-    })();
+    };
+    boot();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -217,7 +232,6 @@ export default function TelegramAppPage() {
 
   return (
     <>
-      <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
       <div className="tg-app">
         <header className="tg-app__header">
           <div>

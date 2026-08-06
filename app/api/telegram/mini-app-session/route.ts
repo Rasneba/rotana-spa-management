@@ -31,8 +31,20 @@ export async function POST(req: Request) {
     if (!isObject(body)) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
     const initData = typeof body.initData === "string" ? body.initData : "";
-    const tgUser = verifyTelegramInitData(initData);
-    if (!tgUser) return NextResponse.json({ error: "Invalid Telegram session" }, { status: 401 });
+    const verified = verifyTelegramInitData(initData);
+    if (!verified.ok) {
+      if (process.env.NODE_ENV !== "production") console.error("mini-app-session verify failed:", verified.reason);
+      const message =
+        verified.reason === "missing_init_data"
+          ? "No Telegram session found. Open this from the bot menu button in Telegram."
+          : verified.reason === "bad_hash"
+            ? "Session verification failed (hash mismatch)."
+            : verified.reason === "expired"
+              ? "Telegram session expired. Reopen the Mini App."
+              : "Invalid Telegram session.";
+      return NextResponse.json({ error: message }, { status: 401 });
+    }
+    const tgUser = verified.user;
 
     const chatIds = staffList("TELEGRAM_STAFF_CHAT_ID");
     const usernames = staffList("TELEGRAM_STAFF_USERNAMES");
