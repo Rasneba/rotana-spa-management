@@ -49,14 +49,26 @@ function buildCheckUrlSearch(initData: string): CheckPair | null {
   }
 }
 
-function hashMatches(dataCheckString: string, expected: string, token: string): boolean {
-  const secretKey = crypto.createHash("sha256").update(token).digest();
-  const computed = crypto.createHmac("sha256", secretKey).update(dataCheckString).digest("hex");
-  return computed === expected.toLowerCase();
+function hmacSha256(secret: Buffer, data: string): string {
+  return crypto.createHmac("sha256", secret).update(data).digest("hex");
 }
 
-// Verifies the Telegram WebApp initData signature using the bot token
-// (HMAC-SHA256 of the sorted data_check_string keyed with SHA256(bot_token)).
+function hashMatches(dataCheckString: string, expected: string, token: string): boolean {
+  const expectedLower = expected.toLowerCase();
+  // Mini Apps (menu button / main web app / direct links) sign with
+  // HMAC-SHA256(secret = HMAC-SHA256(key="WebAppData", message=bot_token)).
+  const miniAppSecret = crypto.createHmac("sha256", "WebAppData").update(token).digest();
+  if (hmacSha256(miniAppSecret, dataCheckString) === expectedLower) return true;
+  // Legacy WebApp launches sign with SHA256(bot_token) instead.
+  const legacySecret = crypto.createHash("sha256").update(token).digest();
+  return hmacSha256(legacySecret, dataCheckString) === expectedLower;
+}
+
+// Verifies the Telegram WebApp initData signature using the bot token.
+// Two signing schemes are accepted:
+//  - Mini Apps (menu button / main web app / direct links):
+//    HMAC-SHA256(data_check_string, HMAC-SHA256(key="WebAppData", message=bot_token))
+//  - Legacy WebApp launches: HMAC-SHA256(data_check_string, SHA256(bot_token))
 export function verifyTelegramInitData(initData: string): InitDataResult {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) return { ok: false, reason: "bad_hash" };
@@ -88,26 +100,4 @@ export function verifyTelegramInitData(initData: string): InitDataResult {
   } catch {
     return { ok: false, reason: "missing_user" };
   }
-}
-
-// Temporary diagnostics to pin down a hash mismatch on the live bot.
-// Returns the parsed data_check_string for each strategy plus computed vs
-// received hash, so we can see exactly how they diverge.
-export function debugInitData(
-  initData: string
-): { manualCheck: string; urlsCheck: string; manualComputed: string; urlsComputed: string; receivedHash: string } | null {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return null;
-  const manual = buildCheckManual(initData);
-  const urls = buildCheckUrlSearch(initData);
-  if (!manual || !urls) return null;
-  const compute = (data: string) =>
-    crypto.createHmac("sha256", crypto.createHash("sha256").update(token).digest()).update(data).digest("hex");
-  return {
-    manualCheck: manual.dataCheckString,
-    urlsCheck: urls.dataCheckString,
-    manualComputed: compute(manual.dataCheckString),
-    urlsComputed: compute(urls.dataCheckString),
-    receivedHash: manual.hash,
-  };
 }
